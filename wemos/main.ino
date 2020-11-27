@@ -6,7 +6,7 @@ const char* password = "Cholera";
 void setup() {
 
     WiFi.softAP("ESPsoftAP_Anus", "pass-to-soft-AP");
- 
+
 }
  
 void loop() {
