@@ -1,0 +1,4 @@
+https://www.w3schools.com/php/php_ref_network.asp
+https://www.w3schools.com/php/func_network_fsockopen.asp
+https://www.php.net/manual/en/book.sockets.php
+
