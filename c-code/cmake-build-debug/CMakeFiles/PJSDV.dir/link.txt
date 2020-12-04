@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/PJSDV.dir/main.cpp.o  -o PJSDV 

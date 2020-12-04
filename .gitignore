@@ -31,4 +31,8 @@
 *.out
 *.app
 
+# IDE
 .idea
+*cmake*
+*CMake*
+
