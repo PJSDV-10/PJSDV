@@ -36,3 +36,6 @@
 *cmake*
 *CMake*
 
+# makefile
+out/*
+
