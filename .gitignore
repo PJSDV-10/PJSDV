@@ -35,6 +35,7 @@
 .idea
 *cmake*
 *CMake*
+.vscode
 
 # makefile
 out/*

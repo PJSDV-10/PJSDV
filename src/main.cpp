@@ -1,6 +1,10 @@
-#include <iostream>
+#include "websocket.h"
 
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+int main(){
+    SocketServer sv(8080);
+    sv.ListenAndAccept();
+
+    const char* msg = "Hello, this is a message from the server!";
+    sv.sendMessage(msg);
+
 }
