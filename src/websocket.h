@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include <cstring>
 #include <sys/socket.h> 
 #include <stdlib.h> 
@@ -36,6 +37,7 @@ private:
 public:
     SocketServer(int port);
     void ListenAndAccept();
+    void printMessage();
     void sendMessage(const char* msg);
 };
 

@@ -49,6 +49,12 @@ void SocketServer::ListenAndAccept(){
     }
 }
 
+void SocketServer::printMessage(){
+    char buffer[1024] = {0};
+    recv(remote_fd, buffer, 1024, 0); 
+    std::cout << "Data read:\n" << buffer << std::endl;
+}
+
 void SocketServer::sendMessage(const char* msg){
     int len = strlen(msg);
     int flags = 0;
