@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <unistd.h>
+#include <errno.h>
 #include <sys/socket.h> 
 #include <stdlib.h> 
 #include <sys/types.h>
@@ -39,6 +41,7 @@ public:
     void ListenAndAccept();
     void printMessage();
     void sendMessage(const char* msg);
+    void closeAll();
 };
 
 

@@ -26,11 +26,18 @@ SocketServer::SocketServer(int port){
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
     }
+    int yes = 1;
+
+    if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes)){
+        perror("Failed setting \"Reuse Address\" option for socket");
+        exit(EXIT_FAILURE);
+    }
 
     if(bind(server_fd, serverInfo->ai_addr, serverInfo->ai_addrlen)){
         perror("Binding to port failed");
         exit(EXIT_FAILURE);
     }
+    freeaddrinfo(serverInfo);
 }
 
 
@@ -59,6 +66,17 @@ void SocketServer::sendMessage(const char* msg){
     int len = strlen(msg);
     int flags = 0;
     send(remote_fd, &msg, len, flags);
+}
+
+void SocketServer::closeAll(){
+    if(close(remote_fd)){
+        perror("Closing remote socket failed");
+        exit(EXIT_FAILURE);
+    }
+    if(close(server_fd)){
+        perror("Closing listening socket failed");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void SocketServer::fillInHints(){
