@@ -127,16 +127,18 @@ void SocketServer::fillInHints()
 
 void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen_t addr_size)
 {
-    const char *httpInfo = sendHTTPInfo();
-    if (send(fd, sendHTTPInfo(), strlen(httpInfo), 0))
+    const char *msg = sendHTTPInfo();
+    char httpHeader[strlen(msg)];
+    strncpy(httpHeader, msg, strlen(msg));
+    if (send(fd, httpHeader, strlen(httpHeader), 0))
     {
         perror("Failed sending http header");
         exit(EXIT_FAILURE);
     }
-    char msgBuf[2000] = {0};
+    char msgBuf[2000];
     while (true)
     {
-        msgBuf[2000] = {0};
+        memset(msgBuf, 0, 2000);
         if (recv(fd, msgBuf, strlen(msgBuf), 0))
         {
             perror("Failed receiving data");
@@ -153,6 +155,7 @@ void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen
         {
             if (parsed.at("Connection") == "Close")
             {
+                std::cout << "Closing connection" << std::endl;
                 close(fd);
                 return;
             }
@@ -175,6 +178,7 @@ const char *SocketServer::sendHTTPInfo()
     header += "Upgrade: websocket";
     header += "Connection: Upgrade";
     const char *msg = header.c_str();
+
     return msg;
 }
 
@@ -188,6 +192,11 @@ std::map<std::string, std::string> SocketServer::parseHTTPHeader(const char *h)
     ptr = header.begin();
     int counter = 0;
     int ptr_pos_counter = 0;
+
+    if (!strncasecmp(h, "GET", 3))
+    {
+        std::cout << "Bruh that ain't a get request" << std::endl;
+    }
 
     while (true)
     {
