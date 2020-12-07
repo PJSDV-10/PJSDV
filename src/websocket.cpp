@@ -135,15 +135,11 @@ void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen
         perror("Failed sending http header");
         exit(EXIT_FAILURE);
     }
-    char msgBuf[2000];
+    char msgBuf[1024] = {0};
     while (true)
     {
         //memset(msgBuf, 0, 2000);
-        if (recv(fd, msgBuf, sizeof msgBuf, 0))
-        {
-            perror("Failed receiving data");
-            exit(EXIT_FAILURE);
-        }
+        recv(fd, msgBuf, 1024, 0);
         std::cout << "Received Message: \n"
                   << msgBuf << std::endl;
         std::map<std::string, std::string> parsed = parseHTTPHeader(msgBuf);
