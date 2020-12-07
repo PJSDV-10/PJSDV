@@ -64,7 +64,7 @@ void SocketServer::ListenAndAccept()
     /* Set the addr_size to the size of the their_addr sockaddr struct. This is a little off from how it's supposed to be though. The their_addr struct is not supposed to be a sockaddr but a sockaddr_storage, but I couldn't get this to work. 
     The accept() function is blocking here and waits for an incoming signal. It then creates a new socket called remote_fd. This is a new socket that can be used. The old server_fd is still listening. Normally this would be put into an accept loop and the processes would then be handled by forks or other threads. */
     addr_size = sizeof(their_addr);
-    remote_fd = accept(server_fd, &their_addr, &addr_size);
+    remote_fd = accept(server_fd, (struct sockaddr *)&their_addr, &addr_size);
 
     if (remote_fd == -1)
     {

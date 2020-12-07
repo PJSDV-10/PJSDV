@@ -24,7 +24,7 @@ private:
 
     struct Connections conns[20];*/
 
-    struct sockaddr their_addr;
+    struct sockaddr_in their_addr;
     socklen_t addr_size;
     int remote_fd;
 
