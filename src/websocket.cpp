@@ -78,8 +78,9 @@ void SocketServer::printMessage()
 {
     char buffer[1024] = {0};
     recv(remote_fd, buffer, 1024, 0);
-    std::cout << "Data read:\n"
-              << buffer << std::endl;
+    //std::cout << "Data read:\n"
+    //          << buffer << std::endl;
+    printf("%s\n",buffer ); 
 }
 
 /* Sends a message to the remote host. */
