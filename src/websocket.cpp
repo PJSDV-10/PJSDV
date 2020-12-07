@@ -127,19 +127,19 @@ void SocketServer::fillInHints()
 
 void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen_t addr_size)
 {
-    const char *acceptMsg = "Source:Server,Action:Accept\n\r";
+    /*const char *acceptMsg = "Source:Server,Action:Accept\n\r";
     if (send(fd, acceptMsg, strlen(acceptMsg), 0) == -1)
     {
         perror("Failed sending accept message");
         exit(EXIT_FAILURE);
-    }
+    }*/
     char msgBuf[1024] = {0};
     while (true)
     {
         memset(msgBuf, 0, 1024);
         recv(fd, msgBuf, 1024, 0);
-        std::cout << "Received Message: \n"
-                  << msgBuf << std::endl;
+        std::cout << "Received Message: \n\""
+                  << msgBuf << "\"" << std::endl;
         std::map<std::string, std::string> parsed = parseMessage(msgBuf);
         try
         {
