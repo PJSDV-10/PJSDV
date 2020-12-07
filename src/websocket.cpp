@@ -34,7 +34,7 @@ SocketServer::SocketServer(int port)
 
     /*This is a little setting we need to change. If we don't set SO_REUSEADDR to true then the program during bind() might get blocked because the port might already be bound. This can happen if we run this program a couple times in succession.*/
     int yes = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_KEEPALIVE, &yes, sizeof yes))
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT | SO_KEEPALIVE, &yes, sizeof yes))
     {
         perror("Failed setting \"Reuse Address\" option for socket");
         exit(EXIT_FAILURE);
@@ -71,8 +71,9 @@ void SocketServer::ListenAndAccept()
     {
         if ((r_fd = accept(server_fd, (struct sockaddr *)&their_addr, &addr_size)))
         {
-            std::thread monitor(&SocketServer::monitorSocket, this, r_fd, their_addr, addr_size);
-            threads.emplace_back(&monitor);
+            //std::thread monitor(&SocketServer::monitorSocket, this, r_fd, their_addr, addr_size);
+            //threads.emplace_back(&monitor);
+            monitorSocket(r_fd, their_addr, addr_size);
         }
     }
 
@@ -127,7 +128,7 @@ void SocketServer::fillInHints()
 void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen_t addr_size)
 {
     const char *httpInfo = sendHTTPInfo();
-    if (send(fd, sendHTTPInfo(), sizeof httpInfo, 0))
+    if (send(fd, sendHTTPInfo(), strlen(httpInfo), 0))
     {
         perror("Failed sending http header");
         exit(EXIT_FAILURE);
@@ -136,7 +137,7 @@ void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen
     while (true)
     {
         msgBuf[2000] = {0};
-        if (recv(fd, msgBuf, sizeof msgBuf, 0))
+        if (recv(fd, msgBuf, strlen(msgBuf), 0))
         {
             perror("Failed receiving data");
             exit(EXIT_FAILURE);
