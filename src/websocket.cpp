@@ -136,27 +136,32 @@ void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen
     char msgBuf[1024] = {0};
     while (true)
     {
+        memset(msgBuf, 0, 1024);
         recv(fd, msgBuf, 1024, 0);
         std::cout << "Received Message: \n"
                   << msgBuf << std::endl;
         std::map<std::string, std::string> parsed = parseMessage(msgBuf);
         try
         {
-            if (parsed.at("Function") == "Close")
+            std::string func = parsed.at("Function");
+            if (func == "Close")
             {
                 std::cout << "Closing connection with remote" << std::endl;
                 close(fd);
                 return;
             }
-            else
+            else if (func == "KA")
             {
+                std::cout << "Keeping alive." << std::endl;
+                send(fd, "OK", 2, 0);
                 continue;
             }
         }
         catch (const std::out_of_range &oor)
         {
             std::cout << "oh no" << std::endl;
-            break;
+            send(fd, "Error", 5, 0);
+            continue;
         }
     }
     return;
@@ -174,12 +179,11 @@ std::map<std::string, std::string> SocketServer::parseMessage(const char *h)
     size_t start = 0;
     size_t pos = 0;
     size_t pos2 = 0;
-    size_t end = 0;
     while (true)
     {
         if (msg == "")
         {
-            break;
+            return {};
         }
         else if ((pos = msg.find(delim)) != std::string::npos)
         {
@@ -197,6 +201,10 @@ std::map<std::string, std::string> SocketServer::parseMessage(const char *h)
                 start = pos + 1;
                 continue;
             }
+            else
+            {
+                return {};
+            }
         }
         else if ((pos = msg.find(ending)) != std::string::npos)
         {
@@ -208,10 +216,14 @@ std::map<std::string, std::string> SocketServer::parseMessage(const char *h)
                 parsed.emplace(tmpkey, tmpval);
                 break;
             }
+            else
+            {
+                return {};
+            }
         }
         else
         {
-            break;
+            return {};
         }
     }
     return parsed;
