@@ -34,7 +34,7 @@ SocketServer::SocketServer(int port)
 
     /*This is a little setting we need to change. If we don't set SO_REUSEADDR to true then the program during bind() might get blocked because the port might already be bound. This can happen if we run this program a couple times in succession.*/
     int yes = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes))
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_KEEPALIVE, &yes, sizeof yes))
     {
         perror("Failed setting \"Reuse Address\" option for socket");
         exit(EXIT_FAILURE);
@@ -63,10 +63,20 @@ void SocketServer::ListenAndAccept()
 
     /* Set the addr_size to the size of the their_addr sockaddr struct. This is a little off from how it's supposed to be though. The their_addr struct is not supposed to be a sockaddr but a sockaddr_storage, but I couldn't get this to work. 
     The accept() function is blocking here and waits for an incoming signal. It then creates a new socket called remote_fd. This is a new socket that can be used. The old server_fd is still listening. Normally this would be put into an accept loop and the processes would then be handled by forks or other threads. */
+    struct sockaddr_in their_addr;
+    socklen_t addr_size;
+    int r_fd;
     addr_size = sizeof(their_addr);
-    remote_fd = accept(server_fd, (struct sockaddr *)&their_addr, &addr_size);
+    while (accepting)
+    {
+        if ((r_fd = accept(server_fd, (struct sockaddr *)&their_addr, &addr_size)))
+        {
+            std::thread monitor(&SocketServer::monitorSocket, this, r_fd, their_addr, addr_size);
+            threads.emplace_back(&monitor);
+        }
+    }
 
-    if (remote_fd == -1)
+    if (r_fd == -1)
     {
         perror("Accepting failed");
         exit(EXIT_FAILURE);
@@ -78,8 +88,9 @@ void SocketServer::printMessage()
 {
     char buffer[1024] = {0};
     recv(remote_fd, buffer, 1024, 0);
-    std::cout << "Data read:\n" << buffer << std::endl;
-    //printf("%s\n",buffer ); 
+    std::cout << "Data read:\n"
+              << buffer << std::endl;
+    //printf("%s\n",buffer );
 }
 
 /* Sends a message to the remote host. */
@@ -93,11 +104,6 @@ void SocketServer::sendMessage(char msg[])
 /* Closes the sockets. This will be made cleaner later once I figure out how it works exactly. */
 void SocketServer::closeAll()
 {
-    if (close(remote_fd))
-    {
-        perror("Closing remote socket failed");
-        exit(EXIT_FAILURE);
-    }
     if (close(server_fd))
     {
         perror("Closing listening socket failed");
@@ -116,4 +122,93 @@ void SocketServer::fillInHints()
     hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+}
+
+void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen_t addr_size)
+{
+    const char *httpInfo = sendHTTPInfo();
+    if (send(fd, sendHTTPInfo(), sizeof httpInfo, 0))
+    {
+        perror("Failed sending http header");
+        exit(EXIT_FAILURE);
+    }
+    char msgBuf[2000] = {0};
+    while (true)
+    {
+        msgBuf[2000] = {0};
+        if (recv(fd, msgBuf, sizeof msgBuf, 0))
+        {
+            perror("Failed receiving data");
+            exit(EXIT_FAILURE);
+        }
+        std::cout << "Received Message: \n"
+                  << msgBuf << std::endl;
+        std::map<std::string, std::string> parsed = parseHTTPHeader(msgBuf);
+        for (auto &kv : parsed)
+        {
+            std::cout << "KEY: `" << kv.first << "`, VALUE: `" << kv.second << '`' << std::endl;
+        }
+        try
+        {
+            if (parsed.at("Connection") == "Close")
+            {
+                close(fd);
+                return;
+            }
+            else if (parsed.at("Connection") == "Upgrade")
+            {
+                setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof opt);
+            }
+        }
+        catch (const std::out_of_range &oor)
+        {
+            std::cout << "The element \"Connection\" was not send (or there is a bug in parsing)" << std::endl;
+        }
+    }
+}
+
+const char *SocketServer::sendHTTPInfo()
+{
+    std::string header;
+    header = "HTTP/1.1 101 Switching Protocols";
+    header += "Upgrade: websocket";
+    header += "Connection: Upgrade";
+    const char *msg = header.c_str();
+    return msg;
+}
+
+std::map<std::string, std::string> SocketServer::parseHTTPHeader(const char *h)
+{
+    std::map<std::string, std::string> parsed;
+    std::string header = h;
+    //std::string ending = "\n\r";
+    //std::string final = "\n\r\n\r";
+    std::string::iterator ptr, pptr;
+    ptr = header.begin();
+    int counter = 0;
+    int ptr_pos_counter = 0;
+
+    while (true)
+    {
+        if (*ptr == '\r')
+        {
+            if (*(ptr + 1) == '\n')
+            {
+                std::string tmpkey, tmpval;
+                std::string::size_type index;
+                index = header.find(':', counter);
+                tmpkey = header.substr(counter, index);
+                tmpval = header.substr(index + 1, ptr_pos_counter - index);
+                parsed.emplace(tmpkey, tmpval);
+                if (*(ptr + 2) == '\r')
+                {
+                    break;
+                }
+                counter = ptr_pos_counter + 2;
+                ptr = ptr + 2;
+            }
+        }
+        ptr_pos_counter++;
+    }
+    return parsed;
 }
