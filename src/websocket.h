@@ -30,7 +30,7 @@ private:
     void listenFunc(int &server_fd);
     void fillInHints();
     const char *sendHTTPInfo();
-    std::map<std::string, std::string> parseHTTPHeader(const char *h);
+    std::map<std::string, std::string> parseMessage(const char *h);
 
 public:
     SocketServer(int port);

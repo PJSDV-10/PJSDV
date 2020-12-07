@@ -127,95 +127,92 @@ void SocketServer::fillInHints()
 
 void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen_t addr_size)
 {
-    const char *msg = sendHTTPInfo();
-    char httpHeader[strlen(msg)];
-    strncpy(httpHeader, msg, strlen(msg));
-    if (send(fd, httpHeader, strlen(httpHeader), 0))
+    const char *acceptMsg = "Source:Server,Action:Accept\n\r";
+    if (send(fd, acceptMsg, strlen(acceptMsg), 0) == -1)
     {
-        perror("Failed sending http header");
+        perror("Failed sending accept message");
         exit(EXIT_FAILURE);
     }
     char msgBuf[1024] = {0};
     while (true)
     {
-        //memset(msgBuf, 0, 2000);
         recv(fd, msgBuf, 1024, 0);
         std::cout << "Received Message: \n"
                   << msgBuf << std::endl;
-        std::map<std::string, std::string> parsed = parseHTTPHeader(msgBuf);
-        for (auto &kv : parsed)
-        {
-            std::cout << "KEY: `" << kv.first << "`, VALUE: `" << kv.second << '`' << std::endl;
-        }
+        std::map<std::string, std::string> parsed = parseMessage(msgBuf);
         try
         {
-            if (parsed.at("Connection") == "Close")
+            if (parsed.at("Function") == "Close")
             {
-                std::cout << "Closing connection" << std::endl;
+                std::cout << "Closing connection with remote" << std::endl;
                 close(fd);
                 return;
             }
-            else if (parsed.at("Connection") == "Upgrade")
+            else
             {
-                setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof opt);
+                continue;
             }
         }
         catch (const std::out_of_range &oor)
         {
-            std::cout << "The element \"Connection\" was not send (or there is a bug in parsing)" << std::endl;
+            std::cout << "oh no" << std::endl;
+            break;
         }
     }
+    return;
 }
 
-const char *SocketServer::sendHTTPInfo()
-{
-    std::string header;
-    header = "HTTP/1.1 101 Switching Protocols";
-    header += "Upgrade: websocket";
-    header += "Connection: Upgrade";
-    const char *msg = header.c_str();
-
-    return msg;
-}
-
-std::map<std::string, std::string> SocketServer::parseHTTPHeader(const char *h)
+std::map<std::string, std::string> SocketServer::parseMessage(const char *h)
 {
     std::map<std::string, std::string> parsed;
-    std::string header = h;
-    //std::string ending = "\n\r";
-    //std::string final = "\n\r\n\r";
-    std::string::iterator ptr, pptr;
-    ptr = header.begin();
-    int counter = 0;
-    int ptr_pos_counter = 0;
+    std::string::iterator ptr;
+    std::string msg = h;
+    std::string delim = ",";
+    std::string idelim = ":";
+    std::string ending = "\r\n";
 
-    if (!strncasecmp(h, "GET", 3))
-    {
-        std::cout << "Bruh that ain't a get request" << std::endl;
-    }
-
+    size_t start = 0;
+    size_t pos = 0;
+    size_t pos2 = 0;
+    size_t end = 0;
     while (true)
     {
-        if (*ptr == '\r')
+        if (msg == "")
         {
-            if (*(ptr + 1) == '\n')
+            break;
+        }
+        else if ((pos = msg.find(delim)) != std::string::npos)
+        {
+            if ((pos2 = msg.find(idelim)) != std::string::npos)
             {
                 std::string tmpkey, tmpval;
-                std::string::size_type index;
-                index = header.find(':', counter);
-                tmpkey = header.substr(counter, index);
-                tmpval = header.substr(index + 1, ptr_pos_counter - index);
+                /* 
+             Start  pos2  pos
+                |     |    |
+                Source:Host,Function:Accept\n\r
+                 */
+                tmpkey = msg.substr(start, pos2);
+                tmpval = msg.substr(pos2 + 1, (pos - (pos2 + 1)));
                 parsed.emplace(tmpkey, tmpval);
-                if (*(ptr + 2) == '\r')
-                {
-                    break;
-                }
-                counter = ptr_pos_counter + 2;
-                ptr = ptr + 2;
+                start = pos + 1;
+                continue;
             }
         }
-        ptr_pos_counter++;
-        ptr = ptr + 1;
+        else if ((pos = msg.find(ending)) != std::string::npos)
+        {
+            if ((pos2 = msg.find(idelim)) != std::string::npos)
+            {
+                std::string tmpkey, tmpval;
+                tmpkey = msg.substr(start, pos2);
+                tmpval = msg.substr(pos2 + 1, (pos - (pos2 + 1)));
+                parsed.emplace(tmpkey, tmpval);
+                break;
+            }
+        }
+        else
+        {
+            break;
+        }
     }
     return parsed;
 }
