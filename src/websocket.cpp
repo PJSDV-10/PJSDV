@@ -83,11 +83,11 @@ void SocketServer::printMessage()
 }
 
 /* Sends a message to the remote host. */
-void SocketServer::sendMessage(const char *msg)
+void SocketServer::sendMessage(char msg[])
 {
     int len = strlen(msg);
     int flags = 0;
-    send(remote_fd, &msg, len, flags);
+    send(remote_fd, msg, len, flags);
 }
 
 /* Closes the sockets. This will be made cleaner later once I figure out how it works exactly. */

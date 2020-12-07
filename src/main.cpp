@@ -6,7 +6,7 @@ int main(){
     sv.ListenAndAccept();
     sv.printMessage();
 
-    const char* msg = "Hello, this is a message from the server!";
+    char msg[] = "Hello, this is a message from the server!";
     sv.sendMessage(msg);
     sv.closeAll();
 

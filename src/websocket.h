@@ -41,7 +41,7 @@ public:
     SocketServer(int port);
     void ListenAndAccept();
     void printMessage();
-    void sendMessage(const char* msg);
+    void sendMessage(char msg[]);
     void closeAll();
 };
 
