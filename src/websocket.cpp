@@ -138,8 +138,8 @@ void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen
     char msgBuf[2000];
     while (true)
     {
-        memset(msgBuf, 0, 2000);
-        if (recv(fd, msgBuf, strlen(msgBuf), 0))
+        //memset(msgBuf, 0, 2000);
+        if (recv(fd, msgBuf, sizeof msgBuf, 0))
         {
             perror("Failed receiving data");
             exit(EXIT_FAILURE);
@@ -219,6 +219,7 @@ std::map<std::string, std::string> SocketServer::parseHTTPHeader(const char *h)
             }
         }
         ptr_pos_counter++;
+        ptr = ptr + 1;
     }
     return parsed;
 }
