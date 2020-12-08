@@ -75,12 +75,11 @@ void SocketServer::ListenAndAccept()
             //threads.emplace_back(&monitor);
             monitorSocket(r_fd, their_addr, addr_size);
         }
-    }
-
-    if (r_fd == -1)
-    {
-        perror("Accepting failed");
-        exit(EXIT_FAILURE);
+        if (r_fd == -1)
+        {
+            perror("Accepting failed");
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -136,7 +135,7 @@ void SocketServer::monitorSocket(int fd, struct sockaddr_in remote_addr, socklen
     char msgBuf[1024] = {0};
     while (true)
     {
-        memset(msgBuf, 0, 1024);
+        strncpy(msgBuf, "", 0);
         recv(fd, msgBuf, 1024, 0);
         std::cout << "Received Message: \n\""
                   << msgBuf << "\"" << std::endl;
