@@ -1,0 +1,173 @@
+This document outlines the communication protocol used for the communication between the server and client devices.
+In this document the different functions and ways of controlling the device, asking the server for information and authentication are explained.
+The order of communication is very strict and therefor needs to be outlined. It is very important to adhere very strictly to this document.
+
+
+The communication between a client and the server is started as follows
+
+    Client ---> Server      (Auth:password,Name:AnyName,Type:TypeOfDevice,Control:ControlType,AOP:AmountOfPinsInteger,Pins:{3;4;5;2})
+                   |
+    Client <--- Server      (Name:DeviceName,Function:OK)
+       |
+    Client ---> Server      (Auth:password,Name:AnyName,Function:OK)
+
+
+The client sends a couple things:
+    - An authentication password, this is hardcoded or in a database idc.
+    - The name by which to identify the device. This has to be unique and can be something like "TempSensor" or "BlindsController".
+        This name is then saved in a table on the server side. It's used to identify different clients.
+    - The type of device. This specifies what the device is capable of. The different options are worked out later.
+        It's also saved alongside the name
+    - The control type of the device. This also tells the server what the device can do. For example it can be a boolean type for a light switch, or a slider for the blinds.
+        It's again also saved alongside the name of the device.
+    - Optionally if the ControlType requires it, the amount of pins has to be specified as well.
+    - If the amount of pins needs to be specified, then an array of pins has to be as well. This is done by opening and closing with curly brackets, and then separating by ;.
+
+        Error possibilities:
+            - Wrong password:
+                In case of a wrong password the server will send the following:
+                    - Function:ERR,Error:WrongPass
+                        The client is expected to send the correct password next time.
+
+            - Client of same name already exists in table:
+                If another client is already registered with the same name then the server will refuse the connection.
+                The client has no way of deleting another entry in the client-table so it will need to get another name.
+                In case of the client having been disconnected and needing to reconnect, refer to the keep-alive section of this document.
+                The server will send the following message to the client:
+                    - Function:ERR,Error:ClientExists
+                        The client is then expected to find a different name.
+
+            - Any invalid type:
+                If the Type or Control is wrong:
+                    - Function:ERR,Error:WrongType|WrongControl|MissingData
+                        The client is expected to fix this.
+    
+
+
+The server then acknowledges the device if the name doesn't already match up with another device by sending:
+    - The received name of the client
+    - Function:OK
+        This essentially means that the server has acknowledged the connection and has put the client into the table.
+        
+
+    
+The client then finally sends another message to acknowledge that:
+    - Authentication password  
+    - Name of the clients
+    - Function:OK  
+        Coming from the client side this is another acknowledgement and means the client is keeping the connection alive.
+
+        Error possibilities:
+            - Client submits wrong name. The server will follow this up with a:
+                - Function:ERR,Error:NOA
+                    NOA stands for Not Our Agreement. The client will retry and be less of a dick.
+
+
+
+The keep-alive
+
+If the client ever turns off then the server will only know about it by the connection being cut off. Other errors might leave the client's name in the client-table.
+Therefor every 5 seconds the client will send a keep alive message. The server will then respond and they will continue listening like normal.
+If the server does not receive a keep alive message from the client for 15 seconds, the connection will be broken by the server if it wasn't already.
+The socket will be closed and the entry in the client-table will be removed.
+The client will then be able to reconnect.
+
+The successful exchange will look like this:
+
+    Client ---> Server      (Auth:password,Name:ClientName,Function:KA)
+                   |
+    Client <--- Server      (Name:ClientName,Function:KA)
+    
+
+
+Graceful disconnect
+
+The client and the server should both be able to terminate a connection. The client and server can both send the same function to achieve this.
+
+    Client ---> Server      (Auth:password,Name:ClientName,Function:Close)
+                   |
+    Client <--- Server      (close(function_descriptor))
+
+The connection will be closed then. This won't happen often.
+
+
+The function list
+
+The universal list of functions that can be sent to both client and server is as follows:
+    - KA (keep-alive)
+    - Close (close connection)
+    - OK (acknowledge, depends on situation)
+    - ERR (requires type)
+    - tbd
+
+The following list only applies for functions that can be sent from the client to the server:
+    - CTRL (control a different client)
+    - GET (get data from a sensor client)
+    - GETALL (gets data from all the connected clients, excluding front-end clients. This is only to be called by the front-end)
+    - RESP (client responds to a request by the server, see special instructions for more info)
+    - tbd
+
+The following list is of functions that the server can give a client to execute:
+    - GET (requires type and possibly content. gets data from the receiving client)
+    - CTRL (requires type and possibly content. controls a controlling client)
+    - tbd
+
+
+The type list
+
+This list outlines the different types a client can be. This is important for the front-end, because it allows the front-end to know what type of controller to display. (eg. slider or button)
+This is requires during the authentication.
+
+    - Sensor (can only send data to the server)
+    - Actuator (can only control a device)
+    - Combi (can both read a sensor and control a device)
+    - Frontend (is the front-end webpage)
+
+
+The error types
+
+Alongside the "Function:ERR" will be an Error datatype to allow the client to identify it's mistake. The different options are as follows:
+
+    - WrongPass (wrong password)
+    - ClientExists (clientname already in server client-table)
+    - NOA  (not the agreement the server agreed to)
+    - WrongType (the type specified by the client on connection is wrong)
+    - WrongControl (the control type specified by the client on connection doesn't exist or doesn't match the type)
+    - WrongFunction (the specified function doesn't exist)
+    - CNTS (client not that smart. The client specified by the front-end can't perform the specified function)
+    - tbd
+
+
+The control types
+
+This is a list of the different control types a client can accept. Of course an actuator can actuate things, but how? 
+By specifying it's a BOOL type, both the server and front-end can know what kinds of actions a client can perform, in this case actuate something to be on or off.
+
+    - BOOL (client can actuate an actuator to be on or off)
+    - PWM (the client can perform a PWM function)
+    - MULTIBOOL (the client can actuate multiple things. this requires additional data, see MULTIBOOL)
+    - MULTIPWM (same as MULTIBOOL, but PWM. See MULTIPWM)
+    - BAKA (baka, the client cannot actuate anything, but is a sensor instead)
+
+
+
+Special instructions
+
+Sometimes a request needs special instructions before it can perform an action. For example this can be which gpio pin to actuate.
+A special instruction can also be a piece of data the server asked for.
+
+Extra data is send with the header "Content"
+
+BOOL/PWM
+The content that has to be sent needs to be either "ON" or "OFF" for BOOL clients and a number ranging from -100-100 for PWM clients.
+
+MULTIBOOL/MULTIPWM
+Whenever a multibool client needs to actuate a pin, the pin in question also has to be specified. The pins that a client can control are sent with the initial connection.
+
+RESP
+If a GET request is sent, the client will respond with the function RESP. The contents of this response are in the Content header. "ON" or "OFF" for BOOL clients and an integer for PWM clients.
+
+TODO:
+    Function list
+    error type list
+    control type list
