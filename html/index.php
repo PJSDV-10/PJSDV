@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Test</title>
-	</head>
+<?php
+	if(!isset($_SESSION['login_user']) {
+		header("?p=login");
+	} else {
+		$page = $_GET['p'];
+		if(empty($_GET['p'])) {
+			$page = "login"
+		}
 
-	<body>
-		<h1><?php print("Hallo wereld!"); ?></h1>
-	</body>
-</html>
+		include("header");
+		include("{$page}.php");
+		include("footer");
+	}
+?>
