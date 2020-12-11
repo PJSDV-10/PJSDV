@@ -6,7 +6,7 @@
 		<label>Password:</label></br>
 		<input type="password" name="password"></br>
 		<?php
-			if(!(empty($_GET['err']))) {
+			if(!(isset($_GET['err']))) {
 				echo "<label>" . $_GET['err'] . "</label>";
 			}
 		?>

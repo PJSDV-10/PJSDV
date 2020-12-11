@@ -17,7 +17,7 @@
 			}
 		}
 		if(empty($error)) {
-			header("Location: ?p=login&err={$error}");
+			header("Location: loginForm.php/?err={$error}");
 		}
 	}
 

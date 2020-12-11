@@ -1,17 +1,14 @@
 <?php
 	if(!isset($_SESSION['login_user']) {
-		header("Location: ?p=login");
+		header("Location: loginForm.php");
 	} else {
-		$page = $_GET['p'];
-		if(empty($_GET['p'])) {
-			$page = "login"
+		$page = "home";
+		if(isset($_GET['p'])) {
+			$page = $_GET['p'];
 		}
 
 		include("header");
 		include("{$page}.php");
-		if($page == "login") {
-			include("loginForm.php");
-		}
 		include("footer");
 	}
 ?>
