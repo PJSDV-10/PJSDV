@@ -1,6 +1,6 @@
 <?php
-	if(!isset($_SESSION['login_user']) {
-		header("Location: loginForm.php");
+	if(!isset($_SESSION['login_user'])) {
+		header("Location: loginForm.php?p=login");
 	} else {
 		$page = "home";
 		if(isset($_GET['p'])) {
