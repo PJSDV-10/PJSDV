@@ -11,7 +11,7 @@
 
 			if($username == "admin" && $password == "admin") {
 				$_SESSION['login_user'] = $username;
-				header("Location: ?p=home");
+				header("Location: index.php?p=home");
 			} else {
 				$error = "Username or password is incorrect!";
 			}
