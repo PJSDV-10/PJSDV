@@ -1,10 +1,16 @@
 <div class="header"></div>
 <div class="main">
 	<form action="login.php" method="post">
-		<label>Username:</label>
-		<input type="text" name="username">
-		<label>Password:</label>
-		<input type="password" name="password">
-	<input type="submit" value="submit">
+		<label>Username:</label></br>
+		<input type="text" name="username"></br>
+		<label>Password:</label></br>
+		<input type="password" name="password"></br>
+		<?php
+			if(!(empty($_GET['err']))) {
+				echo "<label>" . $_GET['err'] . "</label>";
+			}
+		?>
+		</br>
+		<input type="submit" value="submit">
 	</form>
 </div>

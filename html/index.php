@@ -1,6 +1,6 @@
 <?php
 	if(!isset($_SESSION['login_user']) {
-		header("?p=login");
+		header("Location: ?p=login");
 	} else {
 		$page = $_GET['p'];
 		if(empty($_GET['p'])) {
@@ -9,6 +9,9 @@
 
 		include("header");
 		include("{$page}.php");
+		if($page == "login") {
+			include("loginForm.php");
+		}
 		include("footer");
 	}
 ?>
