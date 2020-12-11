@@ -7,8 +7,8 @@
 			$page = $_GET['p'];
 		}
 
-		include "header";
+		include "header.php";
 		include "{$page}.php";
-		include "footer";
+		include "footer.php";
 	}
 ?>

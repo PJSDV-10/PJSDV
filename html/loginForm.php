@@ -1,5 +1,5 @@
 <?php
-	include "header";
+	include "header.php";
 ?>
 
 <div class="header"></div>
@@ -10,7 +10,7 @@
 		<label>Password:</label></br>
 		<input type="password" name="password"></br>
 		<?php
-			if(!(isset($_GET['err']))) {
+			if(isset($_GET['err'])) {
 				echo "<label>" . $_GET['err'] . "</label>";
 			}
 		?>
@@ -20,5 +20,5 @@
 </div>
 
 <?php
-	include "footer";
+	include "footer.php";
 ?>
