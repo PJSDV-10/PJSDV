@@ -2,7 +2,7 @@
 	session_start(); //starting session
 	$error=''; // variable for error mssg
 
-	if(isset($_POST['submit'])) {
+	if(isset($_POST['username'])) {
 		if(empty($_POST['username']) || empty($_POST['password'])) {
 			$error = "Give a username and password. . .";
 		} else {
