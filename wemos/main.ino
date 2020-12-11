@@ -4,6 +4,10 @@
 #include <WiFiClientSecureAxTLS.h>
 #include <WiFiClientSecureBearSSL.h>
 
+
+#define KEEPALIVETIME 5000
+#define RESPTIME 300
+
 // Network SSID
 const char *ssid = "Kanker Project";
 const char *password = "KankerKanker";

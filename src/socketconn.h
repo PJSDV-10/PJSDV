@@ -10,6 +10,10 @@
 #include <netdb.h>
 #include <vector>
 #include <thread>
+#include <iostream>
+#include <map>
+#include <unistd.h>
+
 
 class SocketConnection{
 private:
@@ -24,7 +28,9 @@ private:
 
 public:
     SocketConnection(int fd, std::string name, std::string type, struct addrinfo data);
+    SocketConnection(int fd, std::string name, std::string type);
     void monitorSocket();
+    std::map<std::string, std::string> parseMessage(const char *h);
     inline const std::string getName() const { return this->name; }
     inline const std::string getType() const { return this->type; }
 

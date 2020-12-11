@@ -1,7 +1,7 @@
 #include "socketserver.h"
 
 SocketServer::SocketServer(const char* port){
-    /*server_df is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
+    /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
     The arguments passed are:
     PF_INET:
         This specifies that the socket should operate on the Profile Family for Internet addresses.
@@ -72,10 +72,17 @@ void SocketServer::ListenAndAccept(){
     addr_size = sizeof(their_addr);
     while (accepting)
     {
+        // When connection is accepted start a new thread
         if ((r_fd = accept(listen_fd, (struct sockaddr *)&their_addr, &addr_size)))
         {
-=            std::thread thing()
-
+            try {
+                // Try to create a pointer to a new SocketConnection object
+                SocketConnection* socket_conn = new SocketConnection(r_fd, "test_name", "test_type");
+                // Start a new thread on which the socket monitor function kan run
+                std::thread conn_thread(*socket_conn->monitorSocket());
+            } catch(const std::bad_alloc&){
+                std::cout<<"Couldn't allocate new SocketConnection object"<<std::endl;
+            }
         }
         if (r_fd == -1)
         {
@@ -83,8 +90,4 @@ void SocketServer::ListenAndAccept(){
             exit(EXIT_FAILURE);
         }
     }
-}
-
-std::thread* SocketServer::launchConnection(int fd){
-    SocketConnection conn(fd, )
 }
