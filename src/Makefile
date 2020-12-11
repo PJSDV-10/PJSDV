@@ -1,5 +1,5 @@
 CC       := g++ 
-CFLAGS   := -Wall -pthread
+CFLAGS   := -Wall -pthread -std=c++17
 # LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ../out
 OBJ_DIR  := $(BUILD)/obj
