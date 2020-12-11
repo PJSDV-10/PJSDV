@@ -1,12 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <WiFiClientSecure.h>
-#include <WiFiClientSecureAxTLS.h>
-#include <WiFiClientSecureBearSSL.h>
+
+#define KEEPALIVETIME 5000
+#define RESPTIME 300
 
 // Network SSID
-const char *ssid = "Kanker Project";
+const char *ssid = "WatEenRotTaart";
 const char *password = "KankerKanker";
+const char *ip = "40.68.29.170";
+int receivedResponse = 1;
 
 void setup()
 {
@@ -32,7 +34,26 @@ void setup()
 	Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
 }
 
+WiFiClient client;
+
 void loop()
 {
-	//Add your project's loop code here
+	if (client.connect(ip, 8080))
+	{
+		Serial.println("Connected to server");
+		while(client.available() || client.connected()){
+			if(client.connected() && receivedResponse == 1){
+				delay(KEEPALIVETIME);
+				if(client.availableForWrite()){
+					client.write("Function:KA\r\n");
+					receivedResponse = 0;
+				}
+				
+			}
+			if(client.available() && receivedResponse == 0){
+				Serial.printf("Response:\n\r%s\r\n", client.readString().c_str());
+				receivedResponse = 1;
+			}
+		}
+	}
 }
