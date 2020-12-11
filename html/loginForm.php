@@ -1,3 +1,7 @@
+<?php
+	include "header";
+?>
+
 <div class="header"></div>
 <div class="main">
 	<form action="login.php" method="post">
@@ -14,3 +18,7 @@
 		<input type="submit" value="submit">
 	</form>
 </div>
+
+<?php
+	include "footer";
+?>
