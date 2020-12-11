@@ -1,0 +1,16 @@
+div.header {
+    float: right;
+    height: 100px;
+    width: 40%;
+    margin-right: 10%;
+    position: absolute;
+    background-color: blue;
+    border-radius: 25px;
+}
+
+div.main {
+    float: left;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
