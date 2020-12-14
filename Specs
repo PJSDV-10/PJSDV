@@ -1,173 +1,190 @@
-This document outlines the communication protocol used for the communication between the server and client devices.
-In this document the different functions and ways of controlling the device, asking the server for information and authentication are explained.
-The order of communication is very strict and therefor needs to be outlined. It is very important to adhere very strictly to this document.
-
-
-The communication between a client and the server is started as follows
-
-    Client ---> Server      (Auth:password,Name:AnyName,Type:TypeOfDevice,Control:ControlType,AOP:AmountOfPinsInteger,Pins:{3;4;5;2})
-                   |
-    Client <--- Server      (Name:DeviceName,Function:OK)
-       |
-    Client ---> Server      (Auth:password,Name:AnyName,Function:OK)
-
-
-The client sends a couple things:
-    - An authentication password, this is hardcoded or in a database idc.
-    - The name by which to identify the device. This has to be unique and can be something like "TempSensor" or "BlindsController".
-        This name is then saved in a table on the server side. It's used to identify different clients.
-    - The type of device. This specifies what the device is capable of. The different options are worked out later.
-        It's also saved alongside the name
-    - The control type of the device. This also tells the server what the device can do. For example it can be a boolean type for a light switch, or a slider for the blinds.
-        It's again also saved alongside the name of the device.
-    - Optionally if the ControlType requires it, the amount of pins has to be specified as well.
-    - If the amount of pins needs to be specified, then an array of pins has to be as well. This is done by opening and closing with curly brackets, and then separating by ;.
-
-        Error possibilities:
-            - Wrong password:
-                In case of a wrong password the server will send the following:
-                    - Function:ERR,Error:WrongPass
-                        The client is expected to send the correct password next time.
-
-            - Client of same name already exists in table:
-                If another client is already registered with the same name then the server will refuse the connection.
-                The client has no way of deleting another entry in the client-table so it will need to get another name.
-                In case of the client having been disconnected and needing to reconnect, refer to the keep-alive section of this document.
-                The server will send the following message to the client:
-                    - Function:ERR,Error:ClientExists
-                        The client is then expected to find a different name.
-
-            - Any invalid type:
-                If the Type or Control is wrong:
-                    - Function:ERR,Error:WrongType|WrongControl|MissingData
-                        The client is expected to fix this.
-    
-
-
-The server then acknowledges the device if the name doesn't already match up with another device by sending:
-    - The received name of the client
-    - Function:OK
-        This essentially means that the server has acknowledged the connection and has put the client into the table.
-        
-
-    
-The client then finally sends another message to acknowledge that:
-    - Authentication password  
-    - Name of the clients
-    - Function:OK  
-        Coming from the client side this is another acknowledgement and means the client is keeping the connection alive.
-
-        Error possibilities:
-            - Client submits wrong name. The server will follow this up with a:
-                - Function:ERR,Error:NOA
-                    NOA stands for Not Our Agreement. The client will retry and be less of a dick.
+VERY FUCKING EARLY ALPHABETA V0.00000000000001 VERSIE. VRAAG ZELF VOOR MEER FUNCTIONALITEIT WAAR NODIG!!
 
 
 
-The keep-alive
+De wemos kan dingen sturen naar de server, zoals dat een knop is ingedrukt.
+De website kan dingen sturen naar de server, zoals opvragen van de status van alle wemosjes.
+De server kan dingen sturen naar de wemos, zoals opvragen van data.
+stuff
 
-If the client ever turns off then the server will only know about it by the connection being cut off. Other errors might leave the client's name in the client-table.
-Therefor every 5 seconds the client will send a keep alive message. The server will then respond and they will continue listening like normal.
-If the server does not receive a keep alive message from the client for 15 seconds, the connection will be broken by the server if it wasn't already.
-The socket will be closed and the entry in the client-table will be removed.
-The client will then be able to reconnect.
-
-The successful exchange will look like this:
-
-    Client ---> Server      (Auth:password,Name:ClientName,Function:KA)
-                   |
-    Client <--- Server      (Name:ClientName,Function:KA)
-    
-
-
-Graceful disconnect
-
-The client and the server should both be able to terminate a connection. The client and server can both send the same function to achieve this.
-
-    Client ---> Server      (Auth:password,Name:ClientName,Function:Close)
-                   |
-    Client <--- Server      (close(function_descriptor))
-
-The connection will be closed then. This won't happen often.
+Basis request:
+<message>
+    <header>
+        <sender>senderName</sender>
+        <receiver>receiverName</receiver>
+    </header>
+    <function>functionName</function>
+    <context>
+        <context1>CanHaveAnyName</context1>
+        etc
+        etc
+        etc
+    </context>
+</function
 
 
-The function list
+wemos aanmelden bij server:
 
-The universal list of functions that can be sent to both client and server is as follows:
-    - KA (keep-alive)
-    - Close (close connection)
-    - OK (acknowledge, depends on situation)
-    - ERR (requires type)
-    - tbd
+<message>
+    <header>
+        <sender>wemosNaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>authentication</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+        <clientName>Keuken Lamp</clientName>
+        <capabilities>
+            <func>
+                <type>actuateBool</type>
+                <funcName>lamp</funcName>
+            </func>
+            <func>
+                <type>buttonPress</type>
+                <funcName>lampKnop</funcName>
+            </func>
+        </capabilities>
+    </context>
+</message>
 
-The following list only applies for functions that can be sent from the client to the server:
-    - CTRL (control a different client)
-    - GET (get data from a sensor client)
-    - GETALL (gets data from all the connected clients, excluding front-end clients. This is only to be called by the front-end)
-    - RESP (client responds to a request by the server, see special instructions for more info)
-    - tbd
+Dit is een lamp in de keuken. De naam van de wemos bij clientName is de naam die op de website wordt getoont. Maak dit een normale naam pls.
+Deze wemos kan twee dingen doen, namelijk de func's met types "actuateBool" en "buttonPress". actuateBool betekend dat deze wemos iets kan aan of uitzetten. buttonPress betekend dat deze wemos zelf een knop heeft die ingedrukt kan worden. De server moet dit dus kunnen ontvangen.
+Ze hebben beide een type en een funcName. Deze zijn nodig voor bijvoorbeeld meerdere soorten sensoren. 
 
-The following list is of functions that the server can give a client to execute:
-    - GET (requires type and possibly content. gets data from the receiving client)
-    - CTRL (requires type and possibly content. controls a controlling client)
-    - tbd
-
-
-The type list
-
-This list outlines the different types a client can be. This is important for the front-end, because it allows the front-end to know what type of controller to display. (eg. slider or button)
-This is requires during the authentication.
-
-    - Sensor (can only send data to the server)
-    - Actuator (can only control a device)
-    - Combi (can both read a sensor and control a device)
-    - Frontend (is the front-end webpage)
+Een actuateBool is ook speciaal in dat je deze kan besturen en kan uitlezen. Je kan de funcName van een actuateBool in een status request doen en je krijgt de status van de actuator.
 
 
-The error types
+Het kan ook dat de wemos een sensor is, bijvoorbeeld een temperatuursensor, die geen actuator is. Dan zou alleen de capabilities aangepast moeten worden.
+Een voorbeeld is dan:
 
-Alongside the "Function:ERR" will be an Error datatype to allow the client to identify it's mistake. The different options are as follows:
+<capabilities>
+    <func>
+        <type>sensor</type>
+        <funcName>lichtSensor</funcName>
+    </func>
+    <func>
+        <type>sensor</type>
+        <funcName>tempSensor</funcName>
+    </func>
+</capabilities>
 
-    - WrongPass (wrong password)
-    - ClientExists (clientname already in server client-table)
-    - NOA  (not the agreement the server agreed to)
-    - WrongType (the type specified by the client on connection is wrong)
-    - WrongControl (the control type specified by the client on connection doesn't exist or doesn't match the type)
-    - WrongFunction (the specified function doesn't exist)
-    - CNTS (client not that smart. The client specified by the front-end can't perform the specified function)
-    - tbd
+Zo kunnen meerdere soorten sensoren worden weergeven.
+
+De website moet zichzelf ook authenticeren bij de server. Dat ziet er zo uit, die is namelijk iets anders.
+
+<message>
+    <header>
+        <sender>website</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>authentication</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+        <clientName>Website</clientName>
+        <capabilities>
+            <func>
+                <type>frontend</type>
+                <funcName>na</funcName>
+            </func>
+        </capabilities>
+    </context>
+</message>
+
+Er veranderd vrij weinig, maar de server heeft door dat het type van de func onder capabilities "frontend" is en zodoende herkent de server dat als website.
 
 
-The control types
+Een request van de website naar de server kan er zo uitzien:
 
-This is a list of the different control types a client can accept. Of course an actuator can actuate things, but how? 
-By specifying it's a BOOL type, both the server and front-end can know what kinds of actions a client can perform, in this case actuate something to be on or off.
+<message>
+    <header>
+        <sender>website</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>getStatusAll</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+    </context>
+</message>
 
-    - BOOL (client can actuate an actuator to be on or off)
-    - PWM (the client can perform a PWM function)
-    - MULTIBOOL (the client can actuate multiple things. this requires additional data, see MULTIBOOL)
-    - MULTIPWM (same as MULTIBOOL, but PWM. See MULTIPWM)
-    - BAKA (baka, the client cannot actuate anything, but is a sensor instead)
+In deze vraagt de website om de status van alle wemos apparaten. In dat geval stuurt de server een bericht dat er ongeveer zo uitziet naar alle wemosjes. Het lijkt een beetje op een broadcast bericht, en de reden is dat je niet wilt dat de server te lang bezig is met meerdere xml documenten opzetten.
 
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>allWemos</receiver>
+    </header>
+    <function>getStatusBroadcast</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+        <wemosjes>
+            <wemos name="UniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader">
+                <sensor>lichtSensor</sensor>
+                <sensor>tempSensor</sensor>
+            </wemos>
+            <wemos name="AndereUniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader">
+                <sensor>lamp</sensor>
+            </wemos>
+        </wemosjes>
+    </context>
+</message>
 
+Zoals je kan zien zitten alle beschikbare wemosjes hier in dit bericht. Het handige is dat je meerdere sensoren kan opgeven om uit te lezen. Ook zoals eerder aangegeven is bij de tweede wemos de sensor "lamp". Dit is dezelfde lamp uit de keuken lamp van eerder, waar de wemos zich aanmeldde bij de server. Dit is origineel aan actuateBool, maar die kan dus ook als sensor worden gebruikt.
+Een wemos moet dus zn eigen naam herkennen in dit bericht als attribuut. De hoop is dat dit sneller gaat dan elke keer in het element zelf kijken.
 
-Special instructions
+Elke wemos zal dan zoiets terugsturen als dit:
 
-Sometimes a request needs special instructions before it can perform an action. For example this can be which gpio pin to actuate.
-A special instruction can also be a piece of data the server asked for.
+<message>
+    <header>
+        <sender>wemosNaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>answerToStatusRequest</function>
+    <context>
+        <sensor>
+            <name>lamp</name>
+            <status>1</status>
+        </sensor>
+    </context>
+</message>
 
-Extra data is send with the header "Content"
+Dit is een antwoord op een eerdere request van de server. Zoals je kan zien is er maar 1 sensor, namelijk de lamp van eerder. De status is 1, voor aan obviously. Het zou 0 zijn geweest als de lamp uitstond.
 
-BOOL/PWM
-The content that has to be sent needs to be either "ON" or "OFF" for BOOL clients and a number ranging from -100-100 for PWM clients.
+De server krijgt meerdere van deze binnen. De server heeft onthouden hoeveel wemosjes hij heeft toegevoegd in die broadcast van hem, dus die wacht op alle wemosjes en pas daarna gaat ie een nieuw bericht maken die voor de website bedoelt is. Als na 2 seconden niet alle wemosjes hebben gereageerd wordt er gestuurd wat de server wel heeft. 
 
-MULTIBOOL/MULTIPWM
-Whenever a multibool client needs to actuate a pin, the pin in question also has to be specified. The pins that a client can control are sent with the initial connection.
+Het volgende wordt er dan vanaf de server gestuurd naar de server als alle wemosjes hebben reageert op de getStatusAll functie:
 
-RESP
-If a GET request is sent, the client will respond with the function RESP. The contents of this response are in the Content header. "ON" or "OFF" for BOOL clients and an integer for PWM clients.
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>website</receiver>
+    </header>
+    <function>answerToStatusRequest</function>
+    <context>
+        <wemosjes>
+            <wemos>
+                <name>UniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
+                <sensors>    
+                    <sensor>
+                        <name>lichtSensor</name>
+                        <status>726</status>
+                    </sensor>
+                    <sensor>
+                        <name>tempSensor</name>
+                        <status>21.5</status>
+                    </sensor>
+                </sensors>
+            </wemos>
+            <wemos>
+                <name>AndereUniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
+                <sensors>    
+                    <sensor>
+                        <name>lamp</name>
+                        <status>1</status>
+                    </sensor>
+                </sensors>
+            </wemos>
+        </wemosjes>
+    </context>
+</message>
 
-TODO:
-    Function list
-    error type list
-    control type list
+Dit is een vrij lang bericht, maar zoals je kan zien zijn hier de twee wemosjes te zien die eerder waren opgevraagd. Een sensor kan elke soort waarde teruggeven, zoals een hoog getal in bijvoorbeeld nits voor lichtSensor of celcius voor tempSensor. Een actuateBool geeft altijd een 1 of 0 terug als antwoord. 
