@@ -1,4 +1,5 @@
 // This is testcode for now, since we need to make 7 different wemos codes eventually
+// authentication problably works, but didn't have time to test yet
 // based on the "wall" wemos from the excel file on blackboard 
 // connections:
 // A0 - LDR     A1 - potmeter       DO4 - LCDPanel     D5 - RGBLED
@@ -18,7 +19,6 @@
 // authentication macros
 const char *wemosNaam = "wall"
 const char *server = "testServer"
-const char *password = "password"
 const char *clientName = "wallWemos"
 const int amountOfPins = 4;
 
@@ -26,13 +26,12 @@ const int amountOfPins = 4;
 const char *ssid = "WatEenRotTaart";
 const char *password = "KankerKanker";
 const char *ip = "40.68.29.170";
-int receivedResponse = 1;
 
 WiFiClient client;
 
 void setup()
 {
-  //setupsensor() - needed if using TWI sensor.
+  //setupsensor() - needed when using TWI sensor.
   
 	Serial.begin(115200);
 	Serial.write("Test Message");
@@ -62,6 +61,8 @@ void setup()
     Serial.println("Connected to server");
 	}
 	
+	// first we must authenticate with the server, if this can't happen we can't send any data.
+	// authenticating() is not finished yet though
 	while (authenticating()) {
     }
 	
@@ -72,12 +73,7 @@ void setup()
 
 void loop()
 {
-  // first we must authenticate with the server, if this can't happen we can't send any data.
-  // authenticating() is not finished yet though
-    
-  
-   // as far as we know, we can't create .xml files without using an sd card module.
-   // so for the time being, the old sending function will be used. 
+   // for the time being, the old sending function will be used. 
    // a string formatted like an xml file wil be send via said function.
 
    
@@ -85,6 +81,7 @@ void loop()
    int sensValue = analogread(2);
    
    // format msg
+   // i don't have time to add in the real message now, will come on friday i hope.
    char *msg = "<message>\n\r\t<header>\n\r\t\t<sender>sendername</sender>\n\r\t</header>\n\r</message>";
 
 
@@ -174,7 +171,6 @@ char* receiveData() {
   // TODO: add fancy error checking mechanism.
 if (client.connect(ip, 8080)) {
     if(client.available() && receivedResponse == 0){
-      receivedResponse = 1;
       return client.readString().c_str();
     }
     else return 0;
@@ -183,20 +179,18 @@ if (client.connect(ip, 8080)) {
 }
 
 
-void sendData(char msg[]){
-  // don't know if this still works.
-  
+void sendData(char *msg){
+  // don't know if this still works, problably does though
+
   
     if(client.available()){
       if(client.connected() && receivedResponse == 1){
         delay(KEEPALIVETIME);
         if(client.availableForWrite()){
           client.write(msg);
-          receivedResponse = 0;
 		  return 1;
         }
       } else return 0;
     }
 	else return 0;
-	
 }
