@@ -1,4 +1,12 @@
-//#include <ESP8266WiFi.h>
+// This is testcode for now, since we need to make 7 different wemos codes eventually
+// based on the "wall" wemos from the excel file on blackboard 
+// connections:
+// A0 - LDR     A1 - potmeter       DO4 - LCDPanel     D5 - RGBLED
+
+// I also want to make very clear that i HATE the arduino IDE.
+
+
+#include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <XMLWriter.h>
 
@@ -6,8 +14,13 @@
 #define RESPTIME 300
 #define MIN_TIME      5 // Skip arrivals sooner than this (minutes)
 #define SENSOR_PIN 
-#define STREAM
-#define BUFFERSIZE
+
+// authentication macros
+const char *wemosNaam = "wall"
+const char *server = "testServer"
+const char *password = "password"
+const char *clientName = "wallWemos"
+const int amountOfPins = 4;
 
 // Network SSID
 const char *ssid = "WatEenRotTaart";
@@ -15,11 +28,11 @@ const char *password = "KankerKanker";
 const char *ip = "40.68.29.170";
 int receivedResponse = 1;
 
-
+WiFiClient client;
 
 void setup()
 {
-  //setupsensor() - deeded if TWI sensor.
+  //setupsensor() - needed if using TWI sensor.
   
 	Serial.begin(115200);
 	Serial.write("Test Message");
@@ -43,12 +56,26 @@ void setup()
 	Serial.println("Connection established!");
 	Serial.print("IP address:\t");
 	Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
+	
+	// connect to server
+	if (client.connect(ip, 8080)) {
+    Serial.println("Connected to server");
+	}
+	
+	while (authenticating()) {
+    }
+	
 }
 
-WiFiClient client;
+
+
 
 void loop()
 {
+  // first we must authenticate with the server, if this can't happen we can't send any data.
+  // authenticating() is not finished yet though
+    
+  
    // as far as we know, we can't create .xml files without using an sd card module.
    // so for the time being, the old sending function will be used. 
    // a string formatted like an xml file wil be send via said function.
@@ -58,31 +85,118 @@ void loop()
    int sensValue = analogread(2);
    
    // format msg
-   char msg[] = // this is a placeholder message.
-   "<message>\n\r\t<header>\n\r\t\t<sender>sendername</sender>\n\r\t</header>\n\r</message>";
+   char *msg = "<message>\n\r\t<header>\n\r\t\t<sender>sendername</sender>\n\r\t</header>\n\r</message>";
 
 
   // send msg
-
-
-  
-	if (client.connect(ip, 8080))
-	{
-		Serial.println("Connected to server");
-		while(client.available() || client.connected()){
-			if(client.connected() && receivedResponse == 1){
-				delay(KEEPALIVETIME);
-				if(client.availableForWrite()){
-					client.write(msg);
-					receivedResponse = 0;
-				}
-				
-			}
-			if(client.available() && receivedResponse == 0){
-				Serial.printf("Response:\n\r%s\r\n", client.readString().c_str());
-				receivedResponse = 1;
-			}
-		}
-	}
+  sendData(msg);
+	
  
+}
+
+
+
+bool authenticating(){
+  // goes through the whole authentication procedure.
+  // function is pretty long because of the long message strings.
+  // !!!not finished yet!!!
+  
+  // first format the initial message.
+  char initialMsg[] = 
+  "<message>
+  <header>
+  <sender>wemosNaam</sender>
+  <receiver>server</receiver>
+    </header>
+    <function>authentication</function>
+    <context>
+        <password>password</password>
+        <clientName>clientName</clientName>
+        <AOP>amountOfPins</AOP>
+        <capabilities>
+            <func>
+                <type>actuateBool</type>
+                <funcName>lamp</funcName>
+            </func>
+            <func>
+                <type>buttonPress</type>
+                <funcName>lampKnop</funcName>
+            </func>
+        </capabilities>
+    </context>
+</message>";
+
+  // now send this to the server
+  sendData(initialMsg);
+
+  // wait for some sort of reply, if received do the assignment thing.
+  do {char *receivedMsg = receiveData();}
+  while (receivedResponse != 1);
+
+  // TODO: now extract the usefull bits
+  // DEFINITELY NOT FINISHED YET!!!!
+  
+  char *deviceName = "clientname"; // hardcoded them in so it goes through.
+  char *msgType = "OK";
+
+  // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
+  if (!(deviceName == clientName && msgType == "OK")) {  
+    return 0;
+  }
+
+  // if nothing has gone wrong, send a confirmation
+  char *confirmMsg = 
+  "<header>
+  <sender>wemosNaam</sender>
+  <receiver>server</receiver>
+    </header>
+    <function>authentication</function>
+    <context>
+        <password>password</password>
+        <clientName>clientName</clientName>
+        <capabilities>
+            <func>
+                <type>OK</type>
+                <funcName>OK</funcName>
+            </func>
+        </capabilities>
+    </context>
+</message>";
+    // send the confirm message
+  sendData(confirmMsg);
+
+return 1;
+}
+
+
+char* receiveData() {
+  // pretty rudementairy, if we can read a string we return it, if not we return 0.
+  // TODO: add fancy error checking mechanism.
+if (client.connect(ip, 8080)) {
+    if(client.available() && receivedResponse == 0){
+      receivedResponse = 1;
+      return client.readString().c_str();
+    }
+    else return 0;
+  }
+  else return 0;
+}
+
+
+void sendData(char msg[]){
+  // don't know if this still works.
+  
+  
+    if(client.available()){
+      if(client.connected() && receivedResponse == 1){
+        delay(KEEPALIVETIME);
+        if(client.availableForWrite()){
+          client.write(msg);
+          receivedResponse = 0;
+		  return 1;
+        }
+      } else return 0;
+    }
+	else return 0;
+	
 }
