@@ -1,6 +1,9 @@
 #include "socketserver.h"
 
-SocketServer::SocketServer(const char* port){
+
+
+SocketServer::SocketServer(const char *port)
+{
     /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
     The arguments passed are:
     PF_INET:
@@ -35,6 +38,13 @@ SocketServer::SocketServer(const char* port){
         exit(EXIT_FAILURE);
     }
 
+    int flags = fcntl(listen_fd, F_GETFL);
+    if (fcntl(listen_fd, F_SETFL, flags | O_NONBLOCK) == -1)
+    {
+        perror("Failed setting \"Non-block\" option for socket");
+        exit(EXIT_FAILURE);
+    }
+
     /* Bind the socket server_fd to the port we specified earlier with getaddrinfo(). Finally the socket is bound and can be used. */
     if (bind(listen_fd, serverInfo->ai_addr, serverInfo->ai_addrlen))
     {
@@ -59,13 +69,14 @@ void SocketServer::fillInHints()
     hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
 }
 
-void SocketServer::ListenAndAccept(){
+void SocketServer::ListenAndAccept()
+{
     if (listen(listen_fd, 20))
     {
         perror("Listening failed");
         exit(EXIT_FAILURE);
     }
-    
+
     struct sockaddr_in their_addr;
     socklen_t addr_size;
     int r_fd;
@@ -73,21 +84,85 @@ void SocketServer::ListenAndAccept(){
     while (accepting)
     {
         // When connection is accepted start a new thread
-        if ((r_fd = accept(listen_fd, (struct sockaddr *)&their_addr, &addr_size)))
-        {
-            try {
-                // Try to create a pointer to a new SocketConnection object
-                SocketConnection* socket_conn = new SocketConnection(r_fd, "test_name", "test_type");
-                // Start a new thread on which the socket monitor function kan run
-                std::thread conn_thread(*socket_conn->monitorSocket());
-            } catch(const std::bad_alloc&){
-                std::cout<<"Couldn't allocate new SocketConnection object"<<std::endl;
-            }
-        }
-        if (r_fd == -1)
+        if ((r_fd = accept(listen_fd, (struct sockaddr *)&their_addr, &addr_size)) == -1 && errno != EWOULDBLOCK)
         {
             perror("Accepting failed");
             exit(EXIT_FAILURE);
         }
+        
     }
 }
+
+Map SocketServer::parseXML(const char *x)
+{
+    using namespace rapidxml;
+
+    Map parsedMessage;
+    xml_document<> doc;
+    xml_node<> *root_node;
+
+    char xml[4096] = {};
+    strcpy(xml, x);
+    doc.parse<0>(xml);
+
+    /* The root node is called "message". Everything falls under here. */
+    root_node = doc.first_node("message");
+
+    /* Parsing the sender and receiver out of the header */
+    xml_node<> *header_message = root_node->first_node("header");
+    std::string sender, receiver;
+    sender = header_message->first_node("sender")->value();
+    receiver = header_message->first_node("receiver")->value();
+    parsedMessage.emplace("sender", sender);
+    parsedMessage.emplace("receiver", receiver);
+
+    xml_node<> *function_node = root_node->first_node("function");
+    std::string function;
+    function = function_node->value();
+    parsedMessage.emplace("function", function);
+
+    xml_node<> *context_node = root_node->first_node("context");
+    Map parsedContext = parseFunction(doc, context_node, function);
+    parsedMessage.emplace("context", parsedContext);
+
+    return parsedMessage;
+}
+
+Map SocketServer::parseFunction(rapidxml::xml_document<> &doc, rapidxml::xml_node<> *context_node, std::string function)
+{
+    using namespace rapidxml;
+    Map parsedContext;
+    if (function == "authentication")
+    {
+        if (!checkPassword(context_node->first_node("password")->value()))
+        {
+            return {};
+        }
+        std::string clientName;
+        clientName = context_node->first_node("clientName")->value();
+        Array capabilities;
+        for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
+        {
+            std::string type, funcName;
+            type = func_node->first_node("type")->value();
+            funcName = func_node->first_node("funcName")->value();
+            Map function;
+            function.emplace("type", type);
+            function.emplace("name", funcName);
+            capabilities.push_back(Wrapper(function));
+        }
+        parsedContext.emplace("capabilities", capabilities);
+        return parsedContext;
+    }
+    return {};
+}
+
+bool SocketServer::checkPassword(std::string p)
+{
+    if (p == password)
+    {
+        return true;
+    }
+    return false;
+}
+

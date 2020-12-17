@@ -38,5 +38,6 @@
 .vscode
 
 # makefile
+Makefile
 out/*
 

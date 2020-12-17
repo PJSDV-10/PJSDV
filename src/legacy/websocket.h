@@ -10,7 +10,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <thread>
 #include <map>
 #include <vector>
 
@@ -25,7 +24,6 @@ private:
     int server_fd;
     int status = 1;
     int accepting = 1;
-    std::vector<std::thread *> threads;
 
     void listenFunc(int &server_fd);
     void fillInHints();

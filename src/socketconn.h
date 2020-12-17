@@ -9,13 +9,13 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include <vector>
-#include <thread>
 #include <iostream>
 #include <map>
 #include <unistd.h>
+#include "rapidxml/rapidxml_utils.hpp"
 
-
-class SocketConnection{
+class SocketConnection
+{
 private:
     // Socket information:
     int f_desc;
@@ -23,7 +23,7 @@ private:
     std::string type;
     struct addrinfo a_data;
 
-    int SendData(const char* d);
+    int SendData(const char *d);
     int ReceiveData(std::string::pointer str_p);
 
 public:
@@ -33,5 +33,4 @@ public:
     std::map<std::string, std::string> parseMessage(const char *h);
     inline const std::string getName() const { return this->name; }
     inline const std::string getType() const { return this->type; }
-
 };
