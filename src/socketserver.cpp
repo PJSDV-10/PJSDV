@@ -93,13 +93,14 @@ void SocketServer::ListenAndAccept()
         for (int i = 0; i < FD_SETSIZE; i++){
             if(FD_ISSET(i, &ready_sockets)){
                 if(i == listen_fd){
+                    std::cout << "A new incoming connection" << std::endl;
                     int new_fd;
                     //This is a new incoming connection
                     new_fd = accept_connection(listen_fd);
                     FD_SET(new_fd, &all_sockets);
                     continue;
                 }else{
-
+                    handleRequest(i);
                     FD_CLR(i, &ready_sockets);
                 }
             }
@@ -110,6 +111,7 @@ void SocketServer::ListenAndAccept()
 void SocketServer::handleRequest(int fd){
     char buffer[4096] = {0};
     recv(fd, buffer, 4096, 0);
+    std::cout << "The following message was received:\n\r" << buffer << std::endl;
     Map xml = parseXML(buffer);
     try
     {
@@ -131,6 +133,8 @@ void SocketServer::handleRequest(int fd){
         }
     }catch(const std::out_of_range& oor){
         std::cout << "function did not exist inside the thingy" << std::endl;
+        send(fd, "no", 2, 0);
+        return;
     }
     return;
 }
@@ -196,6 +200,7 @@ Map SocketServer::parseFunction(rapidxml::xml_document<> &doc, rapidxml::xml_nod
         }
         std::string clientName;
         clientName = context_node->first_node("clientName")->value();
+        parsedContext.emplace("clientName", clientName);
         Array capabilities;
         for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
         {
