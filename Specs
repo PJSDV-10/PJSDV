@@ -1,4 +1,7 @@
-VERY FUCKING EARLY ALPHABETA V0.00000000000001 VERSIE. VRAAG ZELF VOOR MEER FUNCTIONALITEIT WAAR NODIG!!
+VERY FUCKING EARLY ALPHABETA V0.00000000000002 VERSIE. VRAAG ZELF VOOR MEER FUNCTIONALITEIT WAAR NODIG!!
+
+Last edited: 17/12/2020
+- authentication ack toegevoegd
 
 
 
@@ -53,7 +56,6 @@ Ze hebben beide een type en een funcName. Deze zijn nodig voor bijvoorbeeld meer
 
 Een actuateBool is ook speciaal in dat je deze kan besturen en kan uitlezen. Je kan de funcName van een actuateBool in een status request doen en je krijgt de status van de actuator.
 
-
 Het kan ook dat de wemos een sensor is, bijvoorbeeld een temperatuursensor, die geen actuator is. Dan zou alleen de capabilities aangepast moeten worden.
 Een voorbeeld is dan:
 
@@ -69,6 +71,19 @@ Een voorbeeld is dan:
 </capabilities>
 
 Zo kunnen meerdere soorten sensoren worden weergeven.
+
+
+De server moet daarna ook een bericht terugsturen om te laten weten dat alles successvol was:
+
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>wemosNaam</receiver>
+    </header>
+    <function>ack</function>
+    <context></context>
+</message>
+
 
 De website moet zichzelf ook authenticeren bij de server. Dat ziet er zo uit, die is namelijk iets anders.
 
