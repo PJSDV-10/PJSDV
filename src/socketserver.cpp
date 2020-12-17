@@ -77,20 +77,76 @@ void SocketServer::ListenAndAccept()
         exit(EXIT_FAILURE);
     }
 
+    fd_set ready_sockets, all_sockets;
+    FD_ZERO(&all_sockets);
+    FD_SET(listen_fd, &all_sockets);
+
+    while (accepting)
+    {
+        ready_sockets = all_sockets;
+
+        if(select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0){
+            perror("Select failed");
+            exit(EXIT_FAILURE);
+        }
+
+        for (int i = 0; i < FD_SETSIZE; i++){
+            if(FD_ISSET(i, &ready_sockets)){
+                if(i == listen_fd){
+                    int new_fd;
+                    //This is a new incoming connection
+                    new_fd = accept_connection(listen_fd);
+                    FD_SET(new_fd, &all_sockets);
+                    continue;
+                }else{
+
+                    FD_CLR(i, &ready_sockets);
+                }
+            }
+        }
+    }
+}
+
+void SocketServer::handleRequest(int fd){
+    char buffer[4096] = {0};
+    recv(fd, buffer, 4096, 0);
+    Map xml = parseXML(buffer);
+    try
+    {
+        if(std::get<std::string>(xml.at("function").value()) == "authentication"){
+            /*  context[
+                    clientName,
+                    capabilities[
+                        func{
+                            name
+                            type
+                        },
+                        ...
+                    ]
+                ]
+                         */
+
+            std::cout << "The following device authenticated with the server:\n"
+                      << std::get<std::string>(std::get<Map>(xml.at("context").value()).at("clientName").value()) << std::endl;
+        }
+    }catch(const std::out_of_range& oor){
+        std::cout << "function did not exist inside the thingy" << std::endl;
+    }
+    return;
+}
+
+int SocketServer::accept_connection(int fd){
     struct sockaddr_in their_addr;
     socklen_t addr_size;
     int r_fd;
     addr_size = sizeof(their_addr);
-    while (accepting)
-    {
-        // When connection is accepted start a new thread
-        if ((r_fd = accept(listen_fd, (struct sockaddr *)&their_addr, &addr_size)) == -1 && errno != EWOULDBLOCK)
-        {
-            perror("Accepting failed");
-            exit(EXIT_FAILURE);
-        }
-        
+
+    r_fd = accept(listen_fd, (struct sockaddr *)&their_addr, &addr_size);
+    if(r_fd == -1){
+        perror("Accepting failed");
+        exit(EXIT_FAILURE);
     }
+    return r_fd;
 }
 
 Map SocketServer::parseXML(const char *x)
@@ -166,3 +222,7 @@ bool SocketServer::checkPassword(std::string p)
     return false;
 }
 
+template <typename T>
+T getValue(Wrapper &w){
+    return std::get<T>(w.value());
+}
