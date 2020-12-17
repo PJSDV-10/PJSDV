@@ -98,10 +98,9 @@ void SocketServer::ListenAndAccept()
                     //This is a new incoming connection
                     new_fd = accept_connection(listen_fd);
                     FD_SET(new_fd, &all_sockets);
-                    continue;
                 }else{
                     handleRequest(i);
-                    FD_CLR(i, &ready_sockets);
+                    FD_CLR(i, &all_sockets);
                 }
             }
         }
@@ -110,26 +109,26 @@ void SocketServer::ListenAndAccept()
 
 void SocketServer::handleRequest(int fd){
     char buffer[4096] = {0};
-    recv(fd, buffer, 4096, 0);
+    int bytesread;
+    if ((bytesread = recv(fd, buffer, 4096, 0)) == -1)
+    {
+        perror("Error receiving");
+        exit(EXIT_FAILURE);
+    }else if(bytesread == 0){
+        close(fd);
+        return;
+    }
+
     std::cout << "The following message was received:\n\r" << buffer << std::endl;
     Map xml = parseXML(buffer);
     try
     {
-        if(std::get<std::string>(xml.at("function").value()) == "authentication"){
-            /*  context[
-                    clientName,
-                    capabilities[
-                        func{
-                            name
-                            type
-                        },
-                        ...
-                    ]
-                ]
-                         */
-
+        if(std::get<std::string>(xml.at("function").value()) == "authentication"){ 
             std::cout << "The following device authenticated with the server:\n"
                       << std::get<std::string>(std::get<Map>(xml.at("context").value()).at("clientName").value()) << std::endl;
+            std::string respondmsg;
+            respondmsg = respond("authentication", std::get<std::string>(xml.at("sender").value()));
+            send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
         }
     }catch(const std::out_of_range& oor){
         std::cout << "function did not exist inside the thingy" << std::endl;
@@ -216,6 +215,38 @@ Map SocketServer::parseFunction(rapidxml::xml_document<> &doc, rapidxml::xml_nod
         return parsedContext;
     }
     return {};
+}
+
+std::string SocketServer::respond(std::string type, std::string dest){
+    using namespace rapidxml;
+
+    if(type == "authentication"){
+        xml_document<> *doc = new xml_document<>;
+        xml_node<> *root_node = doc->allocate_node(node_element, "message");
+        xml_node<> *header_node = buildHeader(dest, *doc);
+        xml_node<> *function_node = doc->allocate_node(node_element, "function", "ack");
+
+        xml_node<> *context_node = doc->allocate_node(node_element, "context", 0);
+        root_node->append_node(header_node);
+        root_node->append_node(function_node);
+        root_node->append_node(context_node);
+        doc->append_node(root_node);
+        std::stringstream ss;
+        ss << *doc;
+        return ss.str();
+    }
+    return {};
+}
+
+rapidxml::xml_node<>* SocketServer::buildHeader(std::string dest, rapidxml::xml_document<> &doc){
+    using namespace rapidxml;
+    xml_node<> *header_node = doc.allocate_node(node_element, "header", 0);
+    xml_node<> *sender_node = doc.allocate_node(node_element, "sender", "server");
+    char *destination = doc.allocate_string(dest.c_str());
+    xml_node<> *receiver_node = doc.allocate_node(node_element, "receiver", destination);
+    header_node->append_node(sender_node);
+    header_node->append_node(receiver_node);
+    return header_node;
 }
 
 bool SocketServer::checkPassword(std::string p)

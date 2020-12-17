@@ -3,6 +3,7 @@
 #include "socketconn.h"
 #include "wrapper.h"
 #include "fcntl.h"
+#include <sstream>
 
 class SocketServer
 {
@@ -20,6 +21,7 @@ private:
     Map parseFunction(rapidxml::xml_document<> &doc, rapidxml::xml_node<> *context_node, std::string function);
     bool checkPassword(std::string);
     int accept_connection(int fd);
+    rapidxml::xml_node<>* buildHeader(std::string dest,rapidxml::xml_document<> &doc);
     //Structs
 
 public: 
@@ -27,6 +29,7 @@ public:
     void ListenAndAccept();
     void handleRequest(int fd);
     Map parseXML(const char *xml);
+    std::string respond(std::string type, std::string dest);
 };
 
 template <typename T>
