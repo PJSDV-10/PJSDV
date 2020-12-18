@@ -22,6 +22,18 @@ void XmlReader::parseDocument(){
         }
         parsedContext.emplace("capabilities", capabilities);
         parsedXML.emplace("context", parsedContext);
+
+        /* 
+        ParsedXML
+            senderName : string
+            receiverName : string
+            function : string
+            ParsedContext : map
+                clientName : string
+                capabilities : array
+                    type : string
+                    func : string
+         */
     }
 }
 
