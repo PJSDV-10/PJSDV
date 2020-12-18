@@ -120,18 +120,23 @@ void SocketServer::handleRequest(int fd){
     }
 
     std::cout << "The following message was received:\n\r" << buffer << std::endl;
-    Map xml = parseXML(buffer);
-    if(xml.empty()){
+    XmlReader xml_r(buffer);
+    xml_r.parseDocument();
+    Map xml = xml_r.getParsedDoc();
+    if (xml.empty())
+    {
         //Debug message
         std::cout << "The parsed XML was empty, check for errors.\n\rThis debug message exists at line " << __LINE__ << std::endl;
     }
     try
     {
-        if(std::get<std::string>(xml.at("function").value()) == "authentication"){ 
+        if(xml_r.getFunction() == "authentication"){ 
             std::cout << "The following device authenticated with the server:\n"
-                      << std::get<std::string>(std::get<Map>(xml.at("context").value()).at("clientName").value()) << std::endl;
+                      << xml_r.getClientName() << std::endl;
             std::string respondmsg;
-            respondmsg = respond("authentication", std::get<std::string>(xml.at("sender").value()));
+            XmlWriter xml_w(xml_r);
+            xml_w.buildXML();
+            respondmsg = xml_w.getXML();
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
         }
     }catch(const std::out_of_range& oor){
@@ -154,134 +159,6 @@ int SocketServer::accept_connection(int fd){
         exit(EXIT_FAILURE);
     }
     return r_fd;
-}
-
-Map SocketServer::parseXML(const char *x)
-{
-    using namespace rapidxml;
-
-    Map parsedMessage;
-    xml_document<> doc;
-    xml_node<> *root_node;
-
-    char xml[4096] = {};
-    strcpy(xml, x);
-    doc.parse<0>(xml);
-
-    /* The root node is called "message". Everything falls under here. */
-    root_node = doc.first_node("message");
-
-    /* Parsing the sender and receiver out of the header */
-    xml_node<> *header_message = root_node->first_node("header");
-    std::string sender, receiver;
-    sender = header_message->first_node("sender")->value();
-    receiver = header_message->first_node("receiver")->value();
-    parsedMessage.emplace("sender", sender);
-    parsedMessage.emplace("receiver", receiver);
-
-    xml_node<> *function_node = root_node->first_node("function");
-    std::string function;
-    function = function_node->value();
-    parsedMessage.emplace("function", function);
-
-    xml_node<> *context_node = root_node->first_node("context");
-    Map parsedContext = parseFunction(doc, context_node, function);
-    if(parsedContext.empty()){
-        //Debug message
-        std::cout << "The parsedContext was empty, check for errors\n\rThis debug message exists at line " << __LINE__ << std::endl;
-        return {};
-    }
-    parsedMessage.emplace("context", parsedContext);
-
-    return parsedMessage;
-}
-
-Map SocketServer::parseFunction(rapidxml::xml_document<> &doc, rapidxml::xml_node<> *context_node, std::string function)
-{
-    using namespace rapidxml;
-    Map parsedContext;
-    if (function == "authentication")
-    {
-        if (!checkPassword(context_node->first_node("password")->value()))
-        {
-            return {};
-        }
-        std::string clientName;
-        clientName = context_node->first_node("clientName")->value();
-        parsedContext.emplace("clientName", clientName);
-        Array capabilities;
-        for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
-        {
-            std::string type, funcName;
-            type = func_node->first_node("type")->value();
-            funcName = func_node->first_node("funcName")->value();
-            Map function;
-            function.emplace("type", type);
-            function.emplace("name", funcName);
-            capabilities.push_back(Wrapper(function));
-        }
-        parsedContext.emplace("capabilities", capabilities);
-
-        std::string senderName;
-        senderName = doc.first_node("message")->first_node("header")->first_node("sender")->value();
-        if (checkIfWemosExists(wemosjes, clientName))
-        {
-            //Debug message
-            std::cout << "Wemos already exists in database\n\rThis debug message exists at line " << __LINE__ << std::endl;
-            return {};
-        }
-        Wemos *womes = new Wemos(capabilities, senderName, clientName);
-        wemosjes.push_back(*womes);
-
-        return parsedContext;
-    }
-    return {};
-}
-
-std::string SocketServer::respond(std::string type, std::string dest){
-    using namespace rapidxml;
-
-    if(type == "authentication"){
-        xml_document<> *doc = new xml_document<>;
-        xml_node<> *root_node = doc->allocate_node(node_element, "message");
-        xml_node<> *header_node = buildHeader(dest, *doc);
-        xml_node<> *function_node = doc->allocate_node(node_element, "function", "ack");
-
-        xml_node<> *context_node = doc->allocate_node(node_element, "context", 0);
-        root_node->append_node(header_node);
-        root_node->append_node(function_node);
-        root_node->append_node(context_node);
-        doc->append_node(root_node);
-        std::stringstream ss;
-        ss << *doc;
-        return ss.str();
-    }
-    return {};
-}
-
-rapidxml::xml_node<>* SocketServer::buildHeader(std::string dest, rapidxml::xml_document<> &doc){
-    using namespace rapidxml;
-    xml_node<> *header_node = doc.allocate_node(node_element, "header", 0);
-    xml_node<> *sender_node = doc.allocate_node(node_element, "sender", "server");
-    char *destination = doc.allocate_string(dest.c_str());
-    xml_node<> *receiver_node = doc.allocate_node(node_element, "receiver", destination);
-    header_node->append_node(sender_node);
-    header_node->append_node(receiver_node);
-    return header_node;
-}
-
-bool SocketServer::checkPassword(std::string p)
-{
-    if (p == password)
-    {
-        return true;
-    }
-    return false;
-}
-
-template <typename T>
-T getValue(Wrapper &w){
-    return std::get<T>(w.value());
 }
 
 bool SocketServer::checkIfWemosExists(std::vector<Wemos> &a, String name){
