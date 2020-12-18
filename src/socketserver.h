@@ -14,6 +14,7 @@ private:
     struct addrinfo hints, *serverInfo;
     int opt = 1;
     bool accepting = true;
+    std::vector<Wemos> wemosjes;
 
     std::string password = "solarwinds123";
 
@@ -22,6 +23,7 @@ private:
     bool checkPassword(std::string);
     int accept_connection(int fd);
     rapidxml::xml_node<>* buildHeader(std::string dest,rapidxml::xml_document<> &doc);
+    bool checkIfWemosExists(std::vector<Wemos> &a, String name);
     //Structs
 
 public: 

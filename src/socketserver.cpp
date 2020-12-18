@@ -121,6 +121,10 @@ void SocketServer::handleRequest(int fd){
 
     std::cout << "The following message was received:\n\r" << buffer << std::endl;
     Map xml = parseXML(buffer);
+    if(xml.empty()){
+        //Debug message
+        std::cout << "The parsed XML was empty, check for errors.\n\rThis debug message exists at line " << __LINE__ << std::endl;
+    }
     try
     {
         if(std::get<std::string>(xml.at("function").value()) == "authentication"){ 
@@ -182,6 +186,11 @@ Map SocketServer::parseXML(const char *x)
 
     xml_node<> *context_node = root_node->first_node("context");
     Map parsedContext = parseFunction(doc, context_node, function);
+    if(parsedContext.empty()){
+        //Debug message
+        std::cout << "The parsedContext was empty, check for errors\n\rThis debug message exists at line " << __LINE__ << std::endl;
+        return {};
+    }
     parsedMessage.emplace("context", parsedContext);
 
     return parsedMessage;
@@ -212,6 +221,18 @@ Map SocketServer::parseFunction(rapidxml::xml_document<> &doc, rapidxml::xml_nod
             capabilities.push_back(Wrapper(function));
         }
         parsedContext.emplace("capabilities", capabilities);
+
+        std::string senderName;
+        senderName = doc.first_node("message")->first_node("header")->first_node("sender")->value();
+        if (checkIfWemosExists(wemosjes, clientName))
+        {
+            //Debug message
+            std::cout << "Wemos already exists in database\n\rThis debug message exists at line " << __LINE__ << std::endl;
+            return {};
+        }
+        Wemos *womes = new Wemos(capabilities, senderName, clientName);
+        wemosjes.push_back(*womes);
+
         return parsedContext;
     }
     return {};
@@ -261,4 +282,18 @@ bool SocketServer::checkPassword(std::string p)
 template <typename T>
 T getValue(Wrapper &w){
     return std::get<T>(w.value());
+}
+
+bool SocketServer::checkIfWemosExists(std::vector<Wemos> &a, String name){
+    for (uint i = 0; i < a.size(); i++){
+        String senderName;
+        //Debug message
+        std::cout << "senderName comparison check\nThis debug message exists at line " << __LINE__ << std::endl;
+        senderName = a[i].getSenderName();
+        if (senderName == name)
+        {
+            return true;
+        }
+    }
+    return false;
 }
