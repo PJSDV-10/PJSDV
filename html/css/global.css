@@ -1,16 +1,62 @@
-div.header {
-    float: right;
+/* global settings */
+* {
+	background-color: #5C757C;
+	color: #CFCFCF;
+	box-sizing: border-box;
+}
+
+
+/* header settings */
+.header {
     height: 100px;
-    width: 40%;
-    margin-right: 10%;
-    position: absolute;
-    background-color: blue;
+	width: 100%;
+	position: fixed;
+    background-color: #506066;
     border-radius: 25px;
 }
 
-div.main {
-    float: left;
+.box {
+	float: left;
+	width: 33%;
+	background-color: inherit;
+}
+
+.title {
+	text-align: center;
+	background-color: inherit;
+}
+
+.filler {
+	margin-top: 25px; /* no clue why it works, but it does, so let's keep it */
+}
+
+.button.right {
+	float: right;
+	margin-right: 10px;
+}
+
+/* content settings */
+.main {
+	margin: auto;
+	padding-top: 120px;
+	width: 80%;
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+	clear: left;
+}
+
+
+/* make buttons nicer */
+.button {
+	width: auto;
+	height: 40px;
+	margin-top: 30px;
+	opacity: 75%;
+	border: solid;
+	border-radius: 20px;
+}
+
+.button:hover {
+	opacity: 100%;
+	border-color: white;
+	color: white;
 }

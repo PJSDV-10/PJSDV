@@ -1,9 +1,9 @@
 <?php
 	session_start();
 	if(!isset($_SESSION['login_user'])) {
-		header("Location: loginForm.php?p=login");
+		header("Location: loginForm.php?p=Login");
 	} else {
-		$page = "home";
+		$page = "Home";
 		if(isset($_GET['p'])) {
 			$page = $_GET['p'];
 		}
