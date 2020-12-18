@@ -10,9 +10,10 @@ std::string XmlWriter::getXML(){
 void XmlWriter::buildXML(){
     using namespace rapidxml;
     
-    if(function == "ack"){
+    if(function == "authentication"){
         buildHeader();
         buildAckContext();
+        doc->append_node(root_node);
     }
 }
 
@@ -20,6 +21,8 @@ void XmlWriter::buildAckContext(){
     using namespace rapidxml;
     function_node = doc->allocate_node(node_element, "function", function.c_str());
     context_node = doc->allocate_node(node_element, "context", 0);
+    root_node->append_node(function_node);
+    root_node->append_node(context_node);
 }
 
 void XmlWriter::buildHeader(){
@@ -29,6 +32,9 @@ void XmlWriter::buildHeader(){
     receiver_node = doc->allocate_node(node_element, "receiver", receiverName.c_str());
     header_node->append_node(sender_node);
     header_node->append_node(receiver_node);
+    root_node->append_node(header_node);
+
+    
 }
 
 XmlWriter::XmlWriter(std::string type, std::string dest){
