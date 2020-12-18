@@ -33,6 +33,9 @@ build:
 debug: CFLAGS += -g3
 debug: all
 
+arm: CC = aarch64-linux-gnu-g++-7
+arm: all
+
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
