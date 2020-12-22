@@ -3,6 +3,7 @@
 	background-color: #5C757C;
 	color: #CFCFCF;
 	box-sizing: border-box;
+	font-family: "Comic Sans";
 }
 
 
@@ -27,12 +28,18 @@
 }
 
 .filler {
-	margin-top: 25px; /* no clue why it works, but it does, so let's keep it */
+	margin-top: 1px; /* no clue why it works, but it does, so let's keep it */
+	background-color: rgba(0, 0, 0, 0);
 }
 
 .button.right {
 	float: right;
-	margin-right: 10px;
+	margin-right: 25px;
+}
+
+.info {
+	margin-left: 10%;
+	background-color: inherit;
 }
 
 /* content settings */

@@ -8,3 +8,6 @@
 	2. $ ln -s ~/PJVD/html /var/www
 4. enjoy our glorious site which automagically updates when the git repo get's pulled
 
+## Structure of the site
+First of all the page the site is on is managed by the variable "$\_GET['p']" to create a more clean experience without showing any .php files in the url.
+To add an additional page you can simply add it to the pages folder and to reach it you need to link to the page on another page or you can simply add "?p=[page name]" at the end of the url. The page will automagically link to a stylesheet with the same name as the page so you can get custom styling for elements on the specific page.
