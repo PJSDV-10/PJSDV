@@ -24,7 +24,10 @@
 			</div>
 			<div class="box">
 
-				<input class="button right" type="submit" value="Log out"
-					onclick="window.location.href='logout.php'">
+				<?php
+				if($page != "Login")
+					echo '<input class="button right" type="submit" value="Log out" '.
+							'onclick="window.location.href=\'/logout.php\'">';
+				?>
 			</div>
 		</div>
