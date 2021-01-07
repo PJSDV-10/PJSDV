@@ -9,7 +9,8 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <XMLWriter.h>
+#include <TinyXML.h>
+
 
 #define KEEPALIVETIME 5000
 #define RESPTIME 300
@@ -19,13 +20,14 @@
 // authentication macros
 const char *wemosNaam = "wall"
 const char *server = "testServer"
-const char *clientName = "wallWemos"
-const int amountOfPins = 4;
 
 // Network SSID
 const char *ssid = "WatEenRotTaart";
 const char *password = "KankerKanker";
 const char *ip = "40.68.29.170";
+
+// sensor globals
+int previousSensorValue = 0;
 
 WiFiClient client;
 
@@ -78,15 +80,18 @@ void loop()
 
    
    // readSensors --- placeholder for now, depends on the test setup.
-   int sensValue = analogread(2);
+   int sensorValue1 = analogread(2);
    
    // format msg
    // i don't have time to add in the real message now, will come on friday i hope.
-   char *msg = "<message>\n\r\t<header>\n\r\t\t<sender>sendername</sender>\n\r\t</header>\n\r</message>";
+   TiXmlDocument AnswerMsg = buildAnwserMsg;
 
 
   // send msg
-  sendData(msg);
+  if (sensorValue1 != previousSensorValue) {
+    sendData(AnswerMsg);
+  }
+  
 	
  
 }
@@ -99,29 +104,7 @@ bool authenticating(){
   // !!!not finished yet!!!
   
   // first format the initial message.
-  char initialMsg[] = 
-  "<message>
-  <header>
-  <sender>wemosNaam</sender>
-  <receiver>server</receiver>
-    </header>
-    <function>authentication</function>
-    <context>
-        <password>password</password>
-        <clientName>clientName</clientName>
-        <AOP>amountOfPins</AOP>
-        <capabilities>
-            <func>
-                <type>actuateBool</type>
-                <funcName>lamp</funcName>
-            </func>
-            <func>
-                <type>buttonPress</type>
-                <funcName>lampKnop</funcName>
-            </func>
-        </capabilities>
-    </context>
-</message>";
+  TiXmlDocument initialMsg = buildInitialMsg();
 
   // now send this to the server
   sendData(initialMsg);
@@ -142,23 +125,7 @@ bool authenticating(){
   }
 
   // if nothing has gone wrong, send a confirmation
-  char *confirmMsg = 
-  "<header>
-  <sender>wemosNaam</sender>
-  <receiver>server</receiver>
-    </header>
-    <function>authentication</function>
-    <context>
-        <password>password</password>
-        <clientName>clientName</clientName>
-        <capabilities>
-            <func>
-                <type>OK</type>
-                <funcName>OK</funcName>
-            </func>
-        </capabilities>
-    </context>
-</message>";
+  TiXmlDocument confirmMsg = buildConfirmMsg();
     // send the confirm message
   sendData(confirmMsg);
 
@@ -193,4 +160,42 @@ void sendData(char *msg){
       } else return 0;
     }
 	else return 0;
+}
+
+void buildAnwserMsg(int sensorValue;)
+{ // builds an awnser message that's to be send to the server.
+  TiXmlDocument anwserMsg;
+  
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+    TiXmlElement * message = new TiXmlElement( "message" );
+    //header
+      TiXmlElement * header = new TiXmlElement( "header" );
+        TiXmlElement * senderElement = new TiXmlElement( "sender" );
+          TiXmlText * senderText = new TiXmlText( wemosNaam );
+        senderElement->LinkEndChild(senderText);
+        TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
+          TiXmlText * receiverText = new TiXmlText( server );
+        receiverElement->LinkEndChild(receiverText);
+    message->LinkEndChild(header);
+    //function
+      TiXmlElement * functionElement = new TiXmlElement( "function" );
+        TiXmlText * functionText = new TiXmlText( "answerToStatusRequest" );
+      functionElement->LinkEndChild(functionText);
+    message->LinkEndChild(functionElement);
+    // context
+      TiXmlElement * context = new TiXmlElement( "context" );
+      TiXmlElement * sensor1Element = new TiXmlElement( "sensor" );
+        TiXmlElement * name1Element = new TiXmlElement( "name" );
+          TiXmlText * name1Text = new TiXmlText( lamp );
+        name1Element->LinkEndChild(name1Text);
+      sensor1Element->LinkEndChild(name1Element);
+        TiXmlElement * status1Element = new TiXmlElement( "status" );
+          TiXmlText * status1Text = new TiXmlText( sensorValue ); //TODO: tostring convert
+        status1Element->LinkEndChild(status1Text);
+      sensor1Element->LinkEndChild(status1Element);
+          
+      message->LinkEndChild(context);
+  
+  anwserMsg.LinkEndChild( message );
+  anwserMsg.SaveFile( "anwserMsg.xml" );
 }
