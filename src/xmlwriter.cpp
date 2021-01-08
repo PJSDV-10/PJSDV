@@ -19,7 +19,7 @@ void XmlWriter::buildXML(){
 
 void XmlWriter::buildAckContext(){
     using namespace rapidxml;
-    function_node = doc->allocate_node(node_element, "function", function.c_str());
+    function_node = doc->allocate_node(node_element, "function", "ack");
     context_node = doc->allocate_node(node_element, "context", 0);
     root_node->append_node(function_node);
     root_node->append_node(context_node);
