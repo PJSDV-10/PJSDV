@@ -6,6 +6,7 @@
 
 		<link rel="stylesheet" type="text/css" href="css/global.css">
 		<link rel="stylesheet" type="text/css" href="css/<?php echo $page; ?>.css">
+		<link rel="shortcut icon" href="favicon.png">
 	</head>
 
 	<body>
