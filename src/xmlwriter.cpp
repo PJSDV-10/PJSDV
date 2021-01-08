@@ -3,7 +3,7 @@
 
 std::string XmlWriter::getXML(){
     std::stringstream ss;
-    ss << doc;
+    ss << *doc;
     return ss.str();
 }
 
@@ -27,7 +27,10 @@ void XmlWriter::buildAckContext(){
 
 void XmlWriter::buildHeader(){
     using namespace rapidxml;
-    header_node = doc->allocate_node(node_element, "header", 0);
+    doc = new xml_document<>;
+    root_node = doc->allocate_node(node_element, "message");
+    char *node_name = doc->allocate_string("header");
+    header_node = doc->allocate_node(node_element, node_name); 
     sender_node = doc->allocate_node(node_element, "sender", senderName.c_str());
     receiver_node = doc->allocate_node(node_element, "receiver", receiverName.c_str());
     header_node->append_node(sender_node);
