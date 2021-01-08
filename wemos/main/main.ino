@@ -10,7 +10,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <tinyxml.h>
-#include<string>
+#include <string>
 
 
 #define KEEPALIVETIME 5000
@@ -42,38 +42,38 @@ void setup()
 {
   //setupsensor() - needed when using TWI sensor.
   
-	Serial.begin(115200);
-	Serial.write("Test Message");
+  Serial.begin(115200);
+  Serial.write("Test Message");
 
 
-	WiFi.begin(ssid, password); // Connect to the network
-	Serial.print("Connecting to ");
-	Serial.print(ssid);
-	Serial.println(" ...");
+  WiFi.begin(ssid, password); // Connect to the network
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
+  Serial.println(" ...");
   
-	int i = 0;
-	while (WiFi.status() != WL_CONNECTED)
-	{ // Wait for the Wi-Fi to connect
-		delay(1000);
-		Serial.print(++i);
-		Serial.print(' ');
-	}
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED)
+  { // Wait for the Wi-Fi to connect
+    delay(1000);
+    Serial.print(++i);
+    Serial.print(' ');
+  }
 
-	Serial.println('\n');
-	Serial.println("Connection established!");
-	Serial.print("IP address:\t");
-	Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
-	
-	// connect to server
-	if (client.connect(ip, 8080)) {
+  Serial.println('\n');
+  Serial.println("Connection established!");
+  Serial.print("IP address:\t");
+  Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
+  
+  // connect to server
+  if (client.connect(ip, 8080)) {
     Serial.println("Connected to server");
-	}
-	
-	// first we must authenticate with the server, if this can't happen we can't send any data.
-	// authenticating() is not finished yet though
-	while (authenticating()) {
+  }
+  
+  // first we must authenticate with the server, if this can't happen we can't send any data.
+  // authenticating() is not finished yet though
+  while (authenticating()) {
     }
-	
+  
 }
 
 
@@ -84,23 +84,27 @@ void loop()
    // for the time being, the old sending function will be used. 
    // a string formatted like an xml file wil be send via said function.
   int sensor[AMOUNTOFSENSORS][3] = {1,0,0};    // sensor array will be {id,currentvalue,previousvalue}
-  char* sensorNames[AMOUNTOFSENSORS][2] = {"1","lamp"};
+  char* sensorNames[AMOUNTOFSENSORS][2] = {{"1","lamp"}};
    
    // readSensors --- placeholder for now, depends on the test setup.
    int sensorValue1 = analogRead(2);
    
    // format msg
    // i don't have time to add in the real message now, will come on friday i hope.
-   TiXmlDocument AnswerMsg = buildAnwserMsg;
+   TiXmlDocument AnswerMsg = buildAnwserMsg(sensor, sensorNames);
 
 
   // send msg
   for(int i = 0; i < AMOUNTOFSENSORS-1; i++)
   if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue);
-    sendData(AnswerMsg);
+    TiXmlPrinter pronter;
+    pronter.SetIndent("\t");
+    AnswerMsg.Accept(&pronter);
+    
+    sendData(pronter.CStr());
   }
   
-	
+  
  
 }
 
@@ -111,12 +115,16 @@ bool authenticating(){
   
   // first format the initial message.
   TiXmlDocument initialMsg = buildInitialMsg();
-
+  TiXmlPrinter printer;
+  printer.SetIndent("\t");
+  initialMsg.Accept(&printer);
+  
   // now send this to the server
-  sendData(initialMsg);
+  sendData(printer.CStr());
 
   // wait for some sort of reply, if received do the assignment thing.
-  do {char *receivedMsg = receiveData();}
+  int receivedResponse = 1;
+  do {char *receivedMsg = receiveData(); receivedResponse = 0;}
   while (receivedResponse != 1);
 
    
@@ -127,7 +135,7 @@ bool authenticating(){
   char *function = "OK";
 
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
-  if (!(deviceName == clientName && msgType == "OK")) {  
+  if (!(function == "OK")) {  
     return 0;
   }
 
@@ -139,8 +147,10 @@ char* receiveData() {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
 if (client.connect(ip, 8080)) {
-    if(client.available() && receivedResponse == 0){
-      return client.readString().c_str();
+    if(client.available()){
+      char *poep;
+      strcpy(poep, client.readString().c_str());
+      return poep;
     }
     else return 0;
   }
@@ -148,20 +158,20 @@ if (client.connect(ip, 8080)) {
 }
 
 
-void sendData(char *msg){
+void sendData(const char *msg){
   // don't know if this still works, problably does though
 
   
     if(client.available()){
-      if(client.connected() && receivedResponse == 1){
+      if(client.connected()){
         delay(KEEPALIVETIME);
         if(client.availableForWrite()){
           client.write(msg);
-		  return 1;
+      return;
         }
-      } else return 0;
+      } else return;
     }
-	else return 0;
+  else return;
 }
 
 TiXmlDocument buildInitialMsg() {
@@ -208,11 +218,12 @@ TiXmlDocument buildInitialMsg() {
           
       message->LinkEndChild(context);
   
-  anwserMsg.LinkEndChild( message );
-  anwserMsg.SaveFile( "anwserMsg.xml" );
+  Msg.LinkEndChild( message );
+  Msg.SaveFile( "anwserMsg.xml" );
+  return Msg;
 }
 
-TiXmlDeclaration buildAnwserMsg(int sensorValue)
+TiXmlDocument buildAnwserMsg(int sensor[AMOUNTOFSENSORS][3], char* sensorNames[AMOUNTOFSENSORS][2])
 { // builds an awnser message that's to be send to the server.
   TiXmlDocument anwserMsg;
   
@@ -243,15 +254,18 @@ TiXmlDeclaration buildAnwserMsg(int sensorValue)
         nameElement->LinkEndChild(nameText);
       sensorElement->LinkEndChild(nameElement);
         TiXmlElement * statusElement = new TiXmlElement( "status" );
-          TiXmlText * statusText = new TiXmlText( sensor[i][1] ); //TODO: tostring convert
+        char* strong;
+        itoa(sensor[i][1], strong, 10);
+          TiXmlText * statusText = new TiXmlText( strong ); //TODO: tostring convert
         statusElement->LinkEndChild(statusText);
       sensorElement->LinkEndChild(statusElement);
-      context->LinkEndChild(sensorElement)
+      context->LinkEndChild(sensorElement);
       }
       message->LinkEndChild(context);
   
   anwserMsg.LinkEndChild( message );
   anwserMsg.SaveFile( "anwserMsg.xml" );
+  return anwserMsg;
 }
 
 
@@ -296,14 +310,13 @@ void parser(std::string S1 ,std::string arr[]){
             std::string functie= S1.substr(SUB1, SUB2 - SUB1);
             arr[2] = functie;
 
-            SUB1 = S1.find("<password>"); // zoek pasword
+            SUB1 = S1.find("<password>"); // zoek password
             SUB2 = S1.find("</password>"); // zoekunctie pasword einde
             SUB1 += 10; // want pasword is 10 groot
             std::string wachtwoord = S1.substr(SUB1, SUB2 - SUB1);
           //signaleerd
-                else{
                     S1.erase(0,SUB1+11);
-                    SUB1 = S1.find(uniekewemosnaam); //zoek naar wemosnaam in overgebleen bestand
+                    SUB1 = S1.find(wemosNaam); //zoek naar wemosnaam in overgebleen bestand
                     if( SUB1 == -1){
                         arr[0]= "geen acties"; // geen actie uit te voeren want deze wemos komt niet voor in context
                     }
@@ -321,6 +334,7 @@ void parser(std::string S1 ,std::string arr[]){
                             arr[i] = temp;
                         }
                 }
-            }
+
         }
     }
+}
