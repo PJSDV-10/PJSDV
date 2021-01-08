@@ -14,8 +14,8 @@
 
 #define KEEPALIVETIME 5000
 #define RESPTIME 300
-#define MIN_TIME      5 // Skip arrivals sooner than this (minutes)
-#define SENSOR_PIN 
+#define MIN_TIME 5 // Skip arrivals sooner than this (minutes)
+#define AMOUNTOFSENSORS 1
 
 // authentication macros
 const char *wemosNaam = "wall"
@@ -77,7 +77,8 @@ void loop()
 {
    // for the time being, the old sending function will be used. 
    // a string formatted like an xml file wil be send via said function.
-
+  int sensor[AMOUNTOFSENSORS][3] = {1,0,0};    // sensor array will be {id,currentvalue,previousvalue}
+  char* sensorNames[AMOUNTOFSENSORS][2] = {"1","lamp"};
    
    // readSensors --- placeholder for now, depends on the test setup.
    int sensorValue1 = analogread(2);
@@ -88,7 +89,8 @@ void loop()
 
 
   // send msg
-  if (sensorValue1 != previousSensorValue) {
+  for(int i = 0; i < AMOUNTOFSENSORS-1; i++)
+  if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue);
     sendData(AnswerMsg);
   }
   
@@ -162,7 +164,55 @@ void sendData(char *msg){
 	else return 0;
 }
 
-void buildAnwserMsg(int sensorValue;)
+TiXmlDocument buildInitialMsg() {
+  TiXmlDocument Msg;
+  
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+    TiXmlElement * message = new TiXmlElement( "message" );
+    //header
+      TiXmlElement * header = new TiXmlElement( "header" );
+        TiXmlElement * senderElement = new TiXmlElement( "sender" );
+          TiXmlText * senderText = new TiXmlText( wemosNaam );
+        senderElement->LinkEndChild(senderText);
+        TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
+          TiXmlText * receiverText = new TiXmlText( server );
+        receiverElement->LinkEndChild(receiverText);
+    message->LinkEndChild(header);
+    //function
+      TiXmlElement * functionElement = new TiXmlElement( "function" );
+        TiXmlText * functionText = new TiXmlText( "authentication" );
+      functionElement->LinkEndChild(functionText);
+    message->LinkEndChild(functionElement);
+    // context
+      TiXmlElement * context = new TiXmlElement( "context" );
+        TiXmlElement * passwordElement = new TiXmlElement( "password" );
+          TiXmlText * passwordText = new TiXmlText( password );
+          passwordElement->LinkEndChild(passwordText);
+        context->LinkEndChild(passwordElement);
+        TiXmlElement * clientNameElement = new TiXmlElement( "clientName" );
+          TiXmlText * clientNameText = new TiXmlText( wemosNaam );
+          clientNameElement->LinkEndChild(clientNameText);
+        context->LinkEndChild(clientNameElement);
+
+        // all the functions of the given wemos board, needs to be edited for every wemos
+        TiXmlElement * func1Element = new TiXmlElement( "func" );
+          TiXmlElement * type1Element = new TiXmlElement( "type" );
+            TiXmlText * type1Text = new TiXmlText( "sensorBool" );
+          func1Element->LinkEndChild(type1Element);
+          TiXmlElement * funcName1Element = new TiXmlElement( "funcName" );
+            TiXmlText * funcName1Text = new TiXmlText( "lampKnop" );
+          funcName1Element->LinkEndChild(funcName1Text);
+        func1Element->LinkEndChild(funcName1Element);
+        
+        context->LinkEndChild(func1Element);
+          
+      message->LinkEndChild(context);
+  
+  anwserMsg.LinkEndChild( message );
+  anwserMsg.SaveFile( "anwserMsg.xml" );
+}
+
+TiXmlDeclaration buildAnwserMsg(int sensorValue;)
 { // builds an awnser message that's to be send to the server.
   TiXmlDocument anwserMsg;
   
@@ -184,16 +234,20 @@ void buildAnwserMsg(int sensorValue;)
     message->LinkEndChild(functionElement);
     // context
       TiXmlElement * context = new TiXmlElement( "context" );
-      TiXmlElement * sensor1Element = new TiXmlElement( "sensor" );
-        TiXmlElement * name1Element = new TiXmlElement( "name" );
-          TiXmlText * name1Text = new TiXmlText( lamp );
-        name1Element->LinkEndChild(name1Text);
-      sensor1Element->LinkEndChild(name1Element);
-        TiXmlElement * status1Element = new TiXmlElement( "status" );
-          TiXmlText * status1Text = new TiXmlText( sensorValue ); //TODO: tostring convert
-        status1Element->LinkEndChild(status1Text);
-      sensor1Element->LinkEndChild(status1Element);
-          
+      
+      // voor elke sensor een apart sensor element toevoegen
+      for (int i = 0; i < AMOUNTOFSENSORS-1; i++) { 
+      TiXmlElement * sensorElement = new TiXmlElement( "sensor" );
+        TiXmlElement * nameElement = new TiXmlElement( "name" );
+          TiXmlText * nameText = new TiXmlText( sensorNames[i][1] );
+        nameElement->LinkEndChild(nameText);
+      sensorElement->LinkEndChild(nameElement);
+        TiXmlElement * statusElement = new TiXmlElement( "status" );
+          TiXmlText * statusText = new TiXmlText( sensor[i][1] ); //TODO: tostring convert
+        statusElement->LinkEndChild(statusText);
+      sensorElement->LinkEndChild(statusElement);
+      context->LinkEndChild(sensorElement)
+      }
       message->LinkEndChild(context);
   
   anwserMsg.LinkEndChild( message );
