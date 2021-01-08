@@ -12,8 +12,6 @@
 #include <tinyxml.h>
 #include <string>
 
-
-#define KEEPALIVETIME 5000
 #define RESPTIME 300
 #define MIN_TIME 5 // Skip arrivals sooner than this (minutes)
 #define AMOUNTOFSENSORS 1
@@ -29,8 +27,8 @@ const char *wemosNaam = "wall";
 const char *server = "testServer";
 
 // Network SSID
-const char *ssid = "Eetmijnpieniet";
-const char *password = "Merwic01";
+const char *ssid = "oop";
+const char *password = "programmer";
 const char *ip = "dutchellie.nl";
 
 // sensor globals
@@ -73,7 +71,7 @@ void setup()
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
-  Serial.println("start auth");
+  Serial.print("start auth");
   while (authenticating()) {
        delay(1000);
     Serial.print(++i);
@@ -127,6 +125,7 @@ bool authenticating(){
   initialMsg.Accept(&printer);
   
   // now send this to the server
+  Serial.print(printer.CStr());
   sendData(printer.CStr());
 
   // wait for some sort of reply, if received do the assignment thing.
@@ -167,18 +166,14 @@ if (client.connect(ip, 8080)) {
 
 void sendData(const char *msg){
   // don't know if this still works, problably does though
-
+Serial.print("send function\n\r");
   
-    if(client.available()){
-      if(client.connected()){
-        delay(KEEPALIVETIME);
+    //if(client.available()&&client.connected()){
         if(client.availableForWrite()){
+          Serial.print(msg);
           client.write(msg);
-      return;
         }
-      } else return;
-    }
-  else return;
+    //}
 }
 
 TiXmlDocument buildInitialMsg() {
@@ -191,9 +186,11 @@ TiXmlDocument buildInitialMsg() {
         TiXmlElement * senderElement = new TiXmlElement( "sender" );
           TiXmlText * senderText = new TiXmlText( wemosNaam );
         senderElement->LinkEndChild(senderText);
+      header->LinkEndChild(senderElement);
         TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
           TiXmlText * receiverText = new TiXmlText( server );
         receiverElement->LinkEndChild(receiverText);
+       header->LinkEndChild(receiverElement);
     message->LinkEndChild(header);
     //function
       TiXmlElement * functionElement = new TiXmlElement( "function" );
@@ -215,7 +212,9 @@ TiXmlDocument buildInitialMsg() {
         TiXmlElement * func1Element = new TiXmlElement( "func" );
           TiXmlElement * type1Element = new TiXmlElement( "type" );
             TiXmlText * type1Text = new TiXmlText( "sensorBool" );
+            type1Element->LinkEndChild(type1Text);
           func1Element->LinkEndChild(type1Element);
+        
           TiXmlElement * funcName1Element = new TiXmlElement( "funcName" );
             TiXmlText * funcName1Text = new TiXmlText( "lampKnop" );
           funcName1Element->LinkEndChild(funcName1Text);
