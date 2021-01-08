@@ -29,9 +29,9 @@ const char *wemosNaam = "wall";
 const char *server = "testServer";
 
 // Network SSID
-const char *ssid = "WatEenRotTaart";
-const char *password = "KankerKanker";
-const char *ip = "40.68.29.170";
+const char *ssid = "Eetmijnpieniet";
+const char *password = "Merwic01";
+const char *ip = "dutchellie.nl";
 
 // sensor globals
 int previousSensorValue = 0;
@@ -65,14 +65,21 @@ void setup()
   Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
   
   // connect to server
-  if (client.connect(ip, 8080)) {
+  if (client.connect(ip, 4500)) {
     Serial.println("Connected to server");
+  }else{
+    Serial.println("Not connected");
   }
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
+  Serial.println("start auth");
   while (authenticating()) {
+       delay(1000);
+    Serial.print(++i);
+    Serial.print(' ');
     }
+    Serial.println("na auth");
   
 }
 
