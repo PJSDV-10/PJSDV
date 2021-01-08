@@ -98,8 +98,6 @@ void loop()
  
 }
 
-
-
 bool authenticating(){
   // goes through the whole authentication procedure.
   // function is pretty long because of the long message strings.
@@ -253,3 +251,76 @@ TiXmlDeclaration buildAnwserMsg(int sensorValue;)
   anwserMsg.LinkEndChild( message );
   anwserMsg.SaveFile( "anwserMsg.xml" );
 }
+
+
+void parser(std::string S1 ,std::string arr[]){
+//    in deze parser word het als volgt neergezet
+//    0 = status en errors
+//    1=sender
+//    2=function
+//    3 en up = context
+
+//vergeet niet NUMBER_OF_STRING te define
+// vergeet niet uniekewemosnaam te define
+// vergeet niet definedwachtwoord te definen
+
+    int  SUB1 = S1.find("<message>");
+    int  SUB2 = S1.find("</message>"); // zoek of dit we lecht een mesage is
+
+    if(SUB1 == -1 || SUB2 == -1){
+        arr[0]= "Verkeerde soort message";
+    }
+    else {
+
+        SUB1 = S1.find("<receiver>");
+        SUB2 = S1.find("</receiver>"); //zoek naa reciever
+        SUB1 +=11 ; //want <receiver> is elf groot
+        std::string naam = S1.substr(SUB1, SUB2 - SUB1);
+        if ((naam == "allWemos" || uniekewemosnaam == naam)){
+            arr[0]= "Niet voor deze wemos bedoelt"; //kijken ov hij voor deze wemos bedoel is
+        }
+        else {
+            SUB1 = S1.find("<sender>"); // zoek sender
+            SUB2 = S1.find("</sender>"); // zoek einde van sender
+            SUB1 += 8 ; //want <sender> is 8 groot
+            std::string sender = S1.substr(SUB1, SUB2 - SUB1); //defieneer sender SUB2 -  Sub1 want substr heeft een getal nodig met hoevel die verder gaat
+            arr[1] = sender; // zet sender definitief
+
+
+            S1.erase(0,SUB2+9); // delete alles van de string waar we al overheen gelopen zijn
+            SUB1 = S1.find("<function>"); // zoek functie
+            SUB2 = S1.find("</function>"); // zoekunctie einde
+            SUB1 += 10 ; //want <function> is 10 groot
+            std::string functie= S1.substr(SUB1, SUB2 - SUB1);
+            arr[2] = functie;
+
+            SUB1 = S1.find("<password>"); // zoek pasword
+            SUB2 = S1.find("</password>"); // zoekunctie pasword einde
+            SUB1 += 10; // want pasword is 10 groot
+            std::string wachtwoord = S1.substr(SUB1, SUB2 - SUB1);
+            if (!(wachtwoord==definedwachtwoord)){ // check of het wachtwoord goed is
+                    arr[0]= "Verkeerde Wachtwoord";
+                }
+                else{
+                    S1.erase(0,SUB1+11);
+                    SUB1 = S1.find(uniekewemosnaam); //zoek naar wemosnaam in overgebleen bestand
+                    if( SUB1 == -1){
+                        arr[0]= "geen acties"; // geen actie uit te voeren want deze wemos komt niet voor in context
+                    }
+                    else{
+                        SUB2 = S1.find("</wemos>");
+                        S1.erase(SUB2,100000); // erase alles na de actie die deze wemos moet uitvoeren
+                        SUB1 = S1.find("<sensor>"); //zoek sensor
+                        SUB2 = S1.find("</sensor>"); // zoek einde sensor
+
+                        for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){
+                            SUB1 = S1.find("<sensor>"); //zoek sensor
+                            SUB2 = S1.find("</sensor>"); // zoek einde sensor
+                            SUB1 += 8 ;
+                            std::string temp = S1.substr(SUB1, SUB2 - SUB1);
+                            arr[i] = temp;
+                        }
+                }
+            }
+        }
+    }
