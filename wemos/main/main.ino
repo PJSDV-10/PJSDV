@@ -9,7 +9,8 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <TinyXML.h>
+#include <tinyxml.h>
+#include<string>
 
 
 #define KEEPALIVETIME 5000
@@ -17,9 +18,15 @@
 #define MIN_TIME 5 // Skip arrivals sooner than this (minutes)
 #define AMOUNTOFSENSORS 1
 
+
+int NUMBER_OF_STRING = 10;
+
+
+const char *definedwachtwoord= "";
+
 // authentication macros
-const char *wemosNaam = "wall"
-const char *server = "testServer"
+const char *wemosNaam = "wall";
+const char *server = "testServer";
 
 // Network SSID
 const char *ssid = "WatEenRotTaart";
@@ -38,7 +45,6 @@ void setup()
 	Serial.begin(115200);
 	Serial.write("Test Message");
 
-  XMLWriter xml;
 
 	WiFi.begin(ssid, password); // Connect to the network
 	Serial.print("Connecting to ");
@@ -81,7 +87,7 @@ void loop()
   char* sensorNames[AMOUNTOFSENSORS][2] = {"1","lamp"};
    
    // readSensors --- placeholder for now, depends on the test setup.
-   int sensorValue1 = analogread(2);
+   int sensorValue1 = analogRead(2);
    
    // format msg
    // i don't have time to add in the real message now, will come on friday i hope.
@@ -113,21 +119,17 @@ bool authenticating(){
   do {char *receivedMsg = receiveData();}
   while (receivedResponse != 1);
 
+   
   // TODO: now extract the usefull bits
   // DEFINITELY NOT FINISHED YET!!!!
   
-  char *deviceName = "clientname"; // hardcoded them in so it goes through.
-  char *msgType = "OK";
+  char *clientname = "clientname"; // hardcoded them in so it goes through.
+  char *function = "OK";
 
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
   if (!(deviceName == clientName && msgType == "OK")) {  
     return 0;
   }
-
-  // if nothing has gone wrong, send a confirmation
-  TiXmlDocument confirmMsg = buildConfirmMsg();
-    // send the confirm message
-  sendData(confirmMsg);
 
 return 1;
 }
@@ -210,7 +212,7 @@ TiXmlDocument buildInitialMsg() {
   anwserMsg.SaveFile( "anwserMsg.xml" );
 }
 
-TiXmlDeclaration buildAnwserMsg(int sensorValue;)
+TiXmlDeclaration buildAnwserMsg(int sensorValue)
 { // builds an awnser message that's to be send to the server.
   TiXmlDocument anwserMsg;
   
@@ -276,7 +278,7 @@ void parser(std::string S1 ,std::string arr[]){
         SUB2 = S1.find("</receiver>"); //zoek naa reciever
         SUB1 +=11 ; //want <receiver> is elf groot
         std::string naam = S1.substr(SUB1, SUB2 - SUB1);
-        if ((naam == "allWemos" || uniekewemosnaam == naam)){
+        if ((naam == "allWemos" || wemosNaam == naam)){
             arr[0]= "Niet voor deze wemos bedoelt"; //kijken ov hij voor deze wemos bedoel is
         }
         else {
@@ -298,9 +300,7 @@ void parser(std::string S1 ,std::string arr[]){
             SUB2 = S1.find("</password>"); // zoekunctie pasword einde
             SUB1 += 10; // want pasword is 10 groot
             std::string wachtwoord = S1.substr(SUB1, SUB2 - SUB1);
-            if (!(wachtwoord==definedwachtwoord)){ // check of het wachtwoord goed is
-                    arr[0]= "Verkeerde Wachtwoord";
-                }
+          //signaleerd
                 else{
                     S1.erase(0,SUB1+11);
                     SUB1 = S1.find(uniekewemosnaam); //zoek naar wemosnaam in overgebleen bestand
