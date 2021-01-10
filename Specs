@@ -1,7 +1,7 @@
-VERY FUCKING EARLY ALPHABETA V0.00000000000002 VERSIE. VRAAG ZELF VOOR MEER FUNCTIONALITEIT WAAR NODIG!!
+VERY FUCKING EARLY ALPHABETA V0.00000000000003 VERSIE. VRAAG ZELF VOOR MEER FUNCTIONALITEIT WAAR NODIG!!
 
-Last edited: 17/12/2020
-- authentication ack toegevoegd
+Last edited: 10/01/2021
+- Stoel stuff added
 
 
 
@@ -203,3 +203,67 @@ Het volgende wordt er dan vanaf de server gestuurd naar de server als alle wemos
 </message>
 
 Dit is een vrij lang bericht, maar zoals je kan zien zijn hier de twee wemosjes te zien die eerder waren opgevraagd. Een sensor kan elke soort waarde teruggeven, zoals een hoog getal in bijvoorbeeld nits voor lichtSensor of celcius voor tempSensor. Een actuateBool geeft altijd een 1 of 0 terug als antwoord. 
+
+
+
+#############################################
+#                                           #
+#                   STOEL                   #
+#                                           #
+#############################################
+
+De stoel heeft de volgende functionaliteiten:
+- Massage ( mbv trilelement )
+- Druksensor die de massage activeert
+
+Voor deze functionaliteit zijn dus twee onderdelen nodig:
+- Trilelement
+- Druksensor
+
+Deze elementen zullen dus als volgt worden doorgegeven aan de server tijdens de authenticatie:
+
+<capabilities>
+    <func>
+        <type>sensor</type>
+        <funcName>drukSensor</funcName>
+    </func>
+    <func>
+        <type>actuateBool</type>
+        <funcName>trilElement</funcName>
+    </func>
+</capabilities>
+
+Wanneer de druksensor wordt ingedrukt op de stoel moet deze een request naar de server sturen voor een actie om uit te voeren. Een request voor een actie heeft als functie type: sensorUpdate
+Dus het volledige XML bericht ziet er dus ongeveer zo uit:
+
+<message>
+    <header>
+        <sender>Wemosnaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>sensorUpdate</function>
+    <context>
+        <sensor>drukSensor</sensor>
+        <data>0</data>
+    </context>
+</message>
+
+Wat hier dus wordt doorgegeven is de informatie dat een sensor is geupdate, welke sensor dit is en wat de nieuwe waarde is. Die nieuwe waarde komt dus in data te staan. Voor de druksensor is dit dus een 1 voor aan en een 0 voor uit. Als gevolg van het prachtige door school gedesignde systeem werkt de massagestand dus niet als de wifi uitvalt! 
+
+Wanneer dit wordt ontvangen beslist de server wat de actie moet zijn dat de stoel moet uitvoeren. In dit geval vrij makkelijk opzich, het trilElement moet aan. De server zal dus een bericht sturen met een context zoals deze:
+
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>wemosnaam</receiver>
+    </header>
+    <function>actuateBool</function>
+    <context>
+        <funcName>trilElement</funcName>
+        <data>0</data>
+    </context>
+</message>
+
+De functie hier is dus "actuateBool". Dit staat voor het veranderen van de status van een boolean gebaseerd element, zoals een trilElement. Deze heeft maar twee standen, aan of uit. Hier is de data de stand waar het trilElement in wordt gezet 0, betekende dat deze wordt uitgeschakeld. 1 zou betekenen dat het trilElement aan moet. 
+De funcName is hier dezelfde naam die wordt meegegeven tijdens de authenticatie.
+
