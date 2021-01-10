@@ -138,6 +138,14 @@ void SocketServer::handleRequest(int fd){
             xml_w.buildXML();
             respondmsg = xml_w.getXML();
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+        }else if(xml_r.getFunction() == "sensorUpdate"){
+            std::cout << "Sensor update received from:\n"
+                      << xml_r.getClientName() << std::endl;
+            std::string respondmsg;
+            XmlWriter xml_w(xml_r);
+            xml_w.buildXML();
+            respondmsg = xml_w.getXML();
+            send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
         }
     }catch(const std::out_of_range& oor){
         std::cout << "function did not exist inside the thingy" << std::endl;
