@@ -14,8 +14,8 @@
 			<div class="box filler">
 				<?php
 				if($page != "Login") {
-					echo "<p class=\"info\">Name: ".$_SESSION['login_user']."<br>";
-					echo "Room: "; //.$_SESSION['room'];
+					echo "<p class=\"info\">Name: ".$_SESSION['username']."<br>";
+					echo "Room: ".$_SESSION['room_number']; //.$_SESSION['room'];
 					echo "</p>";
 				}
 				?>

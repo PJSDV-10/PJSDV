@@ -9,9 +9,12 @@
 			$username=$_POST['username'];
 			$password=$_POST['password'];
 
-			if($username == "admin" && $password == "admin") {
-				$_SESSION['login_user'] = $username;
-				header("Location: /?p=Home");
+			require "db_selector.php";
+
+			if(queryUser($username) && queryPass($username, $password)) {
+					$_SESSION['username'] = $username;
+					$_SESSION['room_number'] = queryRoom($username);
+					header("Location: /?p=Home");
 			} else {
 				$error = "Username or password is incorrect!";
 			}
