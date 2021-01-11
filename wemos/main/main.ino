@@ -100,13 +100,14 @@ void loop()
 
 
   // send msg
-  for(int i = 0; i < AMOUNTOFSENSORS-1; i++)
+  for(int i = 0; i < AMOUNTOFSENSORS-1; i++){
   if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue);
     TiXmlPrinter pronter;
     pronter.SetIndent("\t");
     AnswerMsg.Accept(&pronter);
     
     sendData(pronter.CStr());
+  }
   }
   
   
@@ -129,19 +130,19 @@ bool authenticating(){
   sendData(printer.CStr());
 
   // wait for some sort of reply, if received do the assignment thing.
-  int receivedResponse = 1;
-  do {char *receivedMsg = receiveData(); receivedResponse = 0;}
+  int receivedResponse = 0;
+  char *receivedMsg;
+  do {receivedMsg = receiveData(&receivedResponse);}
   while (receivedResponse != 1);
 
    
-  // TODO: now extract the usefull bits
-  // DEFINITELY NOT FINISHED YET!!!!
-  
-  char *clientname = "clientname"; // hardcoded them in so it goes through.
-  char *function = "OK";
+  // now extract the usefull bits
+  std::string parsedMsg[10];
+  std::string receivedMsgString(receivedMsg);
+  parser(receivedMsgString ,parsedMsg);
 
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
-  if (!(function == "OK")) {  
+  if (!(parsedMsg[2] == "OK")) {  
     return 0;
   }
 
@@ -149,13 +150,14 @@ return 1;
 }
 
 
-char* receiveData() {
+char* receiveData(int* receivedResponse) {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
 if (client.connect(ip, 8080)) {
     if(client.available()){
       char *poep;
       strcpy(poep, client.readString().c_str());
+      *receivedResponse = 1;
       return poep;
     }
     else return 0;
