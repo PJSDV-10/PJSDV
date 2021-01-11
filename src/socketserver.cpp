@@ -147,6 +147,7 @@ void SocketServer::handleRequest(int fd){
             std::cout << "Sensor update received from:\n"
                       << xml_r.getClientName() << std::endl;
             for (int i = 0; i < wemosjes.size(); i++){
+                // todo check sender name for correct wemos
                 wemosjes[i].
             }
                 send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);

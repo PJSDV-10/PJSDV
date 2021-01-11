@@ -1,5 +1,5 @@
-CC       := g++ 
-CFLAGS   := -Wall -pthread -std=c++17
+CC       := arm-linux-gnueabi-g++
+CFLAGS   := -Wall -pthread
 # LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ../out
 OBJ_DIR  := $(BUILD)/obj
