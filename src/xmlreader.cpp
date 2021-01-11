@@ -34,6 +34,12 @@ void XmlReader::parseDocument(){
                     type : string
                     func : string
          */
+    }else if(function == "sensorUpdate"){
+        if(!checkPassword(context_node->first_node("password")->value())){
+            return;
+        }
+        // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
+        
     }
 }
 
