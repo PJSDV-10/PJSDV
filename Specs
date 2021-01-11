@@ -1,7 +1,14 @@
 VERY FUCKING EARLY ALPHABETA V0.00000000000003 VERSIE. VRAAG ZELF VOOR MEER FUNCTIONALITEIT WAAR NODIG!!
 
-Last edited: 10/01/2021
+
+Changelog:
+edited: 11/01/2021
+- Added requirement "type" for authentication
+
+edited: 10/01/2021
 - Stoel stuff added
+
+
 
 
 
@@ -37,6 +44,7 @@ wemos aanmelden bij server:
     <context>
         <password>JeMoederIsEenWachtwoord</password>
         <clientName>Keuken Lamp</clientName>
+        <type>lamp</type>
         <capabilities>
             <func>
                 <type>actuateBool</type>
@@ -96,6 +104,7 @@ De website moet zichzelf ook authenticeren bij de server. Dat ziet er zo uit, di
     <context>
         <password>JeMoederIsEenWachtwoord</password>
         <clientName>Website</clientName>
+        <type>website</type>
         <capabilities>
             <func>
                 <type>frontend</type>
@@ -232,6 +241,11 @@ Deze elementen zullen dus als volgt worden doorgegeven aan de server tijdens de 
         <funcName>trilElement</funcName>
     </func>
 </capabilities>
+
+Ook moet er een type worden meegegeven, het wemostype van de stoel is "stoel", dit gaat zo:
+<type>stoel</type>
+
+Deze staat in de scope van context;
 
 Wanneer de druksensor wordt ingedrukt op de stoel moet deze een request naar de server sturen voor een actie om uit te voeren. Een request voor een actie heeft als functie type: sensorUpdate
 Dus het volledige XML bericht ziet er dus ongeveer zo uit:
