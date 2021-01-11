@@ -133,6 +133,11 @@ void SocketServer::handleRequest(int fd){
         if(xml_r.getFunction() == "authentication"){ 
             std::cout << "The following device authenticated with the server:\n"
                       << xml_r.getClientName() << std::endl;
+            if(authWemos(xml_r) == 1){ // 1 means error
+                std::cout << "Wemos failure with authentication" << std::endl;
+                //send message back?
+                return;
+            }
             std::string respondmsg;
             XmlWriter xml_w(xml_r);
             xml_w.buildXML();
@@ -141,11 +146,10 @@ void SocketServer::handleRequest(int fd){
         }else if(xml_r.getFunction() == "sensorUpdate"){
             std::cout << "Sensor update received from:\n"
                       << xml_r.getClientName() << std::endl;
-            std::string respondmsg;
-            XmlWriter xml_w(xml_r);
-            xml_w.buildXML();
-            respondmsg = xml_w.getXML();
-            send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+            for (int i = 0; i < wemosjes.size(); i++){
+                wemosjes[i].
+            }
+                send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
         }
     }catch(const std::out_of_range& oor){
         std::cout << "function did not exist inside the thingy" << std::endl;
@@ -153,6 +157,17 @@ void SocketServer::handleRequest(int fd){
         return;
     }
     return;
+}
+
+int SocketServer::authWemos(XmlReader& msg){
+    if(checkIfWemosExists(msg.getSenderName()) == 1){
+        std::cout << "Wemos existed in table" << std::endl;
+        return 1;
+    }
+    if(msg.getType() == "stoel"){
+        wemosjes.emplace_back(new Stoel(1, msg.getClientName(), msg.getSenderName()));
+    }
+    return 0;
 }
 
 int SocketServer::accept_connection(int fd){
@@ -169,12 +184,12 @@ int SocketServer::accept_connection(int fd){
     return r_fd;
 }
 
-bool SocketServer::checkIfWemosExists(std::vector<Wemos> &a, String name){
-    for (uint i = 0; i < a.size(); i++){
+bool SocketServer::checkIfWemosExists(String name){
+    for (uint i = 0; i < wemosjes.size(); i++){
         String senderName;
         //Debug message
         std::cout << "senderName comparison check\nThis debug message exists at line " << __LINE__ << std::endl;
-        senderName = a[i].getSenderName();
+        senderName = wemosjes[i].getSenderName();
         if (senderName == name)
         {
             return true;

@@ -9,6 +9,8 @@ void XmlReader::parseDocument(){
         }
         clientName = context_node->first_node("clientName")->value();
         parsedContext.emplace("clientName", clientName);
+        type = context_node->first_node("type")->value();
+        parsedContext.emplace("type", type);
         Array capabilities;
         for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
         {

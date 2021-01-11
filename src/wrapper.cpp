@@ -14,8 +14,8 @@ Value const & Wrapper::value() const {
     return v;
 }
 
-Wemos::Wemos(std::vector<Wrapper> cap, std::string senderName, std::string clientName){
+/*Wemos::Wemos(std::vector<Wrapper> cap, std::string senderName, std::string clientName){
     capabilities = cap;
     this->clientName = clientName;
     this->senderName = senderName;
-}
+}*/

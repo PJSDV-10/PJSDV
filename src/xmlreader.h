@@ -13,6 +13,7 @@ private:
     std::string senderName;
     std::string receiverName;
     std::string clientName;
+    std::string type;
 
     Map parsedXML;
     Map parsedContext;
@@ -44,4 +45,5 @@ public:
     inline const std::string getSenderName() const { return senderName; };
     inline const std::string getReceiverName() const { return receiverName; };
     inline const std::string getClientName() const { return clientName; };
+    inline const std::string getType() const { return type; };
 };

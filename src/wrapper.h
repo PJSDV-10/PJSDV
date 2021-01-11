@@ -6,7 +6,7 @@
 #include <variant>
 
 struct Wrapper;
-class Wemos{
+/*class Wemos{
 private:
     int fd;
     std::string clientName;
@@ -19,12 +19,13 @@ public:
     //Getters
     inline const std::vector<Wrapper> getCapabilities() const { return capabilities; };
     inline const std::string getSenderName() const { return senderName; };
-};
+};*/
+
 using Number = double;
 using String = std::string;
 using Array = std::vector<Wrapper>;
 using Map = std::map<String, Wrapper>;
-using Value = std::variant<Number, String, Array, Map, Wemos>;
+using Value = std::variant<Number, String, Array, Map>;
 
 struct Wrapper
 {
