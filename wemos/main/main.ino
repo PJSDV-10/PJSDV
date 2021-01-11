@@ -25,6 +25,7 @@ const char *definedwachtwoord= "";
 // authentication macros
 const char *wemosNaam = "wall";
 const char *server = "testServer";
+const char* type = "lamp";
 
 // Network SSID
 const char *ssid = "oop";
@@ -41,7 +42,7 @@ void setup()
   //setupsensor() - needed when using TWI sensor.
   
   Serial.begin(115200);
-  Serial.write("Test Message");
+  Serial.print("Test Message");
 
 
   WiFi.begin(ssid, password); // Connect to the network
@@ -68,16 +69,14 @@ void setup()
   }else{
     Serial.println("Not connected");
   }
-  
+  Serial.println();
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
-  Serial.print("start auth");
   while (authenticating()) {
-       delay(1000);
+       //delay(1000);
     Serial.print(++i);
     Serial.print(' ');
     }
-    Serial.println("na auth");
   
 }
 
@@ -101,13 +100,13 @@ void loop()
 
   // send msg
   for(int i = 0; i < AMOUNTOFSENSORS-1; i++){
-  if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue);
-    TiXmlPrinter pronter;
-    pronter.SetIndent("\t");
-    AnswerMsg.Accept(&pronter);
-    
-    sendData(pronter.CStr());
-  }
+     if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue);
+      TiXmlPrinter pronter;
+      pronter.SetIndent("\t");
+      AnswerMsg.Accept(&pronter);
+     
+      sendData(pronter.CStr());
+    }
   }
   
   
@@ -120,16 +119,17 @@ bool authenticating(){
   // !!!not finished yet!!!
   
   // first format the initial message.
+  Serial.println("Starting authentication procedure");
   TiXmlDocument initialMsg = buildInitialMsg();
   TiXmlPrinter printer;
   printer.SetIndent("\t");
   initialMsg.Accept(&printer);
   
   // now send this to the server
-  Serial.print(printer.CStr());
   sendData(printer.CStr());
 
   // wait for some sort of reply, if received do the assignment thing.
+  Serial.println("Waiting for a response.");
   int receivedResponse = 0;
   char *receivedMsg;
   do {receivedMsg = receiveData(&receivedResponse);}
@@ -138,14 +138,14 @@ bool authenticating(){
    
   // now extract the usefull bits
   std::string parsedMsg[10];
-  std::string receivedMsgString(receivedMsg);
+  std::string receivedMsgString(receivedMsg);// turn the character stream
   parser(receivedMsgString ,parsedMsg);
 
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
   if (!(parsedMsg[2] == "OK")) {  
     return 0;
   }
-
+    Serial.println("authentication procedure sucessfully completed");
 return 1;
 }
 
@@ -168,13 +168,12 @@ if (client.connect(ip, 8080)) {
 
 void sendData(const char *msg){
   // don't know if this still works, problably does though
-Serial.print("send function\n\r");
+  Serial.println("starting a transmission of the following message:");
+  Serial.println(msg);
   
-    //if(client.available()&&client.connected()){
-        if(client.availableForWrite()){
-          Serial.print(msg);
+    //if(client.availableForWrite()&&client.connected()){
           client.write(msg);
-        }
+          Serial.println("The message has been send succesfully.");
     //}
 }
 
@@ -229,6 +228,10 @@ TiXmlDocument buildInitialMsg() {
           TiXmlText * clientNameText = new TiXmlText( wemosNaam );
           clientNameElement->LinkEndChild(clientNameText);
         context->LinkEndChild(clientNameElement);
+        TiXmlElement * typeElement = new TiXmlElement( "type" );
+          TiXmlText * typeText = new TiXmlText( type );
+          typeElement->LinkEndChild(typeText);
+        context->LinkEndChild(typeElement); 
 
         // all the functions of the given wemos board, needs to be edited for every wemos
         TiXmlElement * func1Element = new TiXmlElement( "func" );
