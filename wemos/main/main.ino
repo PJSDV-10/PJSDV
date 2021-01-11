@@ -178,6 +178,26 @@ Serial.print("send function\n\r");
     //}
 }
 
+//TiXmlDocument*//
+TiXmlDocument Buildheader(TiXmlDocument I) { 
+  //this function wil make the start of evry masage to the end of the header
+  //deze functie maakt het begin van het bericht totenmet de einde van de header
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+    TiXmlElement * message = new TiXmlElement( "message" );
+    //header
+      TiXmlElement * header = new TiXmlElement( "header" );
+        TiXmlElement * senderElement = new TiXmlElement( "sender" );
+          TiXmlText * senderText = new TiXmlText( wemosNaam );
+        senderElement->LinkEndChild(senderText);
+      header->LinkEndChild(senderElement);
+        TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
+          TiXmlText * receiverText = new TiXmlText( server );
+        receiverElement->LinkEndChild(receiverText);
+       header->LinkEndChild(receiverElement);
+    message->LinkEndChild(header);
+    return I ;// sure if i need to return or if that wil just make a unecsacery copy
+}
+
 TiXmlDocument buildInitialMsg() {
   TiXmlDocument Msg;
   
@@ -277,19 +297,20 @@ TiXmlDocument buildAnwserMsg(int sensor[AMOUNTOFSENSORS][3], char* sensorNames[A
 }
 
 
+
+
+
 void parser(std::string S1 ,std::string arr[]){
-//    in deze parser word het als volgt neergezet
+//    this parser result in the folowing
 //    0 = status en errors
 //    1=sender
 //    2=function
-//    3 en up = context
+//    3 and up = context
 
-//vergeet niet NUMBER_OF_STRING te define
-// vergeet niet uniekewemosnaam te define
-// vergeet niet definedwachtwoord te definen
+// dont ferget to define NUMBER_OF_STRING and wemosnaam
 
     int  SUB1 = S1.find("<message>");
-    int  SUB2 = S1.find("</message>"); // zoek of dit we lecht een mesage is
+    int  SUB2 = S1.find("</message>"); // look for the right format
 
     if(SUB1 == -1 || SUB2 == -1){
         arr[0]= "Verkeerde soort message";
@@ -297,23 +318,23 @@ void parser(std::string S1 ,std::string arr[]){
     else {
 
         SUB1 = S1.find("<receiver>");
-        SUB2 = S1.find("</receiver>"); //zoek naa reciever
-        SUB1 +=11 ; //want <receiver> is elf groot
+        SUB2 = S1.find("</receiver>"); //search for reciever
+        SUB1 +=11 ; //want <receiver> is 11 char big
         std::string naam = S1.substr(SUB1, SUB2 - SUB1);
-        if ((naam == "allWemos" || wemosNaam == naam)){
-            arr[0]= "Niet voor deze wemos bedoelt"; //kijken ov hij voor deze wemos bedoel is
+        if ((naam == "allWemos" || wemosNaam == naam)){ // look if the mesage is for this wemos
+            arr[0]= "Niet voor deze wemos bedoelt"; 
         }
         else {
             SUB1 = S1.find("<sender>"); // zoek sender
             SUB2 = S1.find("</sender>"); // zoek einde van sender
             SUB1 += 8 ; //want <sender> is 8 groot
-            std::string sender = S1.substr(SUB1, SUB2 - SUB1); //defieneer sender SUB2 -  Sub1 want substr heeft een getal nodig met hoevel die verder gaat
-            arr[1] = sender; // zet sender definitief
+            std::string sender = S1.substr(SUB1, SUB2 - SUB1); //defieneer sender SUB2 -  Sub1 want substr needs a int no a laction
+            arr[1] = sender; 
 
 
-            S1.erase(0,SUB2+9); // delete alles van de string waar we al overheen gelopen zijn
-            SUB1 = S1.find("<function>"); // zoek functie
-            SUB2 = S1.find("</function>"); // zoekunctie einde
+            S1.erase(0,SUB2+9); // delete evrything we already searched
+            SUB1 = S1.find("<function>"); 
+            SUB2 = S1.find("</function>"); 
             SUB1 += 10 ; //want <function> is 10 groot
             std::string functie= S1.substr(SUB1, SUB2 - SUB1);
             arr[2] = functie;
@@ -324,19 +345,19 @@ void parser(std::string S1 ,std::string arr[]){
             std::string wachtwoord = S1.substr(SUB1, SUB2 - SUB1);
           //signaleerd
                     S1.erase(0,SUB1+11);
-                    SUB1 = S1.find(wemosNaam); //zoek naar wemosnaam in overgebleen bestand
+                    SUB1 = S1.find(wemosNaam); //find wemosNaam in bestand
                     if( SUB1 == -1){
                         arr[0]= "geen acties"; // geen actie uit te voeren want deze wemos komt niet voor in context
                     }
                     else{
                         SUB2 = S1.find("</wemos>");
-                        S1.erase(SUB2,100000); // erase alles na de actie die deze wemos moet uitvoeren
-                        SUB1 = S1.find("<sensor>"); //zoek sensor
-                        SUB2 = S1.find("</sensor>"); // zoek einde sensor
+                        S1.erase(SUB2,100000); // erase evrything after what this wemos needs
+                        SUB1 = S1.find("<sensor>"); //find sensor
+                        SUB2 = S1.find("</sensor>"); // find end sensor
 
-                        for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){
-                            SUB1 = S1.find("<sensor>"); //zoek sensor
-                            SUB2 = S1.find("</sensor>"); // zoek einde sensor
+                        for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){// look for context
+                            SUB1 = S1.find("<sensor>"); //zfind sensor
+                            SUB2 = S1.find("</sensor>"); // find end sensor
                             SUB1 += 8 ;
                             std::string temp = S1.substr(SUB1, SUB2 - SUB1);
                             arr[i] = temp;
