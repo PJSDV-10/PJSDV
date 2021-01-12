@@ -12,9 +12,8 @@
 #include <tinyxml.h>
 #include <string>
 
-#define RESPTIME 300
-#define MIN_TIME 5 // Skip arrivals sooner than this (minutes)
-#define AMOUNTOFSENSORS 1
+#define AMOUNTOFSENSORS 2
+#define BUFFERSIZE 20
 
 
 int NUMBER_OF_STRING = 10;
@@ -34,6 +33,8 @@ const char *ip = "dutchellie.nl";
 
 // sensor globals
 int previousSensorValue = 0;
+int sensor[AMOUNTOFSENSORS][4] = {{1,255,0,2},{2,17,0,4}};    // sensor array will be {id,currentvalue,previousvalue, pinnumber}
+  char* sensorNames[AMOUNTOFSENSORS][2] = {{"1","drukKnop"},{"2","ldr"}}; // each sensor has a name, but this can't be stored in an int array. {id,name}
 
 WiFiClient client;
 
@@ -73,7 +74,7 @@ void setup()
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
   while (authenticating()) {
-       //delay(1000);
+       delay(1000);
     Serial.print(++i);
     Serial.print(' ');
     }
@@ -87,20 +88,28 @@ void loop()
 {
    // for the time being, the old sending function will be used. 
    // a string formatted like an xml file wil be send via said function.
-  int sensor[AMOUNTOFSENSORS][3] = {1,0,0};    // sensor array will be {id,currentvalue,previousvalue}
-  char* sensorNames[AMOUNTOFSENSORS][2] = {{"1","lamp"}};
+  
    
-   // readSensors --- placeholder for now, depends on the test setup.
-   int sensorValue1 = analogRead(2);
+   // readSensors 
+   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
+    sensor[i][1] = analogRead(sensor[i][3]);
+   }
    
-   // format msg
-   // i don't have time to add in the real message now, will come on friday i hope.
-   TiXmlDocument AnswerMsg = buildAnwserMsg(sensor, sensorNames);
-
+  // if we receive a message, handle it
+   
+  std::string receivedMsg(receiveData()); // receive some data
+  if (receivedMsg != ""){
+    std::string parsedMsg[BUFFERSIZE];
+    parser(receivedMsg, parsedMsg);
+    handleMessage(parsedMsg);
+    
+  }
+  
+TiXmlDocument AnswerMsg = buildAnwserMsg();
 
   // send msg
-  for(int i = 0; i < AMOUNTOFSENSORS-1; i++){
-     if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue);
+  for(int i = 0; i < AMOUNTOFSENSORS; i++){
+     if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
       TiXmlPrinter pronter;
       pronter.SetIndent("\t");
       AnswerMsg.Accept(&pronter);
@@ -113,6 +122,20 @@ void loop()
  
 }
 
+bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
+  
+  if(parsedMsg[2] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
+    TiXmlDocument AnswerMsg = buildAnwserMsg();
+    TiXmlPrinter pranter;
+      pranter.SetIndent("\t");
+      AnswerMsg.Accept(&pranter);
+      sendData(pranter.CStr());
+      return 1;
+  } else  
+  return 0;
+
+}
+
 bool authenticating(){
   // goes through the whole authentication procedure.
   // function is pretty long because of the long message strings.
@@ -120,7 +143,8 @@ bool authenticating(){
   
   // first format the initial message.
   Serial.println("Starting authentication procedure");
-  TiXmlDocument initialMsg = buildInitialMsg();
+  TiXmlDocument initialMsg = buildAnwserMsg();
+  
   TiXmlPrinter printer;
   printer.SetIndent("\t");
   initialMsg.Accept(&printer);
@@ -132,7 +156,7 @@ bool authenticating(){
   Serial.println("Waiting for a response.");
   int receivedResponse = 0;
   char *receivedMsg;
-  do {receivedMsg = receiveData(&receivedResponse);}
+  do {receivedMsg = receiveData(&receivedResponse); if (receivedResponse != 1){delay(100);}}
   while (receivedResponse != 1);
 
    
@@ -153,21 +177,30 @@ return 1;
 char* receiveData(int* receivedResponse) {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
-if (client.connect(ip, 8080)) {
+  //Serial.println("looking if we received a message");
     if(client.available()){
       char *poep;
       strcpy(poep, client.readString().c_str());
       *receivedResponse = 1;
+      Serial.println("We received the following message");
+      Serial.println(poep);
       return poep;
     }
-    else return 0;
-  }
+  else return 0;
+}
+char* receiveData() {
+  // pretty rudementairy, if we can read a string we return it, if not we return 0.
+  // TODO: add fancy error checking mechanism.
+    if(client.available()){
+      char *poep;
+      strcpy(poep, client.readString().c_str());
+      return poep;
+    }
   else return 0;
 }
 
-
 void sendData(const char *msg){
-  // don't know if this still works, problably does though
+  // sends the enclosed message to the connected client
   Serial.println("starting a transmission of the following message:");
   Serial.println(msg);
   
@@ -250,14 +283,13 @@ TiXmlDocument buildInitialMsg() {
       message->LinkEndChild(context);
   
   Msg.LinkEndChild( message );
-  Msg.SaveFile( "anwserMsg.xml" );
   return Msg;
 }
 
-TiXmlDocument buildAnwserMsg(int sensor[AMOUNTOFSENSORS][3], char* sensorNames[AMOUNTOFSENSORS][2])
+TiXmlDocument buildAnwserMsg()
 { // builds an awnser message that's to be send to the server.
   TiXmlDocument anwserMsg;
-  
+  Serial.println("Starting to build an AwnserMessage");
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
     TiXmlElement * message = new TiXmlElement( "message" );
     //header
@@ -265,9 +297,11 @@ TiXmlDocument buildAnwserMsg(int sensor[AMOUNTOFSENSORS][3], char* sensorNames[A
         TiXmlElement * senderElement = new TiXmlElement( "sender" );
           TiXmlText * senderText = new TiXmlText( wemosNaam );
         senderElement->LinkEndChild(senderText);
+      header->LinkEndChild(senderElement);
         TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
           TiXmlText * receiverText = new TiXmlText( server );
         receiverElement->LinkEndChild(receiverText);
+      header->LinkEndChild(receiverElement);
     message->LinkEndChild(header);
     //function
       TiXmlElement * functionElement = new TiXmlElement( "function" );
@@ -275,27 +309,36 @@ TiXmlDocument buildAnwserMsg(int sensor[AMOUNTOFSENSORS][3], char* sensorNames[A
       functionElement->LinkEndChild(functionText);
     message->LinkEndChild(functionElement);
     // context
+    Serial.println("building context");
       TiXmlElement * context = new TiXmlElement( "context" );
       
       // voor elke sensor een apart sensor element toevoegen
-      for (int i = 0; i < AMOUNTOFSENSORS-1; i++) { 
+      for (int i = 0; i < AMOUNTOFSENSORS; i++) { 
+        
       TiXmlElement * sensorElement = new TiXmlElement( "sensor" );
         TiXmlElement * nameElement = new TiXmlElement( "name" );
           TiXmlText * nameText = new TiXmlText( sensorNames[i][1] );
+          Serial.println("test");
         nameElement->LinkEndChild(nameText);
       sensorElement->LinkEndChild(nameElement);
+    Serial.println("test2");
         TiXmlElement * statusElement = new TiXmlElement( "status" );
-        char* strong;
+        Serial.println("test3");
+        char strong[5];
         itoa(sensor[i][1], strong, 10);
-          TiXmlText * statusText = new TiXmlText( strong ); //TODO: tostring convert
+        Serial.println(strong);
+          TiXmlText * statusText = new TiXmlText(strong); 
         statusElement->LinkEndChild(statusText);
       sensorElement->LinkEndChild(statusElement);
       context->LinkEndChild(sensorElement);
+      
       }
+      // TODO: the same for actuators
+      Serial.println("Finished up context");
+      
       message->LinkEndChild(context);
   
   anwserMsg.LinkEndChild( message );
-  anwserMsg.SaveFile( "anwserMsg.xml" );
   return anwserMsg;
 }
 
@@ -313,7 +356,10 @@ void parser(std::string S1 ,std::string arr[]){
 // dont ferget to define NUMBER_OF_STRING and wemosnaam
 
     int  SUB1 = S1.find("<message>");
+
     int  SUB2 = S1.find("</message>"); // look for the right format
+
+
 
     if(SUB1 == -1 || SUB2 == -1){
         arr[0]= "Verkeerde soort message";
