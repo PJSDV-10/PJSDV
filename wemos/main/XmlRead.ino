@@ -25,19 +25,7 @@ char* receiveData(int* receivedResponse) {
   else return 0;
 }
 
-bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
-  
-  if(parsedMsg[2] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
-    TiXmlDocument AnswerMsg = buildAnwserMsg();
-    TiXmlPrinter pranter;
-      pranter.SetIndent("\t");
-      AnswerMsg.Accept(&pranter);
-      sendData(pranter.CStr());
-      return 1;
-  } else  
-  return 0;
 
-}
 
 
 

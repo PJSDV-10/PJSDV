@@ -133,3 +133,54 @@ TiXmlDocument AnswerMsg = buildAnwserMsg();
   
  
 }
+
+bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
+  
+  if(parsedMsg[2] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
+    TiXmlDocument AnswerMsg = buildAnwserMsg();
+    TiXmlPrinter pranter;
+      pranter.SetIndent("\t");
+      AnswerMsg.Accept(&pranter);
+      sendData(pranter.CStr());
+      return 1;
+  } else  
+  return 0;
+
+}
+
+bool authenticating(){
+  // goes through the whole authentication procedure.
+  // function is pretty long because of the long message strings.
+  // !!!not finished yet!!!
+  
+  // first format the initial message.
+  Serial.println("Starting authentication procedure");
+  TiXmlDocument initialMsg = buildInitialMsg();
+  
+  TiXmlPrinter printer;
+  printer.SetIndent("\t");
+  initialMsg.Accept(&printer);
+  
+  // now send this to the server
+  sendData(printer.CStr());
+
+  // wait for some sort of reply, if received do the assignment thing.
+  Serial.println("Waiting for a response.");
+  int receivedResponse = 0;
+  char *receivedMsg;
+  do {receivedMsg = receiveData(&receivedResponse); if (receivedResponse != 1){delay(100);}}
+  while (receivedResponse != 1);
+
+   
+  // now extract the usefull bits
+  std::string parsedMsg[10];
+  std::string receivedMsgString(receivedMsg);// turn the character stream
+  parser(receivedMsgString ,parsedMsg);
+
+  // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
+  if (!(parsedMsg[2] == "OK")) {  
+    return 0;
+  }
+    Serial.println("authentication procedure sucessfully completed");
+return 1;
+}

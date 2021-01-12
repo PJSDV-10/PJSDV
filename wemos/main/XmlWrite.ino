@@ -10,12 +10,10 @@ void sendData(const char *msg){
 }
 
 //TiXmlDocument*//
-TiXmlDocument Buildheader(TiXmlDocument I) { 
+void Buildheader(TiXmlElement * message) { 
   //this function wil make the start of evry masage to the end of the header
   //deze functie maakt het begin van het bericht totenmet de einde van de header
-  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-    TiXmlElement * message = new TiXmlElement( "message" );
-    //header
+
       TiXmlElement * header = new TiXmlElement( "header" );
         TiXmlElement * senderElement = new TiXmlElement( "sender" );
           TiXmlText * senderText = new TiXmlText( wemosNaam );
@@ -26,7 +24,6 @@ TiXmlDocument Buildheader(TiXmlDocument I) {
         receiverElement->LinkEndChild(receiverText);
        header->LinkEndChild(receiverElement);
     message->LinkEndChild(header);
-    return I ;// sure if i need to return or if that wil just make a unecsacery copy
 }
 
 TiXmlDocument buildInitialMsg() {
@@ -35,16 +32,7 @@ TiXmlDocument buildInitialMsg() {
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
     TiXmlElement * message = new TiXmlElement( "message" );
     //header
-      TiXmlElement * header = new TiXmlElement( "header" );
-        TiXmlElement * senderElement = new TiXmlElement( "sender" );
-          TiXmlText * senderText = new TiXmlText( wemosNaam );
-        senderElement->LinkEndChild(senderText);
-      header->LinkEndChild(senderElement);
-        TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
-          TiXmlText * receiverText = new TiXmlText( server );
-        receiverElement->LinkEndChild(receiverText);
-       header->LinkEndChild(receiverElement);
-    message->LinkEndChild(header);
+      Buildheader(message);
     //function
       TiXmlElement * functionElement = new TiXmlElement( "function" );
         TiXmlText * functionText = new TiXmlText( "authentication" );
@@ -88,27 +76,18 @@ TiXmlDocument buildInitialMsg() {
 TiXmlDocument buildAnwserMsg(){
   // builds an awnser message that's to be send to the server.
   TiXmlDocument anwserMsg;
-  Serial.println("Starting to build an AwnserMessage");
+  //Serial.println("Starting to build an AwnserMessage");
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
     TiXmlElement * message = new TiXmlElement( "message" );
     //header
-      TiXmlElement * header = new TiXmlElement( "header" );
-        TiXmlElement * senderElement = new TiXmlElement( "sender" );
-          TiXmlText * senderText = new TiXmlText( wemosNaam );
-        senderElement->LinkEndChild(senderText);
-      header->LinkEndChild(senderElement);
-        TiXmlElement * receiverElement = new TiXmlElement( "receiver" );
-          TiXmlText * receiverText = new TiXmlText( server );
-        receiverElement->LinkEndChild(receiverText);
-      header->LinkEndChild(receiverElement);
-    message->LinkEndChild(header);
+      Buildheader(message);
     //function
       TiXmlElement * functionElement = new TiXmlElement( "function" );
         TiXmlText * functionText = new TiXmlText( "answerToStatusRequest" );
       functionElement->LinkEndChild(functionText);
     message->LinkEndChild(functionElement);
     // context
-    Serial.println("building context");
+    //Serial.println("building context");
       TiXmlElement * context = new TiXmlElement( "context" );
       
       // voor elke sensor een apart sensor element toevoegen
@@ -117,15 +96,15 @@ TiXmlDocument buildAnwserMsg(){
       TiXmlElement * sensorElement = new TiXmlElement( "sensor" );
         TiXmlElement * nameElement = new TiXmlElement( "name" );
           TiXmlText * nameText = new TiXmlText( sensorNames[i][1] );
-          Serial.println("test");
+
         nameElement->LinkEndChild(nameText);
       sensorElement->LinkEndChild(nameElement);
-    Serial.println("test2");
+
         TiXmlElement * statusElement = new TiXmlElement( "status" );
-        Serial.println("test3");
+
         char strong[5];
         itoa(sensor[i][1], strong, 10);
-        Serial.println(strong);
+
           TiXmlText * statusText = new TiXmlText(strong); 
         statusElement->LinkEndChild(statusText);
       sensorElement->LinkEndChild(statusElement);
@@ -133,48 +112,10 @@ TiXmlDocument buildAnwserMsg(){
       
       }
       // TODO: the same for actuators
-      Serial.println("Finished up context");
+      //Serial.println("Finished up context");
       
       message->LinkEndChild(context);
   
   anwserMsg.LinkEndChild( message );
   return anwserMsg;
-}
-
-
-bool authenticating(){
-  // goes through the whole authentication procedure.
-  // function is pretty long because of the long message strings.
-  // !!!not finished yet!!!
-  
-  // first format the initial message.
-  Serial.println("Starting authentication procedure");
-  TiXmlDocument initialMsg = buildAnwserMsg();
-  
-  TiXmlPrinter printer;
-  printer.SetIndent("\t");
-  initialMsg.Accept(&printer);
-  
-  // now send this to the server
-  sendData(printer.CStr());
-
-  // wait for some sort of reply, if received do the assignment thing.
-  Serial.println("Waiting for a response.");
-  int receivedResponse = 0;
-  char *receivedMsg;
-  do {receivedMsg = receiveData(&receivedResponse); if (receivedResponse != 1){delay(100);}}
-  while (receivedResponse != 1);
-
-   
-  // now extract the usefull bits
-  std::string parsedMsg[10];
-  std::string receivedMsgString(receivedMsg);// turn the character stream
-  parser(receivedMsgString ,parsedMsg);
-
-  // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
-  if (!(parsedMsg[2] == "OK")) {  
-    return 0;
-  }
-    Serial.println("authentication procedure sucessfully completed");
-return 1;
 }
