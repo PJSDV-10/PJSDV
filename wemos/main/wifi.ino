@@ -26,8 +26,44 @@ char* receiveData(int* receivedResponse) {
 }
 
 
+void sendData(const char *msg){
+  // sends the enclosed message to the connected client
+  Serial.println("starting a transmission of the following message:");
+  Serial.println(msg);
+  
+    //if(client.availableForWrite()&&client.connected()){
+          client.write(msg);
+          Serial.println("The message has been send succesfully.");
+    //}
+}
 
+void setupWifi(){
+  WiFi.begin(ssid, password); // Connect to the network
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
+  Serial.println(" ...");
+  
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED)
+  { // Wait for the Wi-Fi to connect
+    delay(1000);
+    Serial.print(++i);
+    Serial.print(' ');
+  }
 
+  Serial.println('\n');
+  Serial.println("Wifi connection established!");
+  Serial.print("IP address:\t");
+  Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
+  
+  // connect to server
+  if (client.connect(ip, 4500)) {
+    Serial.println("Connected to server");
+  }else{
+    Serial.println("Not connected to server");
+  }
+  
+}
 
 void parser(std::string S1 ,std::string arr[]){
 //    this parser result in the folowing

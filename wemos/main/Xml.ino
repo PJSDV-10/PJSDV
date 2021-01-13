@@ -1,14 +1,3 @@
-void sendData(const char *msg){
-  // sends the enclosed message to the connected client
-  Serial.println("starting a transmission of the following message:");
-  Serial.println(msg);
-  
-    //if(client.availableForWrite()&&client.connected()){
-          client.write(msg);
-          Serial.println("The message has been send succesfully.");
-    //}
-}
-
 //TiXmlDocument*//
 void Buildheader(TiXmlElement * message) { 
   //this function wil make the start of evry masage to the end of the header
@@ -26,7 +15,7 @@ void Buildheader(TiXmlElement * message) {
     message->LinkEndChild(header);
 }
 
-TiXmlDocument buildInitialMsg() {
+TiXmlDocument buildAuthenticationMsg() {
   TiXmlDocument Msg;
   
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
@@ -73,7 +62,7 @@ TiXmlDocument buildInitialMsg() {
   return Msg;
 }
 
-TiXmlDocument buildAnwserMsg(){
+TiXmlDocument buildStatusMsg(char * function){
   // builds an awnser message that's to be send to the server.
   TiXmlDocument anwserMsg;
   //Serial.println("Starting to build an AwnserMessage");
@@ -83,7 +72,7 @@ TiXmlDocument buildAnwserMsg(){
       Buildheader(message);
     //function
       TiXmlElement * functionElement = new TiXmlElement( "function" );
-        TiXmlText * functionText = new TiXmlText( "answerToStatusRequest" );
+        TiXmlText * functionText = new TiXmlText( function );
       functionElement->LinkEndChild(functionText);
     message->LinkEndChild(functionElement);
     // context

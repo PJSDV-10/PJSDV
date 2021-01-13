@@ -36,17 +36,18 @@ int previousSensorValue = 0;
 int sensor[AMOUNTOFSENSORS][4] = {{1,255,0,2},{2,17,0,4}};    // sensor array will be {id,currentvalue,previousvalue, pinnumber}
   char* sensorNames[AMOUNTOFSENSORS][2] = {{"1","drukKnop"},{"2","ldr"}}; // each sensor has a name, but this can't be stored in an int array. {id,name}
 
-//function declarations xmlwrite
-TiXmlDocument buildAnwserMsg();
-TiXmlDocument buildInitialMsg();
-void sendData(const char *msg);
-bool handleMessage(std::string parsedMsg[BUFFERSIZE]);
-
-//function declaration xmlread
-char* receiveData();
+//function declarations xml
+TiXmlDocument buildStatusMsg();
+TiXmlDocument buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
+
+//function declaration wifi
+void setupWifi();
+char* receiveData();
+
 char* receiveData(int* receivedResponse);
-bool authenticating();
+void sendData(const char *msg);
+
 
 WiFiClient client;
 
@@ -57,34 +58,11 @@ void setup()
   Serial.begin(115200);
   Serial.print("Test Message");
 
-
-  WiFi.begin(ssid, password); // Connect to the network
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-  Serial.println(" ...");
+  setupWifi();
   
-  int i = 0;
-  while (WiFi.status() != WL_CONNECTED)
-  { // Wait for the Wi-Fi to connect
-    delay(1000);
-    Serial.print(++i);
-    Serial.print(' ');
-  }
-
-  Serial.println('\n');
-  Serial.println("Connection established!");
-  Serial.print("IP address:\t");
-  Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
-  
-  // connect to server
-  if (client.connect(ip, 4500)) {
-    Serial.println("Connected to server");
-  }else{
-    Serial.println("Not connected");
-  }
-  Serial.println();
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
+  int i = 0;
   while (authenticating()) {
        delay(1000);
     Serial.print(++i);
@@ -117,14 +95,14 @@ void loop()
     
   }
   
-TiXmlDocument AnswerMsg = buildAnwserMsg();
+  TiXmlDocument statusMsg = buildStatusMsg("");
 
   // send msg
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
       TiXmlPrinter pronter;
       pronter.SetIndent("\t");
-      AnswerMsg.Accept(&pronter);
+      statusMsg.Accept(&pronter);
      
       sendData(pronter.CStr());
     }
@@ -137,7 +115,7 @@ TiXmlDocument AnswerMsg = buildAnwserMsg();
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[2] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
-    TiXmlDocument AnswerMsg = buildAnwserMsg();
+    TiXmlDocument AnswerMsg = buildStatusMsg("answerToStatusRequest");
     TiXmlPrinter pranter;
       pranter.SetIndent("\t");
       AnswerMsg.Accept(&pranter);
@@ -155,7 +133,7 @@ bool authenticating(){
   
   // first format the initial message.
   Serial.println("Starting authentication procedure");
-  TiXmlDocument initialMsg = buildInitialMsg();
+  TiXmlDocument initialMsg = buildAuthenticationMsg();
   
   TiXmlPrinter printer;
   printer.SetIndent("\t");
