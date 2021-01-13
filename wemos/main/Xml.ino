@@ -15,7 +15,7 @@ void Buildheader(TiXmlElement * message) {
     message->LinkEndChild(header);
 }
 
-TiXmlDocument buildAuthenticationMsg() {
+char* buildAuthenticationMsg() {
   TiXmlDocument Msg;
   
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
@@ -77,12 +77,26 @@ TiXmlDocument buildAuthenticationMsg() {
       message->LinkEndChild(context);
   
   Msg.LinkEndChild( message );
-  return Msg;
+  
+  // turn the message into a c string
+  TiXmlPrinter printer;
+    printer.SetIndent("\t");
+    Msg.Accept(&printer);
+    char* stringMsg = "";
+
+    strcpy(stringMsg, printer.CStr());
+
+    //TODO: free up the used memory
+    //delete message;
+    
+
+    
+  return stringMsg;
 }
 
-TiXmlDocument buildStatusMsg(char * function){
+char* buildStatusMsg(char* function){
   // builds an awnser message that's to be send to the server.
-  TiXmlDocument anwserMsg;
+  TiXmlDocument Msg;
   //Serial.println("Starting to build an AwnserMessage");
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
     TiXmlElement * message = new TiXmlElement( "message" );
@@ -141,7 +155,21 @@ TiXmlDocument buildStatusMsg(char * function){
       }
       
       message->LinkEndChild(context);
-  
-  anwserMsg.LinkEndChild( message );
-  return anwserMsg;
+
+    Msg.LinkEndChild( message );
+    
+  // turn the message into a c string
+  TiXmlPrinter printer;
+    printer.SetIndent("\t");
+    Msg.Accept(&printer);
+    char* stringMsg = "";
+
+    strcpy(stringMsg, printer.CStr());
+
+    //TODO: free up the used memory
+    //delete message;
+    
+
+    
+  return stringMsg;
 }

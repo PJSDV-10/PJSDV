@@ -12,7 +12,7 @@
 #include <tinyxml.h>
 #include <string>
 
-#define AMOUNTOFSENSORS 2
+#define AMOUNTOFSENSORS 1
 #define AMOUNTOFACTUATORS 1
 #define BUFFERSIZE 20
 
@@ -33,8 +33,8 @@ const char *password = "programmer";
 const char *ip = "dutchellie.nl";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{255,0,2},{17,0,4}}; // sensor array will be {currentvalue,previousvalue, pinnumber}
-char* sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"},{"sensorInt","ldr"}}; // each sensor has a name, but this can't be stored in an int array. 
+int sensor[AMOUNTOFSENSORS][3] = {{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber}
+char* sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
 int actuator[AMOUNTOFACTUATORS][3] = {{12,12,15}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 char* actuatorNames[AMOUNTOFACTUATORS][2] = {"actuateInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
@@ -43,8 +43,8 @@ this way we don't have to worry about the different types of actuators, like twi
 
 
 //function declarations xml
-TiXmlDocument buildStatusMsg();
-TiXmlDocument buildAuthenticationMsg();
+char* buildStatusMsg(char*);
+char* buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
 
 //function declaration wifi
@@ -58,22 +58,23 @@ WiFiClient client;
 
 void setup()
 {
-  //setupsensor() - needed when using TWI sensor.
+
   
   Serial.begin(115200);
   Serial.print("Test Message");
 
   setupWifi();
-  
+  setupPins(); //needed when using TWI sensor. 
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
+  ///*
   int i = 0;
   while (authenticating()) {
        delay(1000);
     Serial.print(++i);
     Serial.print(' ');
     }
-
+  //*/
 }
 
 void loop()
@@ -81,41 +82,43 @@ void loop()
 
    // placeholder: readSensors is different for every device
    for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-    sensor[i][0] = analogRead(sensor[i][1]);
+    sensor[i][0] = digitalRead(sensor[i][2]);
    }
    
   // if we receive a message, handle it  
-  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is empty
-  if (receivedMsg != ""){
+  std::string receivedMsg(receiveData()), empty; // receive some data, if there is nothing to receive, the string is empty
+  if (!(receivedMsg == empty)){
     std::string parsedMsg[BUFFERSIZE];
     parser(receivedMsg, parsedMsg); // parse the message, 
     handleMessage(parsedMsg);
   }
+   
 
   updateActuators();
-
+ ///*
   // send msg
+  int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
-      TiXmlDocument statusMsg = buildStatusMsg("");
-      TiXmlPrinter pronter;
-      pronter.SetIndent("\t");
-      statusMsg.Accept(&pronter);
-     
-      sendData(pronter.CStr());
-    }
+      sendStatus = 1;
+     }
+     sensor[i][1] = sensor[i][0]; // update the previous value
   }
-
+  
+  if (sendStatus){
+     
+    sendData(buildStatusMsg(""));
+    
+  }
+  
+//*/
 }
 
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[1] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
-    TiXmlDocument AnswerMsg = buildStatusMsg("answerToStatusRequest");
-    TiXmlPrinter pranter;
-      pranter.SetIndent("\t");
-      AnswerMsg.Accept(&pranter);
-      sendData(pranter.CStr());
+
+      sendData(buildStatusMsg("answerToStatusRequest"));
       return 1;
   } else  
   return 0;
@@ -155,14 +158,11 @@ bool authenticating(){
   
   // first format the initial message.
   Serial.println("Starting authentication procedure");
-  TiXmlDocument initialMsg = buildAuthenticationMsg();
-  
-  TiXmlPrinter printer;
-  printer.SetIndent("\t");
-  initialMsg.Accept(&printer);
+
   
   // now send this to the server
-  sendData(printer.CStr());
+  sendData(buildStatusMsg(""));
+  
 
   // wait for some sort of reply, if received do the assignment thing.
   Serial.println("Waiting for a response.");
@@ -174,7 +174,7 @@ bool authenticating(){
    
   // now extract the usefull bits
   std::string parsedMsg[10];
-  std::string receivedMsgString(receivedMsg);// turn the character stream
+  std::string receivedMsgString(receivedMsg);// turn the character stream into a std::string
   parser(receivedMsgString ,parsedMsg);
 
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
@@ -183,4 +183,32 @@ bool authenticating(){
   }
     Serial.println("authentication procedure sucessfully completed");
 return 1;
+}
+
+
+void setupPins() {
+  // sets the wemos' pins in output, input or input_pullup mode depending on actuator/sensor type.
+  setupSensors();
+  setupActuators();
+  Serial.println("pin setup complete");
+}
+void setupSensors() {
+  // puts the pins in input or input_pullup mode depending on the type of sensor
+  // TODO: also enables the needed TWI if we are using a TWI sensor.
+  for (int i = 0; i < AMOUNTOFSENSORS; i++) {
+    if(sensorNames[i][1] == "drukKnop") {
+      pinMode(sensor[i][2],INPUT_PULLUP);
+    }else if (sensorNames[i][1] == "TWISensor") {
+      // do the twi thing
+      
+    }else
+      pinMode(sensor[i][2],INPUT);
+  }
+}
+
+void setupActuators() {
+  // sets the actuator's pins in output mode
+  for (int i = 0; i < AMOUNTOFACTUATORS; i++) {
+    pinMode(actuator[i][2],OUTPUT);
+  }
 }

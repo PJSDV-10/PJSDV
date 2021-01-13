@@ -1,6 +1,7 @@
 char* receiveData() {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
+  //Serial.println("looking if we received a message");
     if(client.available()){
       char *poep;
       strcpy(poep, client.readString().c_str());
@@ -8,7 +9,10 @@ char* receiveData() {
       Serial.println(poep);
       return poep;
     }
-  else return 0;
+  else {
+    //Serial.println("No message received");
+    return "";
+  }
 }
 
 
@@ -24,7 +28,10 @@ char* receiveData(int* receivedResponse) {
       Serial.println(poep);
       return poep;
     }
-  else return 0;
+  else {
+    //Serial.println("No message received");
+    return 0;
+  }
 }
 
 
