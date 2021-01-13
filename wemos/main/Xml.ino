@@ -38,20 +38,21 @@ char* buildAuthenticationMsg() {
           typeElement->LinkEndChild(typeText);
         context->LinkEndChild(typeElement); 
 
+        TiXmlElement * capabilitiesElement = new TiXmlElement( "capabilities" );
         // all the functions of the given wemos board, needs to be edited for every wemos
         for (int i = 0; i < AMOUNTOFSENSORS; i++) { 
-         TiXmlElement * func1Element = new TiXmlElement( "func" );
-            TiXmlElement * type1Element = new TiXmlElement( "type" );
-              TiXmlText * type1Text = new TiXmlText( sensorNames[i][0] );
-              type1Element->LinkEndChild(type1Text);
-            func1Element->LinkEndChild(type1Element);
+         TiXmlElement * funcElement = new TiXmlElement( "func" );
+            TiXmlElement * typeElement = new TiXmlElement( "type" );
+              TiXmlText * typeText = new TiXmlText( sensorNames[i][0] );
+              typeElement->LinkEndChild(typeText);
+            funcElement->LinkEndChild(typeElement);
         
-            TiXmlElement * funcName1Element = new TiXmlElement( "funcName" );
-              TiXmlText * funcName1Text = new TiXmlText( sensorNames[i][1] );
-            funcName1Element->LinkEndChild(funcName1Text);
-          func1Element->LinkEndChild(funcName1Element);
+            TiXmlElement * funcNameElement = new TiXmlElement( "funcName" );
+              TiXmlText * funcNameText = new TiXmlText( sensorNames[i][1] );
+            funcNameElement->LinkEndChild(funcNameText);
+          funcElement->LinkEndChild(funcNameElement);
         
-          context->LinkEndChild(func1Element);
+          capabilitiesElement->LinkEndChild(funcElement);
         }
 
         // do the same for the actuators
@@ -70,10 +71,10 @@ char* buildAuthenticationMsg() {
         funcNameElement->LinkEndChild(funcNameText);
       funcElement->LinkEndChild(funcNameElement);
       
-      context->LinkEndChild(funcElement);
+      capabilitiesElement->LinkEndChild(funcElement);
       
       }
-      
+      context->LinkEndChild(capabilitiesElement);
       message->LinkEndChild(context);
   
   Msg.LinkEndChild( message );

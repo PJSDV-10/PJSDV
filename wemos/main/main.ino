@@ -1,8 +1,7 @@
 // This is testcode for now, since we need to make 7 different wemos codes eventually
 // authentication problably works, but didn't have time to test yet
 // based on the "wall" wemos from the excel file on blackboard 
-// connections:
-// A0 - LDR     A1 - potmeter       DO4 - LCDPanel     D5 - RGBLED
+
 
 // I also want to make very clear that i HATE the arduino IDE.
 
@@ -16,11 +15,8 @@
 #define AMOUNTOFACTUATORS 1
 #define BUFFERSIZE 20
 
-
+// voor parser
 int NUMBER_OF_STRING = 10;
-
-
-const char *definedwachtwoord= "";
 
 // authentication macros
 const char *wemosNaam = "wall";
@@ -37,7 +33,7 @@ int sensor[AMOUNTOFSENSORS][3] = {{0,0,16}}; // sensor array will be {currentval
 char* sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
 int actuator[AMOUNTOFACTUATORS][3] = {{12,12,15}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-char* actuatorNames[AMOUNTOFACTUATORS][2] = {"actuateInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+char* actuatorNames[AMOUNTOFACTUATORS][2] = {"actuatorInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
 
@@ -46,6 +42,7 @@ this way we don't have to worry about the different types of actuators, like twi
 char* buildStatusMsg(char*);
 char* buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
+
 
 //function declaration wifi
 void setupWifi();
@@ -161,7 +158,7 @@ bool authenticating(){
 
   
   // now send this to the server
-  sendData(buildStatusMsg(""));
+  sendData(buildAuthenticationMsg());
   
 
   // wait for some sort of reply, if received do the assignment thing.
