@@ -84,7 +84,7 @@ TiXmlDocument buildStatusMsg(char * function){
         
       TiXmlElement * sensorElement = new TiXmlElement( "sensor" );
         TiXmlElement * nameElement = new TiXmlElement( "name" );
-          TiXmlText * nameText = new TiXmlText( sensorNames[i][1] );
+          TiXmlText * nameText = new TiXmlText(sensorNames[i]);
 
         nameElement->LinkEndChild(nameText);
       sensorElement->LinkEndChild(nameElement);
@@ -92,7 +92,7 @@ TiXmlDocument buildStatusMsg(char * function){
         TiXmlElement * statusElement = new TiXmlElement( "status" );
 
         char strong[5];
-        itoa(sensor[i][1], strong, 10);
+        itoa(sensor[i][0], strong, 10);
 
           TiXmlText * statusText = new TiXmlText(strong); 
         statusElement->LinkEndChild(statusText);

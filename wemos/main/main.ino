@@ -32,9 +32,8 @@ const char *password = "programmer";
 const char *ip = "dutchellie.nl";
 
 // sensor globals
-int previousSensorValue = 0;
-int sensor[AMOUNTOFSENSORS][4] = {{1,255,0,2},{2,17,0,4}};    // sensor array will be {id,currentvalue,previousvalue, pinnumber}
-  char* sensorNames[AMOUNTOFSENSORS][2] = {{"1","drukKnop"},{"2","ldr"}}; // each sensor has a name, but this can't be stored in an int array. {id,name}
+int sensor[AMOUNTOFSENSORS][3] = {{255,0,2},{17,0,4}}; // sensor array will be {currentvalue,previousvalue, pinnumber}
+char* sensorNames[AMOUNTOFSENSORS] = {"drukKnop","ldr"}; // each sensor has a name, but this can't be stored in an int array. 
 
 //function declarations xml
 TiXmlDocument buildStatusMsg();
@@ -71,9 +70,6 @@ void setup()
   
 }
 
-
-
-
 void loop()
 {
    // for the time being, the old sending function will be used. 
@@ -82,7 +78,7 @@ void loop()
    
    // readSensors 
    for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-    sensor[i][1] = analogRead(sensor[i][3]);
+    sensor[i][0] = analogRead(sensor[i][1]);
    }
    
   // if we receive a message, handle it
@@ -99,7 +95,7 @@ void loop()
 
   // send msg
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
-     if (sensor[i][1] != sensor[i][2]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
+     if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
       TiXmlPrinter pronter;
       pronter.SetIndent("\t");
       statusMsg.Accept(&pronter);
@@ -114,7 +110,7 @@ void loop()
 
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
-  if(parsedMsg[2] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
+  if(parsedMsg[1] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
     TiXmlDocument AnswerMsg = buildStatusMsg("answerToStatusRequest");
     TiXmlPrinter pranter;
       pranter.SetIndent("\t");
