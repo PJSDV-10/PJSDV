@@ -29,10 +29,6 @@ TiXmlDocument buildAuthenticationMsg() {
     message->LinkEndChild(functionElement);
     // context
       TiXmlElement * context = new TiXmlElement( "context" );
-        TiXmlElement * passwordElement = new TiXmlElement( "password" );
-          TiXmlText * passwordText = new TiXmlText( password );
-          passwordElement->LinkEndChild(passwordText);
-        context->LinkEndChild(passwordElement);
         TiXmlElement * clientNameElement = new TiXmlElement( "clientName" );
           TiXmlText * clientNameText = new TiXmlText( wemosNaam );
           clientNameElement->LinkEndChild(clientNameText);
@@ -43,19 +39,41 @@ TiXmlDocument buildAuthenticationMsg() {
         context->LinkEndChild(typeElement); 
 
         // all the functions of the given wemos board, needs to be edited for every wemos
-        TiXmlElement * func1Element = new TiXmlElement( "func" );
-          TiXmlElement * type1Element = new TiXmlElement( "type" );
-            TiXmlText * type1Text = new TiXmlText( "sensorBool" );
-            type1Element->LinkEndChild(type1Text);
-          func1Element->LinkEndChild(type1Element);
+        for (int i = 0; i < AMOUNTOFSENSORS; i++) { 
+         TiXmlElement * func1Element = new TiXmlElement( "func" );
+            TiXmlElement * type1Element = new TiXmlElement( "type" );
+              TiXmlText * type1Text = new TiXmlText( sensorNames[i][0] );
+              type1Element->LinkEndChild(type1Text);
+            func1Element->LinkEndChild(type1Element);
         
-          TiXmlElement * funcName1Element = new TiXmlElement( "funcName" );
-            TiXmlText * funcName1Text = new TiXmlText( "lampKnop" );
-          funcName1Element->LinkEndChild(funcName1Text);
-        func1Element->LinkEndChild(funcName1Element);
+            TiXmlElement * funcName1Element = new TiXmlElement( "funcName" );
+              TiXmlText * funcName1Text = new TiXmlText( sensorNames[i][1] );
+            funcName1Element->LinkEndChild(funcName1Text);
+          func1Element->LinkEndChild(funcName1Element);
         
-        context->LinkEndChild(func1Element);
-          
+          context->LinkEndChild(func1Element);
+        }
+
+        // do the same for the actuators
+        for (int i = 0; i < AMOUNTOFACTUATORS; i++) { 
+        
+      TiXmlElement * funcElement = new TiXmlElement( "func" );
+        TiXmlElement * typeElement = new TiXmlElement( "type" );
+          TiXmlText * typeText = new TiXmlText(actuatorNames[i][0]);
+
+        typeElement->LinkEndChild(typeText);
+      funcElement->LinkEndChild(typeElement);
+
+        TiXmlElement * funcNameElement = new TiXmlElement( "funcName" );
+
+          TiXmlText * funcNameText = new TiXmlText(actuatorNames[i][1]); 
+        funcNameElement->LinkEndChild(funcNameText);
+      funcElement->LinkEndChild(funcNameElement);
+      
+      context->LinkEndChild(funcElement);
+      
+      }
+      
       message->LinkEndChild(context);
   
   Msg.LinkEndChild( message );
@@ -84,7 +102,7 @@ TiXmlDocument buildStatusMsg(char * function){
         
       TiXmlElement * sensorElement = new TiXmlElement( "sensor" );
         TiXmlElement * nameElement = new TiXmlElement( "name" );
-          TiXmlText * nameText = new TiXmlText(sensorNames[i]);
+          TiXmlText * nameText = new TiXmlText(sensorNames[i][1]);
 
         nameElement->LinkEndChild(nameText);
       sensorElement->LinkEndChild(nameElement);
@@ -101,7 +119,26 @@ TiXmlDocument buildStatusMsg(char * function){
       
       }
       // TODO: the same for actuators
-      //Serial.println("Finished up context");
+      for (int i = 0; i < AMOUNTOFACTUATORS; i++) { 
+        
+      TiXmlElement * actuatorElement = new TiXmlElement( "actuator" );
+        TiXmlElement * nameElement = new TiXmlElement( "name" );
+          TiXmlText * nameText = new TiXmlText(actuatorNames[i][1]);
+
+        nameElement->LinkEndChild(nameText);
+      actuatorElement->LinkEndChild(nameElement);
+
+        TiXmlElement * statusElement = new TiXmlElement( "status" );
+
+        char strong[5];
+        itoa(actuator[i][0], strong, 10);
+
+          TiXmlText * statusText = new TiXmlText(strong); 
+        statusElement->LinkEndChild(statusText);
+      actuatorElement->LinkEndChild(statusElement);
+      context->LinkEndChild(actuatorElement);
+      
+      }
       
       message->LinkEndChild(context);
   

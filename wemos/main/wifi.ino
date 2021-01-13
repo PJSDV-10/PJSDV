@@ -4,6 +4,8 @@ char* receiveData() {
     if(client.available()){
       char *poep;
       strcpy(poep, client.readString().c_str());
+      Serial.println("We received the following message");
+      Serial.println(poep);
       return poep;
     }
   else return 0;
