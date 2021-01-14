@@ -24,8 +24,8 @@ const char *server = "testServer";
 const char* type = "lamp";
 
 // Network SSID
-const char *ssid = "oop";
-const char *password = "programmer";
+const char *ssid = "Eetmijnpieniet";
+const char *password = "Merwic01";
 const char *ip = "dutchellie.nl";
 
 // sensor globals
