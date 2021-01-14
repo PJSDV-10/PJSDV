@@ -6,6 +6,12 @@
 // I also want to make very clear that i HATE the arduino IDE.
 
 
+
+//allen loops hebben een delay nodig kan gewoon van 0 zijn maar anders crasht esp. hier meer over watchdogs
+// https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
+//https://forum.arduino.cc/index.php?topic=622991.0
+
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <tinyxml.h>
@@ -63,24 +69,38 @@ void setup()
   Serial.print("Test Message");
 
   setupWifi();
-  setupPins(); 
+  pinMode(0, INPUT_PULLUP);
+  pinMode(2, INPUT_PULLUP);
+  digitalWrite(0, HIGH);
+  digitalWrite(2, HIGH);//https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
+  //setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  // authenticating() is not finished yet though
+  //authenticating();// is not finished yet though
 
 
-  authenticating();
+  //authenticating();
+  //heb stack gedecoded hij zegt error hier
   Serial.println("Done authenticating");
-  while(1);
+  int y = 0;
+ while(1){
+      
+      delay(0);
+      Serial.println(y);
+      y++;
+    }
   Serial.println("Entering main program loop now.");
+  delay(0);
 }
 
 void loop()
 { 
+  delay(20);
 
    // placeholder: readSensors is different for every device
    for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     sensor[i][0] = digitalRead(sensor[i][2]);
+      delay(1);
    }
    
   // if we receive a message, handle it  
@@ -97,6 +117,7 @@ void loop()
   // send msg
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
+     delay(1);
      if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
       sendStatus = 1;
      }
@@ -125,6 +146,7 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
 
 void updateActuators() {
     for(int i = 0; i < AMOUNTOFACTUATORS; i++){
+        delay(1);
     if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
       
       Serial.print("we changed the ");
@@ -166,8 +188,11 @@ void authenticating(){
   Serial.println("Waiting for a response.");
   int receivedResponse = 0;
   const char* receivedMsg = "";
-  do {receivedMsg = receiveData(&receivedResponse);}
-  while (!receivedResponse);
+  do {receivedMsg = receiveData(&receivedResponse);
+  }
+  while(receivedResponse==0);
+
+  
    
   // now extract the usefull bits
   std::string parsedMsg[10];
@@ -198,6 +223,7 @@ void setupSensors() {
   // puts the pins in input or input_pullup mode depending on the type of sensor
   // TODO: also enables the needed TWI if we are using a TWI sensor.
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
+      delay(1);
     if(sensorNames[i][1] == "drukKnop") {
       pinMode(sensor[i][2],INPUT_PULLUP);
     }else if (sensorNames[i][1] == "TWISensor") {
@@ -211,6 +237,7 @@ void setupSensors() {
 void setupActuators() {
   // sets the actuator's pins in output mode
   for (int i = 0; i < AMOUNTOFACTUATORS; i++) {
+    delay(1);
     pinMode(actuator[i][2],OUTPUT);
   }
 }

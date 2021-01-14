@@ -134,6 +134,7 @@ void parser(std::string S1 ,std::string arr[]){
                         SUB2 = S1.find("</sensor>"); // find end sensor
 
                         for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){// look for context
+                            delay(1);
                             SUB1 = S1.find("<sensor>"); //zfind sensor
                             SUB2 = S1.find("</sensor>"); // find end sensor
                             SUB1 += 8 ;

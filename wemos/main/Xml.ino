@@ -91,7 +91,7 @@ char* buildAuthenticationMsg() {
     //delete message;
     
 
-    
+  //delete(&Msg);  //werk niet
   return stringMsg;
 }
 
@@ -171,6 +171,6 @@ char* buildStatusMsg(char* function){
     //delete message;
     
 
-    
+  //delete(&Msg); werkt niet // check dit https://stackoverflow.com/questions/853559/what-memory-management-do-i-need-to-cleanup-when-using-tinyxml-for-c   dont have to be deleted
   return stringMsg;
 }
