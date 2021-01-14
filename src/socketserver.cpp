@@ -125,13 +125,16 @@ void SocketServer::handleRequest(int fd){
 
     std::cout << "The following message was received:\n\r" << buffer << std::endl;
     XmlReader xml_r(buffer);
+	std::cout << "reader made" << std::endl;
     xml_r.parseDocument();
-    Map xml = xml_r.getParsedDoc();
-    if (xml.empty())
+	std::cout << "doc parsed" << std::endl;
+    //Map xml = xml_r.getParsedDoc();
+    //std::cout << "map made" << std::endl;
+	/*if (xml.empty())
     {
         //Debug message
         std::cout << "The parsed XML was empty, check for errors.\n\rThis debug message exists at line " << __LINE__ << std::endl;
-    }
+    }*/
     try
     {
         if(xml_r.getFunction() == "authentication"){ 
@@ -142,6 +145,7 @@ void SocketServer::handleRequest(int fd){
             xml_w.buildXML();
             respondmsg = xml_w.getXML();
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+            std::cout << "Send message back" << std::endl;
         }else if(xml_r.getFunction() == "sensorUpdate"){
             std::cout << "Sensor update received from:\n"
                       << xml_r.getClientName() << std::endl;

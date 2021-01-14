@@ -13,6 +13,7 @@ private:
     std::string senderName;
     std::string receiverName;
     std::string clientName;
+    std::string type;
 
     Map parsedXML;
     Map parsedContext;
