@@ -4,11 +4,17 @@ void XmlReader::parseDocument(){
     using namespace rapidxml;
 
     if(function == "authentication"){
-        if(!checkPassword(context_node->first_node("password")->value())){
+        /*if(!checkPassword(context_node->first_node("password")->value())){
             return;
-        }
+        }*/
+        
         clientName = context_node->first_node("clientName")->value();
+        
         parsedContext.emplace("clientName", clientName);
+        std::cout << "clientName gotten" << std::endl;
+        type = context_node->first_node("type")->value();
+        parsedContext.emplace("type", type);
+        std::cout << "type gotten" << std::endl;
         Array capabilities;
         for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
         {
