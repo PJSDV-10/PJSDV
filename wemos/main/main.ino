@@ -41,14 +41,16 @@ this way we don't have to worry about the different types of actuators, like twi
 //function declarations xml
 char* buildStatusMsg(char*);
 char* buildAuthenticationMsg();
-void parser(std::string S1 ,std::string arr[]);
+void parser(std::string, std::string);
 
 
 //function declaration wifi
 void setupWifi();
-char* receiveData();
-char* receiveData(int* receivedResponse);
-void sendData(const char *msg);
+
+const char* receiveData();
+
+const char* receiveData(int*);
+void sendData(const char *);
 
 
 WiFiClient client;
@@ -61,17 +63,16 @@ void setup()
   Serial.print("Test Message");
 
   setupWifi();
-  setupPins(); //needed when using TWI sensor. 
+  setupPins(); 
+  
   // first we must authenticate with the server, if this can't happen we can't send any data.
   // authenticating() is not finished yet though
-  ///*
-  int i = 0;
-  while (authenticating()) {
-       delay(1000);
-    Serial.print(++i);
-    Serial.print(' ');
-    }
-  //*/
+
+
+  authenticating();
+  Serial.println("Done authenticating");
+  while(1);
+  Serial.println("Entering main program loop now.");
 }
 
 void loop()
@@ -148,7 +149,7 @@ void updateActuators() {
   }
 }
 
-bool authenticating(){
+void authenticating(){
   // goes through the whole authentication procedure.
   // function is pretty long because of the long message strings.
   // !!!not finished yet!!!
@@ -164,10 +165,9 @@ bool authenticating(){
   // wait for some sort of reply, if received do the assignment thing.
   Serial.println("Waiting for a response.");
   int receivedResponse = 0;
-  char *receivedMsg;
-  do {receivedMsg = receiveData(&receivedResponse); if (receivedResponse != 1){delay(100);}}
-  while (receivedResponse != 1);
-
+  const char* receivedMsg = "";
+  do {receivedMsg = receiveData(&receivedResponse);}
+  while (!receivedResponse);
    
   // now extract the usefull bits
   std::string parsedMsg[10];
@@ -175,11 +175,16 @@ bool authenticating(){
   parser(receivedMsgString ,parsedMsg);
 
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
-  if (!(parsedMsg[2] == "OK")) {  
-    return 0;
-  }
+  std::string test("ack");
+  Serial.println(parsedMsg[2].c_str());
+  Serial.println(parsedMsg[2].compare(test));
+  if (parsedMsg[2].compare(test) == 0) {  
     Serial.println("authentication procedure sucessfully completed");
-return 1;
+    //return ;
+  }else {
+    Serial.println("authentication procedure not completed, trying again.");
+    //return ;
+  }
 }
 
 

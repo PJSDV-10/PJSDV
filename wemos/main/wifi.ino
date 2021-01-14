@@ -1,37 +1,38 @@
-char* receiveData() {
+
+
+const char* receiveData() {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
   //Serial.println("looking if we received a message");
     if(client.available()){
-      char *poep;
-      strcpy(poep, client.readString().c_str());
-      Serial.println("We received the following message");
-      Serial.println(poep);
-      return poep;
+    
+
+      std::string plas(client.readString().c_str());
+
+
+          Serial.println("We received the following message");
+          Serial.println(plas.c_str());
+
+          return plas.c_str();
     }
-  else {
-    //Serial.println("No message received");
-    return "";
-  }
 }
 
-
-char* receiveData(int* receivedResponse) {
+const char* receiveData(int* receivedResponse) {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
   //Serial.println("looking if we received a message");
     if(client.available()){
-      char *poep;
-      strcpy(poep, client.readString().c_str());
+    
+
+      std::string plas(client.readString().c_str());
       *receivedResponse = 1;
-      Serial.println("We received the following message");
-      Serial.println(poep);
-      return poep;
+
+
+          Serial.println("We received the following message");
+          Serial.println(plas.c_str());
+
+          return plas.c_str();
     }
-  else {
-    //Serial.println("No message received");
-    return 0;
-  }
 }
 
 
@@ -66,7 +67,7 @@ void setupWifi(){
   Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
   
   // connect to server
-  if (client.connect(ip, 4500)) {
+  if (client.connect(ip, 8080)) {
     Serial.println("Connected to server");
   }else{
     Serial.println("Not connected to server");
