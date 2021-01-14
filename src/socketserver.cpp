@@ -113,8 +113,12 @@ void SocketServer::handleRequest(int fd){
     if ((bytesread = recv(fd, buffer, 4096, 0)) == -1)
     {
         perror("Error receiving");
-        exit(EXIT_FAILURE);
-    }else if(bytesread == 0){
+        std::cout << "Recovering" << std::endl;
+        close(fd);
+        return;
+    }
+    else if (bytesread == 0)
+    {
         close(fd);
         return;
     }
