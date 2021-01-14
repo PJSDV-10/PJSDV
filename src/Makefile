@@ -36,6 +36,9 @@ debug: all
 arm: CC = aarch64-linux-gnu-g++-7
 arm: all
 
+arm32: CC = arm-linux-gnueabi-g++-7
+arm32: all
+
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
