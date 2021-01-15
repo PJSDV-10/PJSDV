@@ -1,8 +1,11 @@
-#define RAPIDXML_NO_EXCEPTIONS
+//#define RAPIDXML_NO_EXCEPTIONS
 
 #include "socketserver.h"
 
-void rapidxml::parse_error_handler(const char *what, void *where);
+/*void rapidxml::parse_error_handler(const char *what, void *where){
+    std::cout << "Parsing error: " << what << std::endl;
+    std::abort();
+}*/
 
 int main()
 {
@@ -11,6 +14,3 @@ int main()
     sv.ListenAndAccept();
 }
 
-void rapidxml::parse_error_handler(const char *what, void *where){
-    std::cout << "Parsing error: " << what << std::endl;
-}
