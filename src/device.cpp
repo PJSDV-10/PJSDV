@@ -36,8 +36,8 @@ std::string Stoel::handleSensorUpdate(XmlReader *xml_r){
     std::string destination;
     bool status;
 
-    destination = std::get<std::string>(xml_r->getParsedDoc().find("sendername")->second.value());
-    status = std::round(std::get<double>(xml_r->getParsedContext().find("data")->second.value()));
+    destination = xml_r->getSenderName();
+    status = xml_r->getData();
 
     std::string toBeReturned;
     // Someone sits on chair boy, therefor turn it on

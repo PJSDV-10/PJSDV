@@ -77,13 +77,15 @@ void SocketServer::ListenAndAccept()
         exit(EXIT_FAILURE);
     }
 
-    fd_set ready_sockets, all_sockets;
+    fd_set ready_sockets, all_sockets, error_checking_sockets;
     FD_ZERO(&all_sockets);
+    FD_ZERO(&error_checking_sockets);
     FD_SET(listen_fd, &all_sockets);
-
+    FD_SET(listen_fd, &error_checking_sockets);
     while (accepting)
     {
         ready_sockets = all_sockets;
+        error_checking_sockets = all_sockets;
 
         if(select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0){
             perror("Select failed");
@@ -104,17 +106,22 @@ void SocketServer::ListenAndAccept()
                 }
             }
         }
+        
         for (int i = 0; i < FD_SETSIZE; i++)
         {
-            if(FD_ISSET(i, &all_sockets) && i != listen_fd){
-                if (recv(i, NULL, 0, MSG_DONTWAIT) <= 0)
+            if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
+                int error;
+                if (error = recv(i, NULL, 0, MSG_DONTWAIT | MSG_PEEK); error <= 0)
                 {
-                    if(errno != EWOULDBLOCK){
-                        std::cout << "Closing a random connection" << std::endl;
+                    if(errno == EWOULDBLOCK && error == -1){
+                        std::cout << "Closing a random connection, " << std::endl;
+                        close(i);
+                        errno = 0;
+                        continue;
+                    }else if(error == 0){
+                        std::cout << "Socket was closed properly, closing it again to be sure" << std::endl;
                         close(i);
                         continue;
-                    }else{
-                        errno = 0;
                     }
                 }
             }
@@ -153,7 +160,7 @@ void SocketServer::handleRequest(int fd){
             xml_w.buildXMLAck();
             respondmsg = xml_w.getXML();
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
-
+            std::cout << "Reply to authentication sent" << std::endl;
             // Destroyer
             xml_w.~XmlWriter();
         }
@@ -169,7 +176,7 @@ void SocketServer::handleRequest(int fd){
                 }
             }
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
-
+            std::cout << "Reply to sensorUpdate sent" << std::endl;
             // Destroy
         }
     }catch(const std::out_of_range& oor){
