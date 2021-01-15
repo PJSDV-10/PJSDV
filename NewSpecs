@@ -1,0 +1,197 @@
+New specifications, sorry!
+
+Changelog:
+nothing
+
+
+
+#############################################
+#                                           #
+#              Aanmelden Wemos              #
+#                                           #
+#############################################
+
+<message>
+    <header>
+        <sender>wemosNaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>authentication</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+        <clientName>Keuken Lamp</clientName>
+        <type>lamp</type>
+    </context>
+</message>
+
+
+Acknowledgement:
+
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>wemosNaam</receiver>
+    </header>
+    <function>ack</function>
+    <context></context>
+</message>
+
+
+
+Opmerkingen:
+Geen capabilities meer, die staan in de server hardcoded met type
+
+#############################################
+#                                           #
+#             Aanmelden Website             #
+#                                           #
+#############################################
+
+<message>
+    <header>
+        <sender>website</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>authentication</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+        <clientName>Website</clientName>
+        <type>website</type>
+    </context>
+</message>
+
+
+Server stuurt dezelfde Ack terug als bij wemos
+
+
+#############################################
+#                                           #
+#         Website Request All Wemos         #
+#                                           #
+#############################################
+
+<message>
+    <header>
+        <sender>website</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>getStatusAll</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+    </context>
+</message>
+
+
+Opmerkingen:
+Zelfde als eerst
+
+
+#############################################
+#                                           #
+#            Broadcast naar wemos           #
+#                                           #
+#############################################
+
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>allWemos</receiver>
+    </header>
+    <function>getStatusBroadcast</function>
+    <context>
+        <password>JeMoederIsEenWachtwoord</password>
+    </context>
+</message>
+
+
+Naar elke wemos wordt exact hetzelfde gestuurd.
+
+En dan terug naar de server:
+
+<message>
+    <header>
+        <sender>wemosNaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>answerToStatusRequest</function>
+    <context>
+        <type>lamp</type>
+        <data>1</data>
+    </context>
+</message>
+
+
+Dan wanneer alles terug is gegaan naar de server gaat het volgende naar de website toe:
+
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>website</receiver>
+    </header>
+    <function>answerToStatusRequest</function>
+    <context>
+        <wemosjes>
+            <wemos>
+                <name>UniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
+                <type>stoel</type>
+                <data>0</data>
+            </wemos>
+            <wemos>
+                <name>AndereUniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
+                <type>lamp</type>
+                <data>1</data>
+            </wemos>
+        </wemosjes>
+    </context>
+</message>
+
+Voor de verschillende soorten wemos apparaten en hun data formaten moet je kijken bij die specifieke wemos
+
+
+#############################################
+#                                           #
+#                   STOEL                   #
+#                                           #
+#############################################
+
+De stoel heeft de volgende functionaliteiten:
+- Massage ( mbv trilelement )
+- Druksensor die de massage activeert
+
+Ook moet er een type worden meegegeven, het wemostype van de stoel is "stoel", dit gaat zo:
+<type>stoel</type>
+
+Deze staat in de scope van context;
+
+Wanneer de druksensor wordt ingedrukt op de stoel moet deze een request naar de server sturen voor een actie om uit te voeren. Een request voor een actie heeft als functie type: sensorUpdate
+Dus het volledige XML bericht ziet er dus ongeveer zo uit:
+
+<message>
+    <header>
+        <sender>Wemosnaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>sensorUpdate</function>
+    <context>
+        <type>stoel</type>    
+        <data>0</data>
+    </context>
+</message>
+
+Als gevolg van het prachtige door school gedesignde systeem werkt de massagestand dus niet als de wifi uitvalt! 
+
+Wanneer dit wordt ontvangen beslist de server wat de actie moet zijn dat de stoel moet uitvoeren. In dit geval vrij makkelijk opzich, het trilElement moet aan. De server zal dus een bericht sturen met een context zoals deze:
+
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>wemosnaam</receiver>
+    </header>
+    <function>actuateBool</function>
+    <context>
+        <data>0</data>
+    </context>
+</message>
+
+De functie hier is dus "actuateBool". Een bool heeft twee standen, aan of uit. Een stoel heeft alleen maar een trilElement, dus we doen niet moeilijk en sturen gewoon dat dat ding uit moet.
+
