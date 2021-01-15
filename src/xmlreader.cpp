@@ -60,12 +60,12 @@ XmlReader::XmlReader(const char *xmldoc)
 
     char xml[4096] = {};
     strcpy(xml, xmldoc);
-    //try{
+    try{
         doc->parse<0>(xml);
-    //}catch(parse_error){
-    //    std::cout << "A parsing error occured. Document is not valid XML" << std::endl;
-    //    return;
-    //}
+    }catch(parse_error){
+        std::cout << "A parsing error occured. Document is not valid XML" << std::endl;
+        return;
+    }
     xml_node<> *root_node = doc->first_node("message");
     this->root_node = root_node;
 
