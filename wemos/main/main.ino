@@ -83,34 +83,39 @@ void setup()
   //heb stack gedecoded hij zegt error hier
   Serial.println("Done authenticating");
   int y = 0;
- while(1){
+ //while(1){
       
-      delay(0);
-      Serial.println(y);
-      y++;
-    }
+   //   delay(0);
+    //  Serial.println(y);
+    //  y++;
+  //  }
   Serial.println("Entering main program loop now.");
   delay(0);
 }
 
 void loop()
-{ 
-  delay(20);
+{
+  Serial.println("in program loop now.");
+  
 
    // placeholder: readSensors is different for every device
    for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     sensor[i][0] = digitalRead(sensor[i][2]);
-      delay(1);
+      delay(0);
    }
    
   // if we receive a message, handle it  
+  /*
   std::string receivedMsg(receiveData()), empty; // receive some data, if there is nothing to receive, the string is empty
+  delay(0);
+  
   if (!(receivedMsg == empty)){
     std::string parsedMsg[BUFFERSIZE];
     parser(receivedMsg, parsedMsg); // parse the message, 
     handleMessage(parsedMsg);
   }
-   
+  */
+
 
   updateActuators();
  ///*
@@ -130,7 +135,7 @@ void loop()
     
   }
   
-//*/
+
 }
 
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
@@ -189,6 +194,7 @@ void authenticating(){
   int receivedResponse = 0;
   const char* receivedMsg = "";
   do {receivedMsg = receiveData(&receivedResponse);
+  delay(0);
   }
   while(receivedResponse==0);
 

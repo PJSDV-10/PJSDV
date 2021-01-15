@@ -5,14 +5,15 @@ const char* receiveData() {
   // TODO: add fancy error checking mechanism.
   //Serial.println("looking if we received a message");
     if(client.available()){
-    
+    delay(0);
 
       std::string plas(client.readString().c_str());
+      
 
 
           Serial.println("We received the following message");
           Serial.println(plas.c_str());
-
+            return "test";
           return plas.c_str();
     }
 }
