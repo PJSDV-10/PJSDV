@@ -110,6 +110,7 @@ void SocketServer::ListenAndAccept()
                 if (recv(i, NULL, 0, MSG_DONTWAIT) <= 0)
                 {
                     if(errno != EWOULDBLOCK){
+                        std::cout << "Closing a random connection" << std::endl;
                         close(i);
                         continue;
                     }else{
