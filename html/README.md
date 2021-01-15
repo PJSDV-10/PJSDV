@@ -13,10 +13,10 @@
 1. $ apt install mariadb
 2. $ sudo mysql
 3. \> CREATE USER 'PJSDV'@localhost IDENTIFIED BY 'gaatjeniksaan';
-4. > GRANT ALL PRIVILEGES ON 'PJSDV'.* TO 'PJSDV'@localhost IDENTIFIED BY 'gaatjeniksaan';
-5. > FLUSH PRIVILEGES;
-6. > [plak inhoud bestand db.sql]
-7. > quit
+4. \> GRANT ALL PRIVILEGES ON 'PJSDV'.* TO 'PJSDV'@localhost IDENTIFIED BY 'gaatjeniksaan';
+5. \> FLUSH PRIVILEGES;
+6. \> [plak inhoud bestand db.sql]
+7. \> quit
 
 ## Structure of the site
 First of all the page the site is on is managed by the variable "$\_GET['p']" to create a more clean experience without showing any .php files in the url.
