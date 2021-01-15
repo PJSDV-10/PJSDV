@@ -111,9 +111,9 @@ void SocketServer::ListenAndAccept()
         {
             if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
                 int error;
-                if (error = recv(i, NULL, 0, MSG_DONTWAIT | MSG_PEEK); error <= 0)
+                if (error = recv(i, NULL, 0, MSG_PEEK); error <= 0)
                 {
-                    if(errno == EWOULDBLOCK && error == -1){
+                    if(/* errno == EWOULDBLOCK &&  */error == -1){
                         std::cout << "Closing a random connection, " << std::endl;
                         close(i);
                         errno = 0;
