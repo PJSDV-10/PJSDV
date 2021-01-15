@@ -15,10 +15,16 @@ protected:
     // TODO fd and type can be removed
 
 public:
+    virtual ~Wemos();
 
     //Getters
-    //virtual const bool getStatus(std::string sensor) = 0;
-    virtual std::string handleSensorUpdate();
-    virtual std::string handleSiteRequest();
-};
+    inline const std::string getSenderName() { return senderName; };
+    inline const std::string getClientName() { return clientName; };
+    inline const std::string getWemosType() { return wemosType; };
 
+    //virtual const bool getStatus(std::string sensor) = 0;
+    virtual void doetniks() = 0;
+    virtual std::string handleSensorUpdate(XmlReader *) = 0;
+    //    virtual std::string handleSiteRequest();
+    
+};

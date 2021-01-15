@@ -1,5 +1,5 @@
-CC       := arm-linux-gnueabi-g++
-CFLAGS   := -Wall -pthread
+CC       := g++ 
+CFLAGS   := -Wall -pthread -std=c++17
 # LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ../out
 OBJ_DIR  := $(BUILD)/obj
@@ -8,7 +8,7 @@ TARGET   := program
 #INCLUDE  := -Iinclude/
 SRC      := $(wildcard *.cpp)
    #$(wildcard src/module1/*.cpp) \
-
+   
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES := $(OBJECTS:.o=.d)
 
@@ -35,6 +35,9 @@ debug: all
 
 arm: CC = aarch64-linux-gnu-g++-7
 arm: all
+
+arm32: CC = arm-linux-gnueabi-g++-7
+arm32: all
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*

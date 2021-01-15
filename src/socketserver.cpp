@@ -104,6 +104,20 @@ void SocketServer::ListenAndAccept()
                 }
             }
         }
+        for (int i = 0; i < FD_SETSIZE; i++)
+        {
+            if(FD_ISSET(i, &all_sockets) && i != listen_fd){
+                if (recv(i, NULL, 0, MSG_DONTWAIT) <= 0)
+                {
+                    if(errno != EWOULDBLOCK){
+                        close(i);
+                        continue;
+                    }else{
+                        errno = 0;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -123,11 +137,6 @@ void SocketServer::handleRequest(int fd){
     XmlReader xml_r(buffer);
     xml_r.parseDocument();
     Map xml = xml_r.getParsedDoc();
-    if (xml.empty())
-    {
-        //Debug message
-        std::cout << "The parsed XML was empty, check for errors.\n\rThis debug message exists at line " << __LINE__ << std::endl;
-    }
     try
     {
         if(xml_r.getFunction() == "authentication"){ 
@@ -140,21 +149,36 @@ void SocketServer::handleRequest(int fd){
             }
             std::string respondmsg;
             XmlWriter xml_w(xml_r);
-            xml_w.buildXML();
+            xml_w.buildXMLAck();
             respondmsg = xml_w.getXML();
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
-        }else if(xml_r.getFunction() == "sensorUpdate"){
+
+            // Destroyer
+            xml_w.~XmlWriter();
+        }
+        else if (xml_r.getFunction() == "sensorUpdate")
+        {
             std::cout << "Sensor update received from:\n"
-                      << xml_r.getClientName() << std::endl;
-            for (int i = 0; i < wemosjes.size(); i++){
-                // todo check sender name for correct wemos
-                wemosjes[i].
+                      << xml_r.getSenderName() << std::endl;
+
+            std::string respondmsg;
+            for (std::size_t i = 0; i < wemosjes.size(); i++){
+                if(wemosjes[i]->getSenderName() == xml_r.getSenderName()){
+                    respondmsg = wemosjes[i]->handleSensorUpdate(&xml_r);
+                }
             }
-                send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+            send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+
+            // Destroy
         }
     }catch(const std::out_of_range& oor){
         std::cout << "function did not exist inside the thingy" << std::endl;
         send(fd, "no", 2, 0);
+
+        // Destroying things
+        xml_r.~XmlReader();
+        
+        xml.~map();
         return;
     }
     return;
@@ -190,7 +214,7 @@ bool SocketServer::checkIfWemosExists(String name){
         String senderName;
         //Debug message
         std::cout << "senderName comparison check\nThis debug message exists at line " << __LINE__ << std::endl;
-        senderName = wemosjes[i].getSenderName();
+        senderName = wemosjes[i]->getSenderName();
         if (senderName == name)
         {
             return true;

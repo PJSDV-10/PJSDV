@@ -14,6 +14,7 @@ private:
     std::string receiverName;
     std::string clientName;
     std::string type;
+    int data;
 
     Map parsedXML;
     Map parsedContext;
@@ -31,12 +32,14 @@ private:
 public:
     XmlReader();
     XmlReader(const char *xmldoc);
+    ~XmlReader();
 
     //Parsing
     void parseDocument();
 
     //Misc
     bool checkPassword(std::string password);
+    bool empty();
 
     //Getters
     inline const Map getParsedDoc() const { return parsedXML; };
@@ -47,3 +50,4 @@ public:
     inline const std::string getClientName() const { return clientName; };
     inline const std::string getType() const { return type; };
 };
+

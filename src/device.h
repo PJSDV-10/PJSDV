@@ -5,6 +5,8 @@
 #ifndef PJSDV_PRODUCT_H
 #define PJSDV_PRODUCT_H
 
+#include "wemos.h"
+#include <cmath>
 
 class product {
 
@@ -39,11 +41,12 @@ protected:
 public:
     Stoel(int fd, std::string clientName, std::string senderName);
     ~Stoel();
-    inline const bool getStatus(std::string sensor)
+    inline const bool getStatus(std::string sensor);
     void sensorUpdate(bool newStatus);
-    std::string handleSensorUpdate();
+    std::string handleSensorUpdate(XmlReader*);
     void turnOnTE();
     void turnOffTE();
+    void doetniks();
 };
 
 #endif //PJSDV_PRODUCT_H

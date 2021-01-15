@@ -15,7 +15,7 @@ private:
     std::string senderName;
     std::string receiverName;
     std::string clientName;
-    
+
     //RapidXML variables
     rapidxml::xml_document<> *doc;
     rapidxml::xml_node<> *root_node;
@@ -28,14 +28,20 @@ private:
     //Different function context builders
     void buildHeader();
     void buildAckContext();
+    void buildActuateBoolContext(std::string actuatorName, bool status);
 
 public:
     XmlWriter();
+    /* Type is the function that is sent in the final message, 
+    dest is the sendername from whence your message came*/
     XmlWriter(std::string type, std::string dest);
     XmlWriter(XmlReader &xml_r);
 
-    void buildXML();
+    ~XmlWriter();
 
+    void buildXMLAck();
+
+    void buildXMLActuateBool(std::string actuatorName, bool status);
     //Getters
     std::string getXML();
 };

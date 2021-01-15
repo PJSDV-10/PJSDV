@@ -1,7 +1,7 @@
 #pragma once
 
 #include "socketconn.h"
-#include "wemos.h"
+#include "device.h"
 #include "fcntl.h"
 
 #include <sstream>
@@ -15,7 +15,7 @@ private:
     struct addrinfo hints, *serverInfo;
     int opt = 1;
     bool accepting = true;
-    std::vector<Wemos> wemosjes;
+    std::vector<Wemos*> wemosjes;
 
     std::string password = "solarwinds123";
 
