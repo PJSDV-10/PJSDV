@@ -25,9 +25,10 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-const char *wemosNaam = "wall";
-const char *server = "testServer";
-const char* type = "lamp";
+std::string wemosNaam = "wall";
+std::string server = "testServer";
+std::string wachtwoord = "jemoeder";
+std::string type = "lamp";
 
 // Network SSID
 const char *ssid = "Eetmijnpieniet";
@@ -36,17 +37,19 @@ const char *ip = "dutchellie.nl";
 
 // sensor globals
 int sensor[AMOUNTOFSENSORS][3] = {{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber}
-char* sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
 int actuator[AMOUNTOFACTUATORS][3] = {{12,12,15}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-char* actuatorNames[AMOUNTOFACTUATORS][2] = {"actuatorInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+std::string actuatorNames[AMOUNTOFACTUATORS][2] = {"actuatorInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
 
 
 //function declarations xml
-char* buildStatusMsg(char*);
-char* buildAuthenticationMsg();
+std::string buildcapabilities();
+std::string Buildheader();
+//char* buildStatusMsg(char*);
+std::string buildAuthenticationMsg();
 void parser(std::string, std::string);
 
 
@@ -76,8 +79,7 @@ void setup()
   //setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  //authenticating();// is not finished yet though
-
+  authenticating();// is not finished yet though
 
   //authenticating();
   //heb stack gedecoded hij zegt error hier
@@ -89,6 +91,15 @@ void setup()
     //  Serial.println(y);
     //  y++;
   //  }
+  //char *temp = buildAuthenticationMsg();
+ // char *temp2 = temp;
+ //while(1){
+  //delay(0);
+ //char *temp = "<message><header><sender>wemosNaam</sender><receiver>server</receiver></header><function>authentication</function><context><password>JeMoederIsEenWachtwoord</password><clientName>Keuken Lamp</clientName> <type>lamp</type> <capabilities> <func> <type>actuateBool</type> <funcName>lamp</funcName> </func> <func> <type>buttonPress</type> <funcName>lampKnop</funcName> </func> </capabilities> </context> </message>";
+// sendData(temp);
+ //client.connect(ip, 8080);
+ //}
+
   Serial.println("Entering main program loop now.");
   delay(0);
 }
@@ -106,7 +117,7 @@ void loop()
    
   // if we receive a message, handle it  
   /*
-  std::string receivedMsg(receiveData()), empty; // receive some data, if there is nothing to receive, the string is empty
+  std::string receivedMsg(receiveData()), empty; // receive some data, if there is nothing to receive, the string is empty / this is broken dont use
   delay(0);
   
   if (!(receivedMsg == empty)){
@@ -117,7 +128,7 @@ void loop()
   */
 
 
-  updateActuators();
+ // updateActuators();
  ///*
   // send msg
   int sendStatus = 0;
@@ -131,14 +142,14 @@ void loop()
   
   if (sendStatus){
      
-    sendData(buildStatusMsg(""));
+//    sendData(buildStatusMsg(""));
     
   }
   
 
 }
 
-bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
+/*bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[1] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
 
@@ -147,9 +158,9 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   } else  
   return 0;
 
-}
+}*/
 
-void updateActuators() {
+/*void updateActuators() {
     for(int i = 0; i < AMOUNTOFACTUATORS; i++){
         delay(1);
     if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
@@ -174,7 +185,7 @@ void updateActuators() {
       actuator[i][0] = actuator[i][1]; //update the currentvalue
     }
   }
-}
+}*/
 
 void authenticating(){
   // goes through the whole authentication procedure.
@@ -186,7 +197,14 @@ void authenticating(){
 
   
   // now send this to the server
-  sendData(buildAuthenticationMsg());
+  std::string temp =buildAuthenticationMsg();
+  //const char hallo = 
+  sendData(temp.c_str());
+  //delay(0);
+  //free(temp);
+  //delay(0);
+  //delete(temp);
+  //temp = "hallo";
   
 
   // wait for some sort of reply, if received do the assignment thing.
