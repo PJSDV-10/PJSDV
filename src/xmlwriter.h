@@ -4,6 +4,7 @@
 #include "xmlreader.h"
 #include <string.h>
 #include <iostream>
+#include <stdlib.h>
 #include <sstream>
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
@@ -28,7 +29,7 @@ private:
     //Different function context builders
     void buildHeader();
     void buildAckContext();
-    void buildActuateBoolContext(std::string actuatorName, bool status);
+    void buildActuateBoolContext(std::string actuatorName, int status);
 
 public:
     XmlWriter();

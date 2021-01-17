@@ -18,6 +18,7 @@ void Stoel::doetniks(){
     std::cout << "dit doet niks" << std::endl;
 }
 
+/* Completely unused */
 void Stoel::sensorUpdate(bool newStatus){
     if(newStatus == status){ // aka status is the same, therefor useless
         return;
@@ -33,13 +34,19 @@ void Stoel::sensorUpdate(bool newStatus){
 std::string Stoel::handleSensorUpdate(XmlReader *xml_r){
     /* init variables to be used */
     std::string destination;
-    bool status;
+    int status;
 
     destination = xml_r->getSenderName();
     status = xml_r->getData();
 
     std::string toBeReturned;
     // Someone sits on chair boi, therefor turn it on
+    if(xml_r->getData() == 1){
+        status = 1;
+    }else{
+        status = 0;
+    }
+
     XmlWriter xml_w("actuateBool", destination);
     xml_w.buildXMLActuateBool("trilElement", status);
     toBeReturned = xml_w.getXML();

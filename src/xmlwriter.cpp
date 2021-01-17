@@ -35,22 +35,13 @@ void XmlWriter::buildAckContext(){
     root_node->append_node(context_node);
 }
 
-void XmlWriter::buildActuateBoolContext(std::string actuatorName, bool status){
+void XmlWriter::buildActuateBoolContext(std::string actuatorName, int status){
     using namespace rapidxml;
     function_node = doc->allocate_node(node_element, "function", "actuateBool");
     context_node = doc->allocate_node(node_element, "context", 0);
-    //xml_node<> *funcNameNode = doc->allocate_node(node_element, "funcNameNode", actuatorName.c_str());
     char *data;
-    if (status)
-    {
-        data = doc->allocate_string("1", 1);
-    }
-    else
-    {
-        data = doc->allocate_string("0", 1);
-    }
+    data = itoa(status, 10);
     xml_node<> *dataNode = doc->allocate_node(node_element, "data", data);
-    //context_node->append_node(funcNameNode);
     context_node->append_node(dataNode);
     root_node->append_node(function_node);
     root_node->append_node(context_node);
