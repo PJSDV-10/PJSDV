@@ -17,12 +17,12 @@ void XmlWriter::buildXMLAck(){
     }
 }
 
-void XmlWriter::buildXMLActuateBool(std::string actuatorName, bool status){
+void XmlWriter::buildXMLActuate(std::vector<double> &status){
     using namespace rapidxml;
 
     if(function == "actuateBool"){
         buildHeader();
-        buildActuateBoolContext(actuatorName, status);
+        buildActuateContext(status);
         doc->append_node(root_node);
     }
 }
@@ -35,14 +35,14 @@ void XmlWriter::buildAckContext(){
     root_node->append_node(context_node);
 }
 
-void XmlWriter::buildActuateBoolContext(std::string actuatorName, int status){
+void XmlWriter::buildActuateContext(std::vector<double> &status){
     using namespace rapidxml;
     function_node = doc->allocate_node(node_element, "function", "actuateBool");
     context_node = doc->allocate_node(node_element, "context", 0);
-    char *data;
-    data = itoa(status, 10);
-    xml_node<> *dataNode = doc->allocate_node(node_element, "data", data);
-    context_node->append_node(dataNode);
+    for (int i = 0; i < status.size(); i++){
+        xml_node<> *dataNode = doc->allocate_node(node_element, "data" + i, std::to_string(std::round(status[i])).c_str());
+        context_node->append_node(dataNode);
+    }
     root_node->append_node(function_node);
     root_node->append_node(context_node);
 }

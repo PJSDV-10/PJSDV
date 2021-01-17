@@ -34,21 +34,32 @@ void Stoel::sensorUpdate(bool newStatus){
 std::string Stoel::handleSensorUpdate(XmlReader *xml_r){
     /* init variables to be used */
     std::string destination;
-    int status;
+    std::vector<double> sentStatus;
+    std::vector<double> sendStatus;
 
     destination = xml_r->getSenderName();
-    status = xml_r->getData();
+    sentStatus = xml_r->getData();
 
     std::string toBeReturned;
-    // Someone sits on chair boi, therefor turn it on
-    if(xml_r->getData() == 1){
-        status = 1;
-    }else{
-        status = 0;
+    /* 
+        force sensor + push button
+        if both are on, then send 1, otherwise 0. XOR them
+     */
+    if(std::round(sentStatus[0]) && std::round(sentStatus[1])){
+        sendStatus.push_back(1);
+        sendStatus.push_back(1);
+        TEState = 1;
+        PBState = 1;
+    }
+    else{
+        sendStatus.push_back(0);
+        sendStatus.push_back(0);
+        TEState = 0;
+        PBState = 0;
     }
 
     XmlWriter xml_w("actuateBool", destination);
-    xml_w.buildXMLActuateBool("trilElement", status);
+    xml_w.buildXMLActuate(sendStatus);
     toBeReturned = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeReturned;

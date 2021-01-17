@@ -38,7 +38,7 @@ class Fridge : public Wemos{
 
 class Stoel : public Wemos {
 private:
-    bool status;
+    bool TEState;
     bool PBState;
 
 protected:

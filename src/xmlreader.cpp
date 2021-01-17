@@ -22,8 +22,10 @@ void XmlReader::parseDocument(){
 		if(type == "stoel"){
             type = context_node->first_node("type")->value();
             parsedContext.emplace("type", type);
-            data = atoi(context_node->first_node("data")->value());
-            parsedContext.emplace("data", data);
+            data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
+            parsedContext.emplace("data1", data);
+            data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
+            parsedContext.emplace("data2", data);
         }
     }
 }

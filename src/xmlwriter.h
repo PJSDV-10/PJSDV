@@ -29,7 +29,7 @@ private:
     //Different function context builders
     void buildHeader();
     void buildAckContext();
-    void buildActuateBoolContext(std::string actuatorName, int status);
+    void buildActuateContext(std::vector<double> &status);
 
 public:
     XmlWriter();
@@ -42,7 +42,7 @@ public:
 
     void buildXMLAck();
 
-    void buildXMLActuateBool(std::string actuatorName, bool status);
+    void buildXMLActuate(std::vector<double> &status);
     //Getters
     std::string getXML();
 };
