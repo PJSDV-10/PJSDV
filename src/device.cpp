@@ -39,7 +39,7 @@ std::string Stoel::handleSensorUpdate(XmlReader *xml_r){
     status = xml_r->getData();
 
     std::string toBeReturned;
-    // Someone sits on chair boy, therefor turn it on
+    // Someone sits on chair boi, therefor turn it on
     XmlWriter xml_w("actuateBool", destination);
     xml_w.buildXMLActuateBool("trilElement", status);
     toBeReturned = xml_w.getXML();
