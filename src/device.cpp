@@ -18,18 +18,6 @@ void Stoel::doetniks(){
     std::cout << "dit doet niks" << std::endl;
 }
 
-/* Completely unused */
-void Stoel::sensorUpdate(bool newStatus){
-    if(newStatus == status){ // aka status is the same, therefor useless
-        return;
-    }
-    if(newStatus == true){
-        turnOnTE();
-    }else{
-        turnOffTE();
-    }
-    return;
-}
 
 std::string Stoel::handleSensorUpdate(XmlReader *xml_r){
     /* init variables to be used */

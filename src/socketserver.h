@@ -2,7 +2,6 @@
 
 #include <string>
 #include <string.h>
-#include <cmath>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>

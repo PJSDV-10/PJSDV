@@ -49,6 +49,6 @@ public:
     inline const std::string getReceiverName() const { return receiverName; };
     inline const std::string getClientName() const { return clientName; };
     inline const std::string getType() const { return type; };
-    inline const std::vector<double> &getData() const { return &data; };
+    inline std::vector<double> &getData() { return data; };
 };
 

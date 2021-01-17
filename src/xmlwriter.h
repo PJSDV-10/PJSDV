@@ -3,6 +3,7 @@
 #include "wrapper.h"
 #include "xmlreader.h"
 #include <string.h>
+#include <cmath>
 #include <iostream>
 #include <stdlib.h>
 #include <sstream>
