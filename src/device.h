@@ -12,7 +12,7 @@ class product {
 
 };
 
-class Lights : public Wemos{
+class Wall : public Wemos{
 
 };
 
@@ -20,21 +20,26 @@ class Door : public Wemos{
 
 };
 
-class thermostat : public Wemos {
+class Column : public Wemos {
 
 };
 
-class bed : public Wemos{
+class Bed : public Wemos{
 
 };
 
-class window : public Wemos{
+class TableLamp : public Wemos{
+
+};
+
+class Fridge : public Wemos{
 
 };
 
 class Stoel : public Wemos {
 private:
     bool status;
+    bool PBState;
 
 protected:
 
