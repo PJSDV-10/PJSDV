@@ -12,41 +12,19 @@ void XmlReader::parseDocument(){
         parsedContext.emplace("clientName", clientName);
         type = context_node->first_node("type")->value();
         parsedContext.emplace("type", type);
-        /*Array capabilities;
-        for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
-        {
-            std::string type, funcName;
-            type = func_node->first_node("type")->value();
-            funcName = func_node->first_node("funcName")->value();
-            Map function;
-            function.emplace("type", type);
-            function.emplace("name", funcName);
-            capabilities.push_back(Wrapper(function));
-        }
-        parsedContext.emplace("capabilities", capabilities);
-        parsedXML.emplace("context", parsedContext);
-        */
-        /* 
-        ParsedXML
-            senderName : string
-            receiverName : string
-            function : string
-            ParsedContext : map
-                clientName : string
-                capabilities : array
-                    type : string
-                    func : string
-         */
-    }else if(function == "sensorUpdate"){
-        /*if(!checkPassword(context_node->first_node("password")->value())){
-            return;
+    }
+    else if (function == "sensorUpdate")
+    {
+		/*if(!checkPassword(context_node->first_node("password")->value())){
+			return;
         }*/
-        // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
-        type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
-        data = atoi(context_node->first_node("data")->value());
-        parsedContext.emplace("data", data);
-        
+		// Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
+		if(type == "stoel"){
+            type = context_node->first_node("type")->value();
+            parsedContext.emplace("type", type);
+            data = atoi(context_node->first_node("data")->value());
+            parsedContext.emplace("data", data);
+        }
     }
 }
 
