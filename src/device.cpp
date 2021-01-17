@@ -5,10 +5,9 @@
 #include "device.h"
 
 
-Stoel::Stoel(int fd, std::string clientName, std::string senderName){
+Stoel::Stoel(std::string clientName, std::string senderName){
     this->clientName = clientName;
     this->senderName = senderName;
-    this->fd = fd;
     this->wemosType = "stoel";
 }
 

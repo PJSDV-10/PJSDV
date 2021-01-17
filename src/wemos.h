@@ -8,7 +8,6 @@ class Wemos {
 private:
 
 protected:
-    int fd;
     std::string clientName;
     std::string senderName;
     std::string wemosType;

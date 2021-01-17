@@ -39,7 +39,7 @@ private:
 protected:
 
 public:
-    Stoel(int fd, std::string clientName, std::string senderName);
+    Stoel(std::string clientName, std::string senderName);
     ~Stoel();
     inline const bool getStatus(std::string sensor);
     void sensorUpdate(bool newStatus);
