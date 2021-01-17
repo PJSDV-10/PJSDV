@@ -91,7 +91,10 @@ void SocketServer::ListenAndAccept()
             perror("Select failed");
             exit(EXIT_FAILURE);
         }
-
+        /* To do:
+            - Add a timeout so that the closing socket thing actually happens
+            
+             */
         for (int i = 0; i < FD_SETSIZE; i++){
             if(FD_ISSET(i, &ready_sockets)){
                 if(i == listen_fd){
@@ -173,6 +176,7 @@ void SocketServer::handleRequest(int fd){
             for (std::size_t i = 0; i < wemosjes.size(); i++){
                 if(wemosjes[i]->getSenderName() == xml_r.getSenderName()){
                     respondmsg = wemosjes[i]->handleSensorUpdate(&xml_r);
+                    break;
                 }
             }
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
@@ -192,13 +196,14 @@ void SocketServer::handleRequest(int fd){
     return;
 }
 
+/* Returns a 1 if an error occurred */
 int SocketServer::authWemos(XmlReader& msg){
     if(checkIfWemosExists(msg.getSenderName()) == 1){
         std::cout << "Wemos existed in table" << std::endl;
         return 1;
     }
     if(msg.getType() == "stoel"){
-        wemosjes.emplace_back(new Stoel(1, msg.getClientName(), msg.getSenderName()));
+        wemosjes.emplace_back(new Stoel(msg.getClientName(), msg.getSenderName()));
     }
     return 0;
 }
@@ -217,6 +222,7 @@ int SocketServer::accept_connection(int fd){
     return r_fd;
 }
 
+/* Returns a 1 if the wemos device already existed in the wemos vector */
 bool SocketServer::checkIfWemosExists(String name){
     for (uint i = 0; i < wemosjes.size(); i++){
         String senderName;
