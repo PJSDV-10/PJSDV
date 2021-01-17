@@ -26,83 +26,18 @@ std::string buildAuthenticationMsg() {
    return temp;
 }
 
-/*char* buildStatusMsg(char* function){
-  // builds an awnser message that's to be send to the server.
-                                                                            //TiXmlDocument Msg;
-                                                                            //Serial.println("Starting to build an AwnserMessage");
-                                                                            //TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-                                                                             // TiXmlElement * message = new TiXmlElement( "message" );
-    //header
-     std::string build = Buildheader();
-    //function
-                                                                               /* TiXmlElement * functionElement = new TiXmlElement( "function" );
-                                                                                  TiXmlText * functionText = new TiXmlText( function );
-                                                                                functionElement->LinkEndChild(functionText);
-                                                                              message->LinkEndChild(functionElement);
-    // context
-    //Serial.println("building context");
-      TiXmlElement * context = new TiXmlElement( "context" );
+std::string buildStatusMsg(){
+  std::string temp = Buildheader();
+  temp += "<function>sensorUpdate</function><context><password>" +wachtwoord+ "</password><type>stoel</type>";
+    for(int i = 0;i<AMOUNTOFSENSORS;i++){ //voeg elke keer neeiwe sensot toe
+      char *intStr = itoa(i,intStr,10);
+      std::string ronde =std::string(intStr); // int too string
+
+      intStr = itoa(sensor[i][0],intStr,10);
+      std::string waarde =std::string(intStr); // int to string
       
-      // voor elke sensor een apart sensor element toevoegen
-      for (int i = 0; i < AMOUNTOFSENSORS; i++) { 
-        
-      TiXmlElement * sensorElement = new TiXmlElement( "sensor" );
-        TiXmlElement * nameElement = new TiXmlElement( "name" );
-          TiXmlText * nameText = new TiXmlText(sensorNames[i][1]);
-
-        nameElement->LinkEndChild(nameText);
-      sensorElement->LinkEndChild(nameElement);
-
-        TiXmlElement * statusElement = new TiXmlElement( "status" );
-
-        char strong[5];
-        itoa(sensor[i][0], strong, 10);
-
-          TiXmlText * statusText = new TiXmlText(strong); 
-        statusElement->LinkEndChild(statusText);
-      sensorElement->LinkEndChild(statusElement);
-      context->LinkEndChild(sensorElement);
-      
-      }
-      // TODO: the same for actuators
-      for (int i = 0; i < AMOUNTOFACTUATORS; i++) { 
-        
-      TiXmlElement * actuatorElement = new TiXmlElement( "actuator" );
-        TiXmlElement * nameElement = new TiXmlElement( "name" );
-          TiXmlText * nameText = new TiXmlText(actuatorNames[i][1]);
-
-        nameElement->LinkEndChild(nameText);
-      actuatorElement->LinkEndChild(nameElement);
-
-        TiXmlElement * statusElement = new TiXmlElement( "status" );
-
-        char strong[5];
-        itoa(actuator[i][0], strong, 10);
-
-          TiXmlText * statusText = new TiXmlText(strong); 
-        statusElement->LinkEndChild(statusText);
-      actuatorElement->LinkEndChild(statusElement);
-      context->LinkEndChild(actuatorElement);
-      
-      }
-      
-      message->LinkEndChild(context);
-
-    Msg.LinkEndChild( message );
-    
-  // turn the message into a c string
-  TiXmlPrinter printer;
-    printer.SetIndent("\t");
-    Msg.Accept(&printer);
-    char* stringMsg = "";
-
-    strcpy(stringMsg, printer.CStr());
-
-    //TODO: free up the used memory
-    //delete message;
-    
-
-  //delete(&Msg); werkt niet // check dit https://stackoverflow.com/questions/853559/what-memory-management-do-i-need-to-cleanup-when-using-tinyxml-for-c   dont have to be deleted
-  return stringMsg;
+      temp +=  "<data"+ronde+">"+ waarde +"</data>";
+  }
+  temp +=   "</context></message>";
+  return temp;
 }
-*/

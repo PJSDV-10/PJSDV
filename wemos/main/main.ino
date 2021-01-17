@@ -25,10 +25,10 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "wall";
+std::string wemosNaam = "stoel1";
 std::string server = "testServer";
 std::string wachtwoord = "jemoeder";
-std::string type = "lamp";
+std::string type = "stoel";
 
 // Network SSID
 const char *ssid = "Eetmijnpieniet";
@@ -36,7 +36,7 @@ const char *password = "Merwic01";
 const char *ip = "dutchellie.nl";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber}
+int sensor[AMOUNTOFSENSORS][3] = {{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
 int actuator[AMOUNTOFACTUATORS][3] = {{12,12,15}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
@@ -79,7 +79,7 @@ void setup()
   //setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  authenticating();// is not finished yet though
+  //authenticating();// is not finished yet though
 
   //authenticating();
   //heb stack gedecoded hij zegt error hier
@@ -93,12 +93,13 @@ void setup()
   //  }
   //char *temp = buildAuthenticationMsg();
  // char *temp2 = temp;
- //while(1){
-  //delay(0);
+ while(1){
+  delay(0);
+  Serial.println(buildAuthenticationMsg().c_str());
  //char *temp = "<message><header><sender>wemosNaam</sender><receiver>server</receiver></header><function>authentication</function><context><password>JeMoederIsEenWachtwoord</password><clientName>Keuken Lamp</clientName> <type>lamp</type> <capabilities> <func> <type>actuateBool</type> <funcName>lamp</funcName> </func> <func> <type>buttonPress</type> <funcName>lampKnop</funcName> </func> </capabilities> </context> </message>";
 // sendData(temp);
  //client.connect(ip, 8080);
- //}
+ }
 
   Serial.println("Entering main program loop now.");
   delay(0);

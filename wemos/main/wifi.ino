@@ -129,16 +129,19 @@ void parser(std::string S1 ,std::string arr[]){
                         arr[0]= "geen acties"; // geen actie uit te voeren want deze wemos komt niet voor in context
                     }
                     else{
-                        SUB2 = S1.find("</wemos>");
-                        S1.erase(SUB2,100000); // erase evrything after what this wemos needs
-                        SUB1 = S1.find("<sensor>"); //find sensor
-                        SUB2 = S1.find("</sensor>"); // find end sensor
+                        
+                        SUB1 = S1.find("<data1>"); //find sensor
+                        SUB2 = S1.find("<data1>"); // find end sensor
 
                         for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){// look for context
                             delay(1);
-                            SUB1 = S1.find("<sensor>"); //zfind sensor
-                            SUB2 = S1.find("</sensor>"); // find end sensor
-                            SUB1 += 8 ;
+                            
+                            char *intStr = itoa(i-2,intStr,10);
+                            std::string ronde =std::string(intStr); // int too string
+                            
+                            SUB1 = S1.find("<data"+ronde+">"); //zfind sensor
+                            SUB2 = S1.find("</data"+ronde+">"); // find end sensor
+                            SUB1 += 7 ;
                             std::string temp = S1.substr(SUB1, SUB2 - SUB1);
                             arr[i] = temp;
                         }
