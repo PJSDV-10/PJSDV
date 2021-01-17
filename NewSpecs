@@ -174,7 +174,8 @@ Dus het volledige XML bericht ziet er dus ongeveer zo uit:
     <function>sensorUpdate</function>
     <context>
         <type>stoel</type>    
-        <data>0</data>
+        <data1>0</data1>  <!-- force sensor -->
+        <data2>0</data2>  <!-- push button -->
     </context>
 </message>
 
@@ -189,9 +190,57 @@ Wanneer dit wordt ontvangen beslist de server wat de actie moet zijn dat de stoe
     </header>
     <function>actuateBool</function>
     <context>
-        <data>0</data>
+        <data1>0</data1>
     </context>
 </message>
 
 De functie hier is dus "actuateBool". Een bool heeft twee standen, aan of uit. Een stoel heeft alleen maar een trilElement, dus we doen niet moeilijk en sturen gewoon dat dat ding uit moet.
 
+
+
+
+
+Column:
+    Push button 
+    Gas sensor
+
+    Buzzer
+    Led
+
+
+Bed:
+    Push button
+    Force sensor
+
+    Led
+
+
+Table-lamp:
+    PIR sensor
+
+    RGB LED ( <data>222</data> <data2>222</data2> etc)
+
+
+Door:
+    Push button (buiten)
+    Push button (binnen)
+
+    Led (buiten)
+    Led (binnen)
+    Servo
+
+
+Wall:
+    LDR
+    Potentiometer
+
+    LCD panel ( <data1>0-100</data1> )
+    RGB LED
+
+Fridge:
+    Switch
+    NTC (koelkast)
+    NTC (peltier) ( >60C fan aan )
+
+    Fan
+    Peltier 
