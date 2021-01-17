@@ -1,6 +1,20 @@
 #pragma once
 
-#include "socketconn.h"
+#include <string>
+#include <string.h>
+#include <cmath>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <vector>
+#include <iostream>
+#include <map>
+#include <unistd.h>
+#include "rapidxml/rapidxml.hpp"
+#include "rapidxml/rapidxml_print.hpp"
 #include "device.h"
 #include "fcntl.h"
 
@@ -9,7 +23,6 @@
 class SocketServer
 {
 private:
-    std::vector<SocketConnection *> clients;
 
     int listen_fd;
     struct addrinfo hints, *serverInfo;
