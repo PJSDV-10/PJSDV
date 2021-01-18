@@ -89,6 +89,16 @@ void SocketServer::ListenAndAccept()
     FD_ZERO(&error_checking_sockets);
     FD_SET(listen_fd, &all_sockets);
     FD_SET(listen_fd, &error_checking_sockets);
+
+    rapidxml::xml_document<> doc;
+    rapidxml::xml_node<> *root_node = doc.allocate_node(rapidxml::node_element, "message");
+    rapidxml::xml_node<> *function_node = doc.allocate_node(rapidxml::node_element, "function", "keepalive");
+    root_node->append_node(function_node);
+    doc.append_node(root_node);
+    std::stringstream ss;
+    ss << doc;
+    std::string keepalive_msg = ss.str();
+
     while (accepting)
     {
         ready_sockets = all_sockets;
@@ -121,7 +131,7 @@ void SocketServer::ListenAndAccept()
         {
             if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
                 int error;
-                if (error = send(i, "keepalive", 9, 0); error == -1)
+                if (error = send(i, keepalive_msg.c_str(), strlen(keepalive_msg.c_str()), 0); error == -1)
                 {
                     if(errno == ECONNRESET){
                         /* A client disconnected */
