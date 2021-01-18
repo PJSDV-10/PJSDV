@@ -110,13 +110,13 @@ void SocketServer::ListenAndAccept()
             }
         }
         
-        for (int i = 0; i < FD_SETSIZE; i++)
+        /*for (int i = 0; i < FD_SETSIZE; i++)
         {
             if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
                 int error;
                 if (error = recv(i, NULL, 0, MSG_PEEK); error <= 0)
                 {
-                    if(/* errno == EWOULDBLOCK &&  */error == -1){
+                    if(errno == EWOULDBLOCK &&  error == -1){
                         std::cout << "Closing a random connection, " << std::endl;
                         close(i);
                         errno = 0;
@@ -128,7 +128,7 @@ void SocketServer::ListenAndAccept()
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -153,21 +153,23 @@ void SocketServer::handleRequest(int fd){
         if(xml_r.getFunction() == "authentication"){ 
             std::cout << "The following device authenticated with the server:\n"
                       << xml_r.getClientName() << std::endl;
-            if(authWemos(xml_r) == 1){ // 1 means error
+            /*if(authWemos(xml_r) == 1){ // 1 means error
                 std::cout << "Wemos failure with authentication" << std::endl;
                 //send message back?
                 return;
-            }
+            }*/
             std::string respondmsg;
             XmlWriter xml_w(xml_r);
             xml_w.buildXMLAck();
             respondmsg = xml_w.getXML();
+            std::cout << "Message to be sent to client:\n"
+                      << respondmsg << std::endl;
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
             std::cout << "Reply to authentication sent" << std::endl;
             // Destroyer
             xml_w.~XmlWriter();
         }
-        else if (xml_r.getFunction() == "sensorUpdate")
+        else if (xml_r.getFunction() == "sensorUpdate" || xml_r.getFunction() == "getStatusAll")
         {
             std::cout << "Sensor update received from:\n"
                       << xml_r.getSenderName() << std::endl;
@@ -204,6 +206,8 @@ int SocketServer::authWemos(XmlReader& msg){
     }
     if(msg.getType() == "stoel"){
         wemosjes.emplace_back(new Stoel(msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "website"){
+        wemosjes.emplace_back(new Website(msg.getClientName(), msg.getSenderName()));
     }
     return 0;
 }

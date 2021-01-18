@@ -14,9 +14,6 @@ Stoel::Stoel(std::string clientName, std::string senderName){
 Stoel::~Stoel(){
 }
 
-void Stoel::doetniks(){
-    std::cout << "dit doet niks" << std::endl;
-}
 
 
 std::string Stoel::handleSensorUpdate(XmlReader *xml_r){
@@ -59,4 +56,29 @@ void Stoel::turnOnTE(){
 
 void Stoel::turnOffTE(){
 
+}
+
+Website::Website(std::string clientName, std::string senderName){
+    this->clientName = clientName;
+    this->senderName = senderName;
+    this->wemosType = "stoel";
+}
+
+Website::~Website(){
+
+}
+
+std::string Website::handleSensorUpdate(XmlReader* xml_r){
+    /* Realistically the actual function is called getStatusAll, but this works fine too */
+    std::string destination;
+    std::vector<double> sentStatus;
+    std::vector<double> sendStatus;
+
+    destination = xml_r->getSenderName();
+    sentStatus = xml_r->getData();
+
+    std::string toBeReturned;
+
+    toBeReturned = "<message><header><sender>server</sender><receiver>website</receiver></header><function>answerToStatusRequest</function><context></context></message>";
+    return toBeReturned;
 }

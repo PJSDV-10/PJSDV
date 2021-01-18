@@ -22,7 +22,6 @@ public:
     inline const std::string getWemosType() { return wemosType; };
 
     //virtual const bool getStatus(std::string sensor) = 0;
-    virtual void doetniks() = 0;
     virtual std::string handleSensorUpdate(XmlReader *) = 0;
     //    virtual std::string handleSiteRequest();
     

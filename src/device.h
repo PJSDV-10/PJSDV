@@ -36,6 +36,16 @@ class Fridge : public Wemos{
 
 };
 
+class Website : public Wemos{
+private:
+    
+
+public:
+    Website(std::string clientName, std::string senderName);
+    ~Website();
+    std::string handleSensorUpdate(XmlReader *);
+};
+
 class Stoel : public Wemos {
 private:
     bool TEState;
@@ -51,7 +61,6 @@ public:
     std::string handleSensorUpdate(XmlReader*);
     void turnOnTE();
     void turnOffTE();
-    void doetniks();
 };
 
 #endif //PJSDV_PRODUCT_H
