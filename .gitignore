@@ -36,6 +36,8 @@
 *cmake*
 *CMake*
 .Trash-1000*
+.vscode
 
 # makefile
+Makefile
 out/*
