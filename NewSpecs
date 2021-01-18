@@ -148,6 +148,29 @@ Dan wanneer alles terug is gegaan naar de server gaat het volgende naar de websi
 Voor de verschillende soorten wemos apparaten en hun data formaten moet je kijken bij die specifieke wemos
 
 
+
+#############################################
+#                                           #
+#                 Keepalive                 #
+#                                           #
+#############################################
+
+De server stuurt om de zoveel tijd een keepalive door naar de wemos apparaten om te kijken of de connectie
+nog bestaat.
+
+Die ziet er zo uit:
+
+<message>
+    <function>keepalive</function>
+<message>
+
+
+Geen header, geen context, alleen een functie keepalive.
+
+
+
+
+
 #############################################
 #                                           #
 #                   STOEL                   #
