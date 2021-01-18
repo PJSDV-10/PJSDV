@@ -77,10 +77,12 @@ void SocketServer::ListenAndAccept()
         exit(EXIT_FAILURE);
     }
     /* 
-    all_sockets here is the set of all sockets. This includes the listening socket
-    as well as all the open sockets to wemos devices.
-    ready_sockets is filled with the select function, making it the set of all sockets
-    that are ready to read. 
+        all_sockets here is the set of all sockets. This includes the listening socket
+        as well as all the open sockets to wemos devices.
+        ready_sockets is filled with the select function, making it the set of all sockets
+        that are ready to read. 
+        error_checking_sockets checks for every socket if there can be messages sent to it.
+        if you cannot, that means the connection is broken. So close the socket you fool!
     */
     //fd_set ready_sockets, all_sockets, error_checking_sockets;
     FD_ZERO(&all_sockets);
@@ -96,10 +98,7 @@ void SocketServer::ListenAndAccept()
             perror("Select failed");
             exit(EXIT_FAILURE);
         }
-        /* To do:
-            - Add a timeout so that the closing socket thing actually happens
-            
-             */
+
         for (int i = 0; i <= FD_SETSIZE; i++){
             if(FD_ISSET(i, &ready_sockets)){
                 if(i == listen_fd){
@@ -129,6 +128,7 @@ void SocketServer::ListenAndAccept()
                         std::cout << "A client failed to receive any data.\n\rClosing socket" << std::endl;
                         FD_CLR(i, &all_sockets);
                         close(i);
+                        removeWemosByFD(i);
                     }
                 }
             }
@@ -146,6 +146,7 @@ void SocketServer::handleRequest(int fd){
     }else if(bytesread == 0){
         std::cout << "Closing socket from handleRequest function" << std::endl;
         close(fd);
+        removeWemosByFD(fd);
         return;
     }
 
@@ -158,11 +159,11 @@ void SocketServer::handleRequest(int fd){
         if(xml_r.getFunction() == "authentication"){ 
             std::cout << "The following device authenticated with the server:\n"
                       << xml_r.getClientName() << std::endl;
-            /*if(authWemos(xml_r) == 1){ // 1 means error
+            if(authWemos(fd, xml_r) == 1){ // 1 means error
                 std::cout << "Wemos failure with authentication" << std::endl;
                 //send message back?
                 return;
-            }*/
+            }
             std::string respondmsg;
             XmlWriter xml_w(xml_r);
             xml_w.buildXMLAck();
@@ -175,6 +176,7 @@ void SocketServer::handleRequest(int fd){
             /* Close socket in case that the client is the website */
             if(xml_r.getType() == "website"){
                 close(fd);
+                removeWemosByFD(fd);
             }
             // Destroyer
             xml_w.~XmlWriter();
@@ -197,6 +199,7 @@ void SocketServer::handleRequest(int fd){
             /* Close socket in case that the client is the website */
             if(xml_r.getType() == "website"){
                 close(fd);
+                removeWemosByFD(fd);
             }
             // Destroy
 
@@ -251,6 +254,7 @@ void SocketServer::handleRequest(int fd){
             // Close connection to website
             if(xml_r.getType() == "website"){
                 close(fd);
+                removeWemosByFD(fd);
             }
             // Destroy
             xml_ww.~XmlWriter();
@@ -270,15 +274,17 @@ void SocketServer::handleRequest(int fd){
 }
 
 /* Returns a 1 if an error occurred */
-int SocketServer::authWemos(XmlReader& msg){
-    if(checkIfWemosExists(msg.getSenderName()) == 1){
+int SocketServer::authWemos(int fd, XmlReader& msg){
+    /*if(checkIfWemosExists(msg.getSenderName()) == 1){
         std::cout << "Wemos existed in table" << std::endl;
         return 1;
-    }
+    }*/
     if(msg.getType() == "stoel"){
-        wemosjes.emplace_back(new Stoel(msg.getClientName(), msg.getSenderName()));
+        wemosjes.emplace_back(new Stoel(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "website"){
-        wemosjes.emplace_back(new Website(msg.getClientName(), msg.getSenderName()));
+        wemosjes.emplace_back(new Website(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "column"){
+        wemosjes.emplace_back(new Column(fd, msg.getClientName(), msg.getSenderName()));
     }
     return 0;
 }
@@ -310,4 +316,16 @@ bool SocketServer::checkIfWemosExists(String name){
         }
     }
     return false;
+}
+
+/* Removes the wemos that can be identified by it's fd. */
+void SocketServer::removeWemosByFD(int fd){
+    for (auto it = wemosjes.begin(); it != wemosjes.end(); )
+    {
+        if((*it)->getFD() == fd){
+            it = wemosjes.erase(it);
+        }else{
+            ++it;
+        }
+    }
 }

@@ -31,12 +31,13 @@ private:
 
     std::string password = "solarwinds123";
 
-    int authWemos(XmlReader& msg);
+    int authWemos(int fd, XmlReader& msg);
     void fillInHints();
     bool checkPassword(std::string);
     int accept_connection(int fd);
     rapidxml::xml_node<>* buildHeader(std::string dest,rapidxml::xml_document<> &doc);
     bool checkIfWemosExists(String name);
+    void removeWemosByFD(int fd);
     //Structs
 
 public: 

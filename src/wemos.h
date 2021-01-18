@@ -12,7 +12,7 @@ protected:
     std::string clientName;
     std::string senderName;
     std::string wemosType;
-    // TODO fd and type can be removed
+    int fd;
 
 public:
     virtual ~Wemos();
@@ -21,6 +21,7 @@ public:
     inline const std::string getSenderName() { return senderName; };
     inline const std::string getClientName() { return clientName; };
     inline const std::string getWemosType() { return wemosType; };
+    inline const int getFD() { return fd; };
 
     //virtual const bool getStatus(std::string sensor) = 0;
     virtual std::string handleSensorUpdate(XmlReader *) = 0;

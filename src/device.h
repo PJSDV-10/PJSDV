@@ -21,7 +21,14 @@ class Door : public Wemos{
 };
 
 class Column : public Wemos {
+private:
+    bool stateBuzzer;
+    bool stateLED;
 
+public:
+    Column(int fd, std::string clientName, std::string senderName);
+    ~Column();
+    std::string handleSensorUpdate(XmlReader *);
 };
 
 class Bed : public Wemos{
@@ -41,7 +48,7 @@ private:
     
 
 public:
-    Website(std::string clientName, std::string senderName);
+    Website(int fd, std::string clientName, std::string senderName);
     ~Website();
     std::string handleSensorUpdate(XmlReader *);
     //XmlReader* sendStatusRequest(fd_set* all_sockets);
@@ -55,7 +62,7 @@ private:
 protected:
 
 public:
-    Stoel(std::string clientName, std::string senderName);
+    Stoel(int fd, std::string clientName, std::string senderName);
     ~Stoel();
     std::string handleSensorUpdate(XmlReader*);
     //XmlReader* sendStatusRequest(fd_set*);
