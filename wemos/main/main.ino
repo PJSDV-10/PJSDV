@@ -16,6 +16,7 @@
 #include <WiFiClient.h>
 #include <tinyxml.h>
 #include <string>
+#include <sstream> 
 
 #define AMOUNTOFSENSORS 1
 #define AMOUNTOFACTUATORS 1
@@ -25,14 +26,14 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "stoel1";
+std::string wemosNaam = "stoel2";
 std::string server = "testServer";
 std::string wachtwoord = "jemoeder";
 std::string type = "stoel";
 
 // Network SSID
-const char *ssid = "Eetmijnpieniet";
-const char *password = "Merwic01";
+const char *ssid = "oop";
+const char *password = "programmer";
 const char *ip = "dutchellie.nl";
 
 // sensor globals
@@ -48,9 +49,10 @@ this way we don't have to worry about the different types of actuators, like twi
 //function declarations xml
 std::string buildcapabilities();
 std::string Buildheader();
-//char* buildStatusMsg(char*);
+std::string buildStatusMsg();
 std::string buildAuthenticationMsg();
 void parser(std::string, std::string);
+std::string intToString(int i);
 
 
 //function declaration wifi
@@ -72,34 +74,16 @@ void setup()
   Serial.print("Test Message");
 
   setupWifi();
+  /*
   pinMode(0, INPUT_PULLUP);
   pinMode(2, INPUT_PULLUP);
   digitalWrite(0, HIGH);
   digitalWrite(2, HIGH);//https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
-  //setupPins(); 
+  */
+  setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  //authenticating();// is not finished yet though
-
-  //authenticating();
-  //heb stack gedecoded hij zegt error hier
-  Serial.println("Done authenticating");
-  int y = 0;
- //while(1){
-      
-   //   delay(0);
-    //  Serial.println(y);
-    //  y++;
-  //  }
-  //char *temp = buildAuthenticationMsg();
- // char *temp2 = temp;
- while(1){
-  delay(0);
-  Serial.println(buildAuthenticationMsg().c_str());
- //char *temp = "<message><header><sender>wemosNaam</sender><receiver>server</receiver></header><function>authentication</function><context><password>JeMoederIsEenWachtwoord</password><clientName>Keuken Lamp</clientName> <type>lamp</type> <capabilities> <func> <type>actuateBool</type> <funcName>lamp</funcName> </func> <func> <type>buttonPress</type> <funcName>lampKnop</funcName> </func> </capabilities> </context> </message>";
-// sendData(temp);
- //client.connect(ip, 8080);
- }
+  authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
@@ -107,14 +91,17 @@ void setup()
 
 void loop()
 {
-  Serial.println("in program loop now.");
-  
-
-   // placeholder: readSensors is different for every device
-   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-    sensor[i][0] = digitalRead(sensor[i][2]);
+  // placeholder: readSensors is different for every device
+  /*
+  for (int i = 0; i < AMOUNTOFSENSORS; i++) {
+    if (sensorNames[i][0].compare("sensorBool") == 0) {
+      sensor[i][0] = digitalRead(sensor[i][2]);
       delay(0);
-   }
+    } else if (sensorNames[i][0].compare("sensorInt")) {
+      sensor[i][0] = analogRead(sensor[i][2]);
+    }
+  }
+  */
    
   // if we receive a message, handle it  
   /*
@@ -129,8 +116,8 @@ void loop()
   */
 
 
- // updateActuators();
- ///*
+  updateActuators();
+
   // send msg
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
@@ -142,32 +129,29 @@ void loop()
   }
   
   if (sendStatus){
-     
-//    sendData(buildStatusMsg(""));
-    
+    sendData(buildStatusMsg());
   }
-  
 
 }
 
-/*bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
+bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
-  if(parsedMsg[1] == "getStatusBroadcast") { // can't do switch statements with strings so giant if else it's gonna have to be.
+  if(parsedMsg[1].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
 
-      sendData(buildStatusMsg("answerToStatusRequest"));
+      sendData(buildStatusMsg());
       return 1;
   } else  
   return 0;
 
-}*/
+}
 
-/*void updateActuators() {
+void updateActuators() {
     for(int i = 0; i < AMOUNTOFACTUATORS; i++){
         delay(1);
     if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
       
       Serial.print("we changed the ");
-        Serial.print(actuatorNames[i][1]);
+        Serial.print(actuatorNames[i][1].c_str());
         Serial.print("'s value to: ");
         Serial.print(actuator[i][1]);
         
@@ -186,30 +170,20 @@ void loop()
       actuator[i][0] = actuator[i][1]; //update the currentvalue
     }
   }
-}*/
+}
 
 void authenticating(){
   // goes through the whole authentication procedure.
-  // function is pretty long because of the long message strings.
-  // !!!not finished yet!!!
-  
-  // first format the initial message.
   Serial.println("Starting authentication procedure");
 
   
-  // now send this to the server
-  std::string temp =buildAuthenticationMsg();
-  //const char hallo = 
-  sendData(temp.c_str());
-  //delay(0);
-  //free(temp);
-  //delay(0);
-  //delete(temp);
-  //temp = "hallo";
-  
+  // build the message, and send it to the server
+
+  sendData(buildAuthenticationMsg());
 
   // wait for some sort of reply, if received do the assignment thing.
   Serial.println("Waiting for a response.");
+  
   int receivedResponse = 0;
   const char* receivedMsg = "";
   do {receivedMsg = receiveData(&receivedResponse);
@@ -217,24 +191,19 @@ void authenticating(){
   }
   while(receivedResponse==0);
 
-  
-   
   // now extract the usefull bits
   std::string parsedMsg[10];
   std::string receivedMsgString(receivedMsg);// turn the character stream into a std::string
   parser(receivedMsgString ,parsedMsg);
 
+
   // if we receive the wrong clientName of msgtype something has probably gone wrong, so we try again.
-  std::string test("ack");
-  Serial.println(parsedMsg[2].c_str());
-  Serial.println(parsedMsg[2].compare(test));
-  if (parsedMsg[2].compare(test) == 0) {  
+  if (parsedMsg[2].compare("ack") == 0) {  
     Serial.println("authentication procedure sucessfully completed");
-    //return ;
-  }else {
+
+  }else 
     Serial.println("authentication procedure not completed, trying again.");
-    //return ;
-  }
+  
 }
 
 
@@ -249,13 +218,15 @@ void setupSensors() {
   // TODO: also enables the needed TWI if we are using a TWI sensor.
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
       delay(1);
-    if(sensorNames[i][1] == "drukKnop") {
+    if(sensorNames[i][1].compare("drukKnop") == 0) {
       pinMode(sensor[i][2],INPUT_PULLUP);
-    }else if (sensorNames[i][1] == "TWISensor") {
+      Serial.println("input_pullup");
+    }else if (sensorNames[i][0].compare("TWISensor") == 0) {
       // do the twi thing
       
     }else
       pinMode(sensor[i][2],INPUT);
+      Serial.println("input");
   }
 }
 
@@ -264,5 +235,6 @@ void setupActuators() {
   for (int i = 0; i < AMOUNTOFACTUATORS; i++) {
     delay(1);
     pinMode(actuator[i][2],OUTPUT);
+    Serial.println("output");
   }
 }

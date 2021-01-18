@@ -37,15 +37,15 @@ const char* receiveData(int* receivedResponse) {
 }
 
 
-void sendData(const char *msg){
+void sendData(std::string msg){
   // sends the enclosed message to the connected client
   Serial.println("starting a transmission of the following message:");
-  Serial.println(msg);
+  Serial.println(msg.c_str());
   
-    //if(client.availableForWrite()&&client.connected()){
-          client.write(msg);
+    if(client.availableForWrite()&&client.connected()){
+          client.write(msg.c_str());
           Serial.println("The message has been send succesfully.");
-    //}
+    }
 }
 
 void setupWifi(){

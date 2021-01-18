@@ -29,15 +29,29 @@ std::string buildAuthenticationMsg() {
 std::string buildStatusMsg(){
   std::string temp = Buildheader();
   temp += "<function>sensorUpdate</function><context><password>" +wachtwoord+ "</password><type>stoel</type>";
+  
     for(int i = 0;i<AMOUNTOFSENSORS;i++){ //voeg elke keer neeiwe sensot toe
-      char *intStr = itoa(i,intStr,10);
-      std::string ronde =std::string(intStr); // int too string
-
-      intStr = itoa(sensor[i][0],intStr,10);
-      std::string waarde =std::string(intStr); // int to string
+      delay(0);
       
-      temp +=  "<data"+ronde+">"+ waarde +"</data>";
+       std::string roundd = intToString( i); // int too string
+       std::string worth = intToString(sensor[i][0]);
+       
+      temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
+      delay(0);
   }
+  
+  delay(0);
   temp +=   "</context></message>";
+  
   return temp;
+}
+
+
+
+std::string intToString(int i){ //conver int to string
+    std::stringstream str;
+   str << i;
+   std::string s;
+   s += str.str();
+   return s;
 }
