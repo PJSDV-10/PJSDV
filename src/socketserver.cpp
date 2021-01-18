@@ -131,14 +131,14 @@ void SocketServer::ListenAndAccept()
             }
         }
         
-        for (int i = 0; i < FD_SETSIZE; i++)
+        /*for (int i = 0; i < FD_SETSIZE; i++)
         {
             if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
                 int error;
                 if (error = send(i, keepalive_msg.c_str(), strlen(keepalive_msg.c_str()), 0); error == -1)
                 {
                     if(errno == ECONNRESET){
-                        /* A client disconnected */
+                        // A client disconnected 
                         std::cout << "A client failed to receive any data.\n\rClosing socket" << std::endl;
                         FD_CLR(i, &all_sockets);
                         close(i);
@@ -146,7 +146,7 @@ void SocketServer::ListenAndAccept()
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -319,6 +319,8 @@ int SocketServer::accept_connection(int fd){
         perror("Accepting failed");
         exit(EXIT_FAILURE);
     }
+
+    setsockopt(r_fd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof opt);
     return r_fd;
 }
 
