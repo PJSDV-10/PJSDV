@@ -104,10 +104,14 @@ void SocketServer::ListenAndAccept()
         ready_sockets = all_sockets;
         error_checking_sockets = all_sockets;
 
-        if(select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0){
+        std::cout << "\nWaiting for client to read from" << std::endl;
+        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0)
+        {
             perror("Select failed");
             exit(EXIT_FAILURE);
         }
+
+        std::cout << "Found one!" << std::endl;
 
         for (int i = 0; i <= FD_SETSIZE; i++){
             if(FD_ISSET(i, &ready_sockets)){
@@ -151,18 +155,23 @@ void SocketServer::handleRequest(int fd){
     int bytesread;
     if ((bytesread = recv(fd, buffer, 4096, 0)) == -1)
     {
-        perror("Error receiving");
-        exit(EXIT_FAILURE);
-    }else if(bytesread == 0){
+        perror("Error receiving at handleRequest");
+        closeConnection(fd);
+        return;
+    }
+    else if (bytesread == 0)
+    {
         std::cout << "Closing socket from handleRequest function" << std::endl;
-        close(fd);
-        removeWemosByFD(fd);
+        closeConnection(fd);
         return;
     }
 
     std::cout << "The following message was received:\n\r" << buffer << std::endl;
     XmlReader xml_r(buffer);
     xml_r.parseDocument();
+    if(xml_r.error() == PARSING_ERROR){
+        return;
+    }
     Map xml = xml_r.getParsedDoc();
     try
     {
@@ -185,8 +194,7 @@ void SocketServer::handleRequest(int fd){
 
             /* Close socket in case that the client is the website */
             if(xml_r.getType() == "website"){
-                close(fd);
-                removeWemosByFD(fd);
+                closeConnection(fd);
             }
             // Destroyer
             xml_w.~XmlWriter();
@@ -208,8 +216,7 @@ void SocketServer::handleRequest(int fd){
 
             /* Close socket in case that the client is the website */
             if(xml_r.getType() == "website"){
-                close(fd);
-                removeWemosByFD(fd);
+                closeConnection(fd);
             }
             // Destroy
 
@@ -266,8 +273,7 @@ void SocketServer::handleRequest(int fd){
             }
             // Close connection to website
             if(xml_r.getType() == "website"){
-                close(fd);
-                removeWemosByFD(fd);
+                closeConnection(fd);
             }
             // Destroy
             xml_ww.~XmlWriter();
@@ -341,4 +347,11 @@ void SocketServer::removeWemosByFD(int fd){
             ++it;
         }
     }
+}
+
+void SocketServer::closeConnection(int fd){
+    close(fd);
+    removeWemosByFD(fd);
+    FD_CLR(fd, &all_sockets);
+    return;
 }

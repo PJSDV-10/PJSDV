@@ -1,5 +1,7 @@
 #pragma once
 
+#define PARSING_ERROR 1
+
 #include "wrapper.h"
 #include <string.h>
 #include <iostream>
@@ -15,6 +17,7 @@ private:
     std::string clientName;
     std::string type;
     std::vector<double> data;
+    int err;
 
     Map parsedXML;
     Map parsedContext;
@@ -40,6 +43,7 @@ public:
     //Misc
     bool checkPassword(std::string password);
     bool empty();
+    inline void reseterr() { err = 0; };
 
     //Getters
     inline const Map getParsedDoc() const { return parsedXML; };
@@ -50,5 +54,5 @@ public:
     inline const std::string getClientName() const { return clientName; };
     inline const std::string getType() const { return type; };
     inline std::vector<double> &getData() { return data; };
+    inline const int error() const { return err; };
 };
-

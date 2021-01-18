@@ -38,6 +38,7 @@ private:
     rapidxml::xml_node<>* buildHeader(std::string dest,rapidxml::xml_document<> &doc);
     bool checkIfWemosExists(String name);
     void removeWemosByFD(int fd);
+    void closeConnection(int fd);
     //Structs
 
 public: 

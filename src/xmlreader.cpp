@@ -1,5 +1,6 @@
 #include "xmlreader.h"
 
+
 void XmlReader::parseDocument(){
     using namespace rapidxml;
 
@@ -42,6 +43,7 @@ XmlReader::XmlReader(const char *xmldoc)
         doc->parse<0>(xml);
     }catch(parse_error){
         std::cout << "A parsing error occured. Document is not valid XML" << std::endl;
+        err = PARSING_ERROR;
         return;
     }
     xml_node<> *root_node = doc->first_node("message");
