@@ -1,15 +1,21 @@
-<p>submitted text: <?php echo $_POST["teststory"]; ?></p>
-
 <?php
-print("<p>starting socket test. . .</p>");
-
-$fp = fsockopen("127.0.0.1", 3016, $errno, $errstr, 20);
+$fp = fsockopen("127.0.0.1", 8080, $errno, $errstr, 1);
 if(!$fp) {
 	echo "$errstr ($errno)<br>";
 } else {
-	$out = "GET / HTTP/1.1\r\n";
-	$out .= "Host: 127.0.0.1\r\n";
-	$out .= "Connection: Close\r\n";
+	$out = "<message>
+	    <header>
+	        <sender>website</sender>
+	        <receiver>server</receiver>
+	    </header>
+	    <function>authentication</function>
+	    <context>
+	        <password>JeMoederIsEenWachtwoord</password>
+	        <clientName>Website</clientName>
+	        <type>website</type>
+	    </context>
+	</message>";
+
 	fwrite($fp,$out);
 	while(!feof($fp)) {
 		echo fgets($fp, 128);
