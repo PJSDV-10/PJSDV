@@ -217,6 +217,9 @@ void SocketServer::handleRequest(int fd){
             /* 
                 Handling for the getStatusAll request from the website. 
                 Let's hope this actually goddamn works XD
+
+                A thing you can try when it doesn't work is to add a select() call to make sure you can actually
+                write to the sockets.
              */
             std::cout << "getStatusAll request received, handling it by sending broadcast" << std::endl;
 
