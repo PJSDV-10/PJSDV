@@ -26,11 +26,14 @@ private:
     rapidxml::xml_node<> *receiver_node;
     rapidxml::xml_node<> *function_node;
     rapidxml::xml_node<> *context_node;
+    rapidxml::xml_node<> *wemosjes_node;
 
     //Different function context builders
     void buildHeader();
     void buildAckContext();
     void buildActuateContext(std::vector<double> &status);
+    void buildStatusRequestContext();
+
 
 public:
     XmlWriter();
@@ -42,8 +45,11 @@ public:
     ~XmlWriter();
 
     void buildXMLAck();
-
     void buildXMLActuate(std::vector<double> &status);
+    void buildXMLStatusRequest();
+    void buildXMLAnswerToSR();
+    void finalizeAnswerToSR();
+    void addDataToAnswer(std::string type, std::string clientName, std::vector<double> data);
     //Getters
     std::string getXML();
 };

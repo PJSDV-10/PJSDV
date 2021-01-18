@@ -76,8 +76,13 @@ void SocketServer::ListenAndAccept()
         perror("Listening failed");
         exit(EXIT_FAILURE);
     }
-
-    fd_set ready_sockets, all_sockets, error_checking_sockets;
+    /* 
+    all_sockets here is the set of all sockets. This includes the listening socket
+    as well as all the open sockets to wemos devices.
+    ready_sockets is filled with the select function, making it the set of all sockets
+    that are ready to read. 
+    */
+    //fd_set ready_sockets, all_sockets, error_checking_sockets;
     FD_ZERO(&all_sockets);
     FD_ZERO(&error_checking_sockets);
     FD_SET(listen_fd, &all_sockets);
@@ -95,7 +100,7 @@ void SocketServer::ListenAndAccept()
             - Add a timeout so that the closing socket thing actually happens
             
              */
-        for (int i = 0; i < FD_SETSIZE; i++){
+        for (int i = 0; i <= FD_SETSIZE; i++){
             if(FD_ISSET(i, &ready_sockets)){
                 if(i == listen_fd){
                     std::cout << "A new incoming connection" << std::endl;
@@ -105,30 +110,29 @@ void SocketServer::ListenAndAccept()
                     FD_SET(new_fd, &all_sockets);
                 }else{
                     handleRequest(i);
-                    FD_CLR(i, &all_sockets);
+                    /* Technically most sockets here are not supposed to be closed
+                    the FD_CLR function here removes the socket from all sockets that are
+                    connected, so it's not monitored anymore, which is bad */
+                    //FD_CLR(i, &all_sockets);
                 }
             }
         }
         
-        /*for (int i = 0; i < FD_SETSIZE; i++)
+        for (int i = 0; i < FD_SETSIZE; i++)
         {
             if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
                 int error;
-                if (error = recv(i, NULL, 0, MSG_PEEK); error <= 0)
+                if (error = send(i, "keepalive", 9, 0); error == -1)
                 {
-                    if(errno == EWOULDBLOCK &&  error == -1){
-                        std::cout << "Closing a random connection, " << std::endl;
+                    if(errno == ECONNRESET){
+                        /* A client disconnected */
+                        std::cout << "A client failed to receive any data.\n\rClosing socket" << std::endl;
+                        FD_CLR(i, &all_sockets);
                         close(i);
-                        errno = 0;
-                        continue;
-                    }else if(error == 0){
-                        std::cout << "Socket was closed properly, closing it again to be sure" << std::endl;
-                        close(i);
-                        continue;
                     }
                 }
             }
-        }*/
+        }
     }
 }
 
@@ -140,6 +144,7 @@ void SocketServer::handleRequest(int fd){
         perror("Error receiving");
         exit(EXIT_FAILURE);
     }else if(bytesread == 0){
+        std::cout << "Closing socket from handleRequest function" << std::endl;
         close(fd);
         return;
     }
@@ -166,10 +171,15 @@ void SocketServer::handleRequest(int fd){
                       << respondmsg << std::endl;
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
             std::cout << "Reply to authentication sent" << std::endl;
+
+            /* Close socket in case that the client is the website */
+            if(xml_r.getType() == "website"){
+                close(fd);
+            }
             // Destroyer
             xml_w.~XmlWriter();
         }
-        else if (xml_r.getFunction() == "sensorUpdate" || xml_r.getFunction() == "getStatusAll")
+        else if (xml_r.getFunction() == "sensorUpdate")
         {
             std::cout << "Sensor update received from:\n"
                       << xml_r.getSenderName() << std::endl;
@@ -183,7 +193,68 @@ void SocketServer::handleRequest(int fd){
             }
             send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
             std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+            /* Close socket in case that the client is the website */
+            if(xml_r.getType() == "website"){
+                close(fd);
+            }
             // Destroy
+
+        }else if(xml_r.getFunction() == "getStatusAll"){
+            /* 
+                Handling for the getStatusAll request from the website. 
+                Let's hope this actually goddamn works XD
+             */
+            std::cout << "getStatusAll request received, handling it by sending broadcast" << std::endl;
+
+            XmlWriter xml_w("getStatusBroadcast", "allWemos");
+            xml_w.buildXMLStatusRequest();
+            std::string toBeSent = xml_w.getXML();
+            xml_w.~XmlWriter();
+            std::cout << "Sending status request to all wemos devices" << std::endl;
+            XmlWriter xml_ww("answerToStatusRequest", "website");
+            xml_ww.buildXMLAnswerToSR();
+            for (int i = 0; i < FD_SETSIZE; i++)
+            {
+                if(FD_ISSET(i, &all_sockets) && i != fd){        
+                    ssize_t error = send(i, toBeSent.c_str(), strlen(toBeSent.c_str()), 0);
+                    if(error == -1){
+                        if(errno == ECONNRESET){
+                            std::cout << "During sending of status request a socket appear closed or unresponsive\n\rNot closing the connection yet, but beware" << std::endl;
+                            errno = 0;
+                        }
+                    }
+                    char buffer[4096] = {0};
+                    int bytesread;
+                    if ((bytesread = recv(i, buffer, 4096, 0)) == -1)
+                    {
+                        perror("Error receiving");
+                        exit(EXIT_FAILURE);
+                    }
+                    XmlReader xml_r(buffer);
+                    xml_r.parseDocument();
+                    xml_ww.addDataToAnswer(xml_r.getType(), xml_r.getClientName(), xml_r.getData());
+                    xml_r.~XmlReader();
+                }
+            }
+            xml_ww.finalizeAnswerToSR();
+            std::string sendBack;
+            sendBack = xml_ww.getXML();
+            ssize_t error = send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0);
+            if(error == -1 && errno != ENOTCONN){
+                perror("Error sending");
+                exit(EXIT_FAILURE);
+            }else{
+                std::cout << "The connection to the website was aborted during the building of the answer to it's status request.\n\rStuff will be fine, closing the socket was the next thing anyway." << std::endl;
+                errno = 0;
+            }
+            // Close connection to website
+            if(xml_r.getType() == "website"){
+                close(fd);
+            }
+            // Destroy
+            xml_ww.~XmlWriter();
+
         }
     }catch(const std::out_of_range& oor){
         std::cout << "function did not exist inside the thingy" << std::endl;

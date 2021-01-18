@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sys/socket.h>
 #include "xmlreader.h"
 #include "xmlwriter.h"
 
@@ -23,6 +24,6 @@ public:
 
     //virtual const bool getStatus(std::string sensor) = 0;
     virtual std::string handleSensorUpdate(XmlReader *) = 0;
+    //virtual XmlReader* sendStatusRequest();
     //    virtual std::string handleSiteRequest();
-    
 };

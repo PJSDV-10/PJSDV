@@ -44,6 +44,7 @@ public:
     Website(std::string clientName, std::string senderName);
     ~Website();
     std::string handleSensorUpdate(XmlReader *);
+    //XmlReader* sendStatusRequest(fd_set* all_sockets);
 };
 
 class Stoel : public Wemos {
@@ -56,11 +57,8 @@ protected:
 public:
     Stoel(std::string clientName, std::string senderName);
     ~Stoel();
-    inline const bool getStatus(std::string sensor);
-    void sensorUpdate(bool newStatus);
     std::string handleSensorUpdate(XmlReader*);
-    void turnOnTE();
-    void turnOffTE();
+    //XmlReader* sendStatusRequest(fd_set*);
 };
 
 #endif //PJSDV_PRODUCT_H

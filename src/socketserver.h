@@ -22,7 +22,7 @@
 class SocketServer
 {
 private:
-
+    fd_set ready_sockets, all_sockets, error_checking_sockets;
     int listen_fd;
     struct addrinfo hints, *serverInfo;
     int opt = 1;
