@@ -83,7 +83,7 @@ void setup()
   setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  authenticating();
+  //authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
@@ -92,33 +92,36 @@ void setup()
 void loop()
 {
   // placeholder: readSensors is different for every device
-  /*
+  Serial.println("reading sensors now");
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     if (sensorNames[i][0].compare("sensorBool") == 0) {
       sensor[i][0] = digitalRead(sensor[i][2]);
       delay(0);
-    } else if (sensorNames[i][0].compare("sensorInt")) {
+    } else if (sensorNames[i][0].compare("sensorInt") == 0) {
       sensor[i][0] = analogRead(sensor[i][2]);
     }
   }
-  */
+  
    
   // if we receive a message, handle it  
-  /*
-  std::string receivedMsg(receiveData()), empty; // receive some data, if there is nothing to receive, the string is empty / this is broken dont use
-  delay(0);
+  Serial.println("checking if we received a msg");
   
-  if (!(receivedMsg == empty)){
+  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is empty / this is broken dont use
+  delay(0);
+
+  
+  if (receivedMsg.compare("NULL") != 0){
     std::string parsedMsg[BUFFERSIZE];
     parser(receivedMsg, parsedMsg); // parse the message, 
     handleMessage(parsedMsg);
   }
-  */
+  
 
-
+  Serial.println("updating actuators");
   updateActuators();
 
   // send msg
+    Serial.println("sending sensorupdate");
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(1);
@@ -131,7 +134,7 @@ void loop()
   if (sendStatus){
     sendData(buildStatusMsg());
   }
-
+  delay(1000);
 }
 
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
