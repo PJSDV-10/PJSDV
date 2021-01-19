@@ -49,7 +49,7 @@ std::string buildStatusMsg(){
 
 
 std::string intToString(int i){ //conver int to string
-    std::stringstream str;
+   std::stringstream str;
    str << i;
    std::string s;
    s += str.str();
