@@ -19,14 +19,14 @@
 #include <sstream> 
 
 #define AMOUNTOFSENSORS 2
-#define AMOUNTOFACTUATORS 1
+#define AMOUNTOFACTUATORS 2
 #define BUFFERSIZE 20
 
 // voor parser
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "stoel2";
+std::string wemosNaam = "stoel3";
 std::string server = "testServer";
 std::string wachtwoord = "jemoeder";
 std::string type = "stoel";
@@ -37,11 +37,11 @@ const char *password = "programmer";
 const char *ip = "home.dutchellie.nl";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{0,0,16},{0,0,12}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
-std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"},{"sensorBool","naam"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+int sensor[AMOUNTOFSENSORS][3] = {{0,0,4},{0,0,2}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","pushButton"},{"sensorInt","forceSensor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{12,12,15}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-std::string actuatorNames[AMOUNTOFACTUATORS][2] = {"actuatorInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+int actuator[AMOUNTOFACTUATORS][3] = {{0,0,17},{0,0,5}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"actuatorBool","LED"},{"actuatorBool","VibrationMotor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
 
@@ -66,8 +66,7 @@ void sendData(const char *);
 
 WiFiClient client;
 
-void setup()
-{
+void setup() {
 
   
   Serial.begin(115200);
@@ -89,8 +88,7 @@ void setup()
   delay(0);
 }
 
-void loop()
-{
+void loop() {
   // placeholder: readSensors is different for every device
   Serial.println("reading sensors now");
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
@@ -108,7 +106,6 @@ void loop()
   
   std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is empty / this is broken dont use
   delay(0);
-
   
   if (receivedMsg.compare("NULL") != 0){
     std::string parsedMsg[BUFFERSIZE];
@@ -140,11 +137,15 @@ void loop()
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[1].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
-
-      sendData(buildStatusMsg());
-      return 1;
-  } else  
-  return 0;
+    sendData(buildStatusMsg());
+    return 1;
+  } else if (parsedMsg[1].compare("actuateBool") == 0) {
+    for (int i = 0; i < (sizeof(parsedMsg)/sizeof(parsedMsg[0])) - 1; i++) {
+      actuator[i][1] = atoi(parsedMsg[i+3].c_str());
+    }
+    return 1;
+  } else
+    return 0;
 
 }
 
@@ -209,19 +210,19 @@ void authenticating(){
   
 }
 
-
 void setupPins() {
   // sets the wemos' pins in output, input or input_pullup mode depending on actuator/sensor type.
   setupSensors();
   setupActuators();
   Serial.println("pin setup complete");
 }
+
 void setupSensors() {
   // puts the pins in input or input_pullup mode depending on the type of sensor
   // TODO: also enables the needed TWI if we are using a TWI sensor.
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
       delay(1);
-    if(sensorNames[i][1].compare("drukKnop") == 0) {
+    if(sensorNames[i][1].compare("pushButton") == 0) {
       pinMode(sensor[i][2],INPUT_PULLUP);
       Serial.println("input_pullup");
     }else {

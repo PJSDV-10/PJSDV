@@ -62,7 +62,7 @@ void setupWifi(){
   WiFi.begin(ssid, password); // Connect to the network
   Serial.print("Connecting to ");
   Serial.print(ssid);
-  Serial.println(" ...");
+  Serial.println("...");
   
   int i = 0;
   while (WiFi.status() != WL_CONNECTED)
@@ -141,7 +141,7 @@ void parser(std::string S1 ,std::string arr[]){
                     else{
                         
                         SUB1 = S1.find("<data1>"); //find sensor
-                        SUB2 = S1.find("<data1>"); // find end sensor
+                        SUB2 = S1.find("</data1>"); // find end sensor
 
                         for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){// look for context
                             delay(1);
@@ -156,7 +156,6 @@ void parser(std::string S1 ,std::string arr[]){
                             arr[i] = temp;
                         }
                 }
-
         }
     }
 }
