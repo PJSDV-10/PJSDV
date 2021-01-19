@@ -6,9 +6,9 @@ void XmlReader::parseDocument(){
 
     if(function == "authentication"){
         //Password check turned off because Wemos team thought "not validating" meant "don't send it to me"
-        /*if(!checkPassword(context_node->first_node("password")->value())){
+        if(!checkPassword(context_node->first_node("password")->value())){
             return;
-        }*/
+        }
         clientName = context_node->first_node("clientName")->value();
         parsedContext.emplace("clientName", clientName);
         type = context_node->first_node("type")->value();
@@ -16,13 +16,18 @@ void XmlReader::parseDocument(){
     }
     else if (function == "sensorUpdate")
     {
-		/*if(!checkPassword(context_node->first_node("password")->value())){
-			return;
-        }*/
-		// Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
+        std::cout << "Sensorupdate handling" << std::endl;
+        if (!checkPassword(context_node->first_node("password")->value()))
+        {
+            return;
+        }
+        type = context_node->first_node("type")->value();
+        parsedContext.emplace("type", type);
+        
+        // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
 		if(type == "stoel"){
-            type = context_node->first_node("type")->value();
-            parsedContext.emplace("type", type);
+            std::cout << "Stoel identified" << std::endl;
+            
             data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
             data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
         }

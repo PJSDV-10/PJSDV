@@ -206,7 +206,9 @@ void SocketServer::handleRequest(int fd){
 
             std::string respondmsg;
             for (std::size_t i = 0; i < wemosjes.size(); i++){
-                if(wemosjes[i]->getSenderName() == xml_r.getSenderName()){
+                std::cout << "trying to find right wemos" << std::endl;
+                if (wemosjes[i]->getSenderName() == xml_r.getSenderName())
+                {
                     respondmsg = wemosjes[i]->handleSensorUpdate(&xml_r);
                     break;
                 }
@@ -294,10 +296,10 @@ void SocketServer::handleRequest(int fd){
 
 /* Returns a 1 if an error occurred */
 int SocketServer::authWemos(int fd, XmlReader& msg){
-    /*if(checkIfWemosExists(msg.getSenderName()) == 1){
+    if(checkIfWemosExists(msg.getSenderName()) == 1){
         std::cout << "Wemos existed in table" << std::endl;
         return 1;
-    }*/
+    }
     if(msg.getType() == "stoel"){
         wemosjes.emplace_back(new Stoel(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "website"){

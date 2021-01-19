@@ -75,7 +75,8 @@ void XmlWriter::buildActuateContext(std::vector<double> &status){
     function_node = doc->allocate_node(node_element, "function", "actuateBool");
     context_node = doc->allocate_node(node_element, "context", 0);
     for (size_t i = 0; i < status.size(); i++){
-        xml_node<> *dataNode = doc->allocate_node(node_element, "data" + i, std::to_string(std::round(status[i])).c_str());
+        std::string dataNumber("data" + std::to_string(i + 1));
+        xml_node<> *dataNode = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()), doc->allocate_string(std::to_string((int)std::round(status[i])).c_str()));
         context_node->append_node(dataNode);
     }
     root_node->append_node(function_node);

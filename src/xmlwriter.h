@@ -5,7 +5,8 @@
 #include <string.h>
 #include <cmath>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
+#include <stdio.h>
 #include <sstream>
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
