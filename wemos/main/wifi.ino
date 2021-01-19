@@ -154,6 +154,7 @@ void parser(std::string S1 ,std::string arr[]){
                             SUB1 += 7 ;
                             std::string temp = S1.substr(SUB1, SUB2 - SUB1);
                             arr[i] = temp;
+                            S1.erase(SUB1,SUB2+7);
                         }
                 }
 
