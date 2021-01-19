@@ -18,7 +18,7 @@
 #include <string>
 #include <sstream> 
 
-#define AMOUNTOFSENSORS 1
+#define AMOUNTOFSENSORS 2
 #define AMOUNTOFACTUATORS 1
 #define BUFFERSIZE 20
 
@@ -34,11 +34,11 @@ std::string type = "stoel";
 // Network SSID
 const char *ssid = "oop";
 const char *password = "programmer";
-const char *ip = "dutchellie.nl";
+const char *ip = "home.dutchellie.nl";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
-std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+int sensor[AMOUNTOFSENSORS][3] = {{0,0,16},{0,0,12}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","drukKnop"},{"sensorBool","naam"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
 int actuator[AMOUNTOFACTUATORS][3] = {{12,12,15}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {"actuatorInt","lamp"}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
@@ -83,7 +83,7 @@ void setup()
   setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  //authenticating();
+  authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
@@ -224,12 +224,10 @@ void setupSensors() {
     if(sensorNames[i][1].compare("drukKnop") == 0) {
       pinMode(sensor[i][2],INPUT_PULLUP);
       Serial.println("input_pullup");
-    }else if (sensorNames[i][0].compare("TWISensor") == 0) {
-      // do the twi thing
-      
-    }else
+    }else {
       pinMode(sensor[i][2],INPUT);
       Serial.println("input");
+    }
   }
 }
 

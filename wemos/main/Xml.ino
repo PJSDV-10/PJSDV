@@ -33,7 +33,7 @@ std::string buildStatusMsg(){
     for(int i = 0;i<AMOUNTOFSENSORS;i++){ //voeg elke keer neeiwe sensot toe
       delay(0);
       
-       std::string roundd = intToString( i); // int too string
+       std::string roundd = intToString(i + 1); // int too string
        std::string worth = intToString(sensor[i][0]);
        
       temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
