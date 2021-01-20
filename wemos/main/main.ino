@@ -40,7 +40,7 @@ const char *ip = "home.dutchellie.nl";
 int sensor[AMOUNTOFSENSORS][3] = {{0,0,0},{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{0,0,5},{0,1,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+int actuator[AMOUNTOFACTUATORS][3] = {{0,0,5},{0,0,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
@@ -135,7 +135,7 @@ void loop() {
 
   //---------misc functions---------//
 
-  
+  Serial.println("");
   delay(1000); // delay can be 0, but still has to be present.
 }
 
