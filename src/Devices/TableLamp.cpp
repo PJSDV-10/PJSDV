@@ -13,3 +13,7 @@ TableLamp::TableLamp(int fd, std::string clientName, std::string senderName) {
 
 TableLamp::~TableLamp() {
 }
+
+std::string TableLamp::handleSensorUpdate(XmlReader * xml_r) {
+
+}
