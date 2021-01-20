@@ -26,10 +26,10 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "stoel3";
+std::string wemosNaam = "chair";
 std::string server = "testServer";
 std::string wachtwoord = "jemoeder";
-std::string type = "stoel";
+std::string type = "chair";
 
 // Network SSID
 const char *ssid = "oop";
@@ -73,12 +73,6 @@ void setup() {
   Serial.print("Test Message");
 
   setupWifi();
-  /*
-  pinMode(0, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
-  digitalWrite(0, HIGH);
-  digitalWrite(2, HIGH);//https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
-  */
   setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
@@ -89,28 +83,22 @@ void setup() {
 }
 
 void loop() {
-  // placeholder: readSensors is different for every device
+
   Serial.println("reading sensors now");
-  for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-    if (sensorNames[i][0].compare("sensorBool") == 0) {
-      sensor[i][0] = digitalRead(sensor[i][2]);
-      delay(0);
-    } else if (sensorNames[i][0].compare("sensorInt") == 0) {
-      sensor[i][0] = analogRead(sensor[i][2]);
-    }
-  }
+  readSensors();
   
    
   // if we receive a message, handle it  
   Serial.println("checking if we received a msg");
   
-  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is empty / this is broken dont use
+  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
   delay(0);
   
   if (receivedMsg.compare("NULL") != 0){
     std::string parsedMsg[BUFFERSIZE];
     parser(receivedMsg, parsedMsg); // parse the message, 
     handleMessage(parsedMsg);
+    Serial.println("The received message has been parsed");
   }
   
 
@@ -140,8 +128,8 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
     sendData(buildStatusMsg());
     return 1;
   } else if (parsedMsg[1].compare("actuateBool") == 0) {
-    for (int i = 0; i < (sizeof(parsedMsg)/sizeof(parsedMsg[0])) - 1; i++) {
-      actuator[i][1] = atoi(parsedMsg[i+3].c_str());
+    for (int i = 3; i < (sizeof(parsedMsg)/sizeof(parsedMsg[0])) - 1; i++) {
+      actuator[i-2][1] = atoi(parsedMsg[i].c_str());
     }
     return 1;
   } else
@@ -238,5 +226,18 @@ void setupActuators() {
     delay(1);
     pinMode(actuator[i][2],OUTPUT);
     Serial.println("output");
+  }
+}
+
+
+
+void readSensors(){
+    for (int i = 0; i < AMOUNTOFSENSORS; i++) {
+    if (sensorNames[i][0].compare("sensorBool") == 0) {
+      sensor[i][0] = digitalRead(sensor[i][2]);
+      delay(0);
+    } else if (sensorNames[i][0].compare("sensorInt") == 0) {
+      sensor[i][0] = analogRead(sensor[i][2]);
+    }
   }
 }
