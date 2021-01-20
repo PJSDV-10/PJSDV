@@ -46,25 +46,29 @@ void XmlWriter::buildXMLAnswerToSR(){
     using namespace rapidxml;
     buildHeader();
     function_node = doc->allocate_node(node_element, "function", function.c_str());
+    wemosjes_node = doc->allocate_node(node_element, "wemosjes");
+    context_node = doc->allocate_node(node_element, "context");
     root_node->append_node(function_node);
 }
 
 void XmlWriter::finalizeAnswerToSR(){
     using namespace rapidxml;
+    context_node->append_node(wemosjes_node);
     root_node->append_node(context_node);
     doc->append_node(root_node);
 }
 
 void XmlWriter::addDataToAnswer(std::string type, std::string clientName, std::vector<double> data){
     using namespace rapidxml;
-    xml_node<> *wemos_node = doc->allocate_node(node_element, "wemosjes");
+    xml_node<> *wemos_node = doc->allocate_node(node_element, "wemos");
     xml_node<> *clientName_node = doc->allocate_node(node_element, "name", clientName.c_str());
     xml_node<> *type_node = doc->allocate_node(node_element, "type", type.c_str());
     wemos_node->append_node(clientName_node);
     wemos_node->append_node(type_node);
     for (std::size_t i = 0; i < data.size(); i++)
     {
-        xml_node<> *data_node = doc->allocate_node(node_element, "data" + i, std::to_string(std::round(data[i])).c_str());
+        std::string dataNumber("data" + std::to_string(i + 1));
+        xml_node<> *data_node = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()), std::to_string(std::round(data[i])).c_str());
         wemos_node->append_node(data_node);
     }
     wemosjes_node->append_node(wemos_node);
@@ -100,8 +104,12 @@ void XmlWriter::buildHeader(){
 
 void XmlWriter::buildStatusRequestContext(){
     using namespace rapidxml;
+    context_node = doc->allocate_node(node_element, "context", 0);
+    function_node = doc->allocate_node(node_element, "function", function.c_str());
     xml_node<> *password_node = doc->allocate_node(node_element, "password", "solarwinds123");
     context_node->append_node(password_node);
+    root_node->append_node(function_node);
+    root_node->append_node(context_node);
 }
 
 XmlWriter::XmlWriter(std::string type, std::string dest){

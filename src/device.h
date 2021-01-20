@@ -18,6 +18,9 @@ public:
 
 
 class Door : public Wemos{
+private:
+    bool PBStateOutside;
+    bool PBStateInside;
 
 public:
     Door(int fd, std::string clientName, std::string senderName);
@@ -39,6 +42,9 @@ public:
 
 
 class Bed : public Wemos{
+private:
+    bool PBState;
+    bool FSState;
 
 public:
     Bed(int fd, std::string clientName, std::string senderName);

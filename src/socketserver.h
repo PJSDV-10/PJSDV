@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEBUG 1
+
 #include <string>
 #include <string.h>
 #include <sys/socket.h>
@@ -47,3 +49,4 @@ public:
     void handleRequest(int fd);
     std::string respond(std::string type, std::string dest);
 };
+

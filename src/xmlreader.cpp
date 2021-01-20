@@ -16,7 +16,7 @@ void XmlReader::parseDocument(){
     }
     else if (function == "sensorUpdate")
     {
-        std::cout << "Sensorupdate handling" << std::endl;
+        //std::cout << "Sensorupdate handling" << std::endl;
         if (!checkPassword(context_node->first_node("password")->value()))
         {
             return;
@@ -25,16 +25,29 @@ void XmlReader::parseDocument(){
         parsedContext.emplace("type", type);
         
         // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
-		if(type == "stoel"){
-            std::cout << "Stoel identified" << std::endl;
-            
-            data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
-            data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
+        parseDeviceData();
+    }
+    else if (function == "answerToStatusRequest")
+    {
+        if (!checkPassword(context_node->first_node("password")->value()))
+        {
+            return;
         }
+        type = context_node->first_node("type")->value();
+        parsedContext.emplace("type", type);
+        parseDeviceData();
     }
 }
 
-
+void XmlReader::parseDeviceData(){
+    using namespace rapidxml;
+    if(type == "chair"){
+        std::cout << "Stoel identified" << std::endl;
+        
+        data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
+        data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
+    }
+}
 
 XmlReader::XmlReader(const char *xmldoc)
 {

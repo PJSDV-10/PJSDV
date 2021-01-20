@@ -15,7 +15,6 @@ protected:
     int fd;
 
 public:
-    virtual ~Wemos();
 
     //Getters
     inline const std::string getSenderName() { return senderName; };

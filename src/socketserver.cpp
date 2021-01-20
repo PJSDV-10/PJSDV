@@ -90,15 +90,6 @@ void SocketServer::ListenAndAccept()
     FD_SET(listen_fd, &all_sockets);
     FD_SET(listen_fd, &error_checking_sockets);
 
-    rapidxml::xml_document<> doc;
-    rapidxml::xml_node<> *root_node = doc.allocate_node(rapidxml::node_element, "message");
-    rapidxml::xml_node<> *function_node = doc.allocate_node(rapidxml::node_element, "function", "keepalive");
-    root_node->append_node(function_node);
-    doc.append_node(root_node);
-    std::stringstream ss;
-    ss << doc;
-    std::string keepalive_msg = ss.str();
-
     while (accepting)
     {
         ready_sockets = all_sockets;
@@ -173,123 +164,126 @@ void SocketServer::handleRequest(int fd){
         return;
     }
     Map xml = xml_r.getParsedDoc();
-    try
-    {
-        if(xml_r.getFunction() == "authentication"){ 
-            std::cout << "The following device authenticated with the server:\n"
-                      << xml_r.getClientName() << std::endl;
-            if(authWemos(fd, xml_r) == 1){ // 1 means error
-                std::cout << "Wemos failure with authentication" << std::endl;
-                //send message back?
-                return;
-            }
-            std::string respondmsg;
-            XmlWriter xml_w(xml_r);
-            xml_w.buildXMLAck();
-            respondmsg = xml_w.getXML();
-            std::cout << "Message to be sent to client:\n"
-                      << respondmsg << std::endl;
-            send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
-            std::cout << "Reply to authentication sent" << std::endl;
-
-            /* Close socket in case that the client is the website */
-            if(xml_r.getType() == "website"){
-                closeConnection(fd);
-            }
-            // Destroyer
-            xml_w.~XmlWriter();
+    if(xml_r.getFunction() == "authentication"){ 
+        std::cout << "The following device authenticated with the server:\n"
+                    << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
+        if(authWemos(fd, xml_r) == 1){ // 1 means error
+            std::cout << "Wemos failure with authentication" << std::endl;
+            //send message back?
+            return;
         }
-        else if (xml_r.getFunction() == "sensorUpdate")
+        std::string respondmsg;
+        XmlWriter xml_w(xml_r);
+        xml_w.buildXMLAck();
+        respondmsg = xml_w.getXML();
+        std::cout << "Message to be sent to client:\n"
+                    << respondmsg << std::endl;
+        send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+        std::cout << "Reply to authentication sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getType() == "website"){
+            closeConnection(fd);
+        }
+        // Destroyer
+        xml_w.~XmlWriter();
+    }
+    else if (xml_r.getFunction() == "sensorUpdate")
+    {
+        /*std::cout << "Sensor update received from:\n" << xml_r.getSenderName() << std::endl;*/
+
+        std::string respondmsg;
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            //std::cout << "trying to find right wemos" << std::endl;
+            if (wemosjes[i]->getSenderName() == xml_r.getSenderName())
+            {
+                respondmsg = wemosjes[i]->handleSensorUpdate(&xml_r);
+                break;
+            }
+        }
+        send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
+        //std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getType() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+
+    }else if(xml_r.getFunction() == "getStatusAll"){
+        /* 
+            Handling for the getStatusAll request from the website. 
+            Let's hope this actually goddamn works XD
+
+            A thing you can try when it doesn't work is to add a select() call to make sure you can actually
+            write to the sockets.
+            */
+        std::cout << "getStatusAll request received, handling it by sending broadcast" << std::endl;
+
+        XmlWriter xml_w("getStatusBroadcast", "allWemos");
+        xml_w.buildXMLStatusRequest();
+        std::string toBeSent = xml_w.getXML();
+        xml_w.~XmlWriter();
+        std::cout << "Sending status request to all wemos devices" << std::endl;
+        XmlWriter xml_ww("answerToStatusRequest", "website");
+        xml_ww.buildXMLAnswerToSR();
+        fd_set wemosSet = all_sockets;
+        timeval shortTime;
+
+        for (int j = 0; j < 1; j++)
         {
-            std::cout << "Sensor update received from:\n"
-                      << xml_r.getSenderName() << std::endl;
-
-            std::string respondmsg;
-            for (std::size_t i = 0; i < wemosjes.size(); i++){
-                std::cout << "trying to find right wemos" << std::endl;
-                if (wemosjes[i]->getSenderName() == xml_r.getSenderName())
-                {
-                    respondmsg = wemosjes[i]->handleSensorUpdate(&xml_r);
-                    break;
-                }
+            shortTime.tv_usec = 100000;
+            if (select(FD_SETSIZE, NULL, &wemosSet, NULL, &shortTime) < 0)
+            { 
+                perror("Select failed");
+                exit(EXIT_FAILURE);
             }
-            send(fd, respondmsg.c_str(), strlen(respondmsg.c_str()), 0);
-            std::cout << "Reply to sensorUpdate sent" << std::endl;
-
-            /* Close socket in case that the client is the website */
-            if(xml_r.getType() == "website"){
-                closeConnection(fd);
+            if(shortTime.tv_usec < 10){
+                std::cout << "timeout expired" << std::endl;
             }
-            // Destroy
-
-        }else if(xml_r.getFunction() == "getStatusAll"){
-            /* 
-                Handling for the getStatusAll request from the website. 
-                Let's hope this actually goddamn works XD
-
-                A thing you can try when it doesn't work is to add a select() call to make sure you can actually
-                write to the sockets.
-             */
-            std::cout << "getStatusAll request received, handling it by sending broadcast" << std::endl;
-
-            XmlWriter xml_w("getStatusBroadcast", "allWemos");
-            xml_w.buildXMLStatusRequest();
-            std::string toBeSent = xml_w.getXML();
-            xml_w.~XmlWriter();
-            std::cout << "Sending status request to all wemos devices" << std::endl;
-            XmlWriter xml_ww("answerToStatusRequest", "website");
-            xml_ww.buildXMLAnswerToSR();
             for (int i = 0; i < FD_SETSIZE; i++)
             {
-                if(FD_ISSET(i, &all_sockets) && i != fd){        
-                    ssize_t error = send(i, toBeSent.c_str(), strlen(toBeSent.c_str()), 0);
-                    if(error == -1){
-                        if(errno == ECONNRESET){
-                            std::cout << "During sending of status request a socket appear closed or unresponsive\n\rNot closing the connection yet, but beware" << std::endl;
-                            errno = 0;
-                        }
-                    }
-                    char buffer[4096] = {0};
-                    int bytesread;
-                    if ((bytesread = recv(i, buffer, 4096, 0)) == -1)
+                //std::cout << "Checking socket number: " << i << std::endl;
+                if (FD_ISSET(i, &wemosSet) && i != fd)
+                {
+                    std::cout << "Sending broadcast to this device" << std::endl;
+                    if (send(i, toBeSent.c_str(), strlen(toBeSent.c_str()), 0) == -1)
                     {
-                        perror("Error receiving");
+                        perror("Error sending status broadcast to wemos devices");
                         exit(EXIT_FAILURE);
                     }
-                    XmlReader xml_r(buffer);
-                    xml_r.parseDocument();
-                    xml_ww.addDataToAnswer(xml_r.getType(), xml_r.getClientName(), xml_r.getData());
-                    xml_r.~XmlReader();
+                    char buffer2[4096] = {0};
+                    int bytesread2;
+                    if ((bytesread2 = recv(i, buffer2, 4096, 0)) == -1)
+                    {
+                        std::cout << "Error receiving answer to broadcast, closing connection" << std::endl;
+                        closeConnection(i);
+                        errno = 0;
+                    }
+                    std::cout << "message received: " << buffer2 << std::endl;
+                    XmlReader xml_rr(buffer2);
+                    xml_rr.parseDocument();
+                    xml_ww.addDataToAnswer(xml_rr.getType(), xml_rr.getClientName(), xml_rr.getData());
                 }
             }
-            xml_ww.finalizeAnswerToSR();
-            std::string sendBack;
-            sendBack = xml_ww.getXML();
-            ssize_t error = send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0);
-            if(error == -1 && errno != ENOTCONN){
-                perror("Error sending");
-                exit(EXIT_FAILURE);
-            }else{
-                std::cout << "The connection to the website was aborted during the building of the answer to it's status request.\n\rStuff will be fine, closing the socket was the next thing anyway." << std::endl;
-                errno = 0;
-            }
-            // Close connection to website
-            if(xml_r.getType() == "website"){
-                closeConnection(fd);
-            }
-            // Destroy
-            xml_ww.~XmlWriter();
-
         }
-    }catch(const std::out_of_range& oor){
-        std::cout << "function did not exist inside the thingy" << std::endl;
-        send(fd, "no", 2, 0);
 
-        // Destroying things
-        xml_r.~XmlReader();
-        
-        xml.~map();
-        return;
+        std::cout << "Gotten all stuff, finalizing answer, then sending data" << std::endl;
+        xml_ww.finalizeAnswerToSR();
+        std::string sendBack;
+        sendBack = xml_ww.getXML();
+        ssize_t error = send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0);
+        if(error == -1 && errno != ENOTCONN){
+            perror("Error sending");
+            exit(EXIT_FAILURE);
+        }else{
+            std::cout << "The connection to the website was aborted during the building of the answer to it's status request.\n\rStuff will be fine, closing the socket was the next thing anyway." << std::endl;
+            errno = 0;
+        }
+        // Close connection to website
+        closeConnection(fd);
+        // Destroy
+
     }
     return;
 }
@@ -300,9 +294,9 @@ int SocketServer::authWemos(int fd, XmlReader& msg){
         std::cout << "Wemos existed in table" << std::endl;
         return 1;
     }
-    if(msg.getType() == "stoel"){
+    if(msg.getType() == "chair"){
         wemosjes.emplace_back(new Chair(fd, msg.getClientName(), msg.getSenderName()));
-    }else if(msg.getType() == "website"){
+    }else if(msg.getType() == "website2"){
         wemosjes.emplace_back(new Website(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "column"){
         wemosjes.emplace_back(new Column(fd, msg.getClientName(), msg.getSenderName()));
@@ -354,6 +348,7 @@ void SocketServer::removeWemosByFD(int fd){
 }
 
 void SocketServer::closeConnection(int fd){
+    std::cout << "Closing website connection" << std::endl;
     close(fd);
     removeWemosByFD(fd);
     FD_CLR(fd, &all_sockets);

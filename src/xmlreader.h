@@ -31,6 +31,7 @@ private:
 
     //Different function context parsers
     Map parseAuthContext();
+    void parseDeviceData();
 
 public:
     XmlReader();
