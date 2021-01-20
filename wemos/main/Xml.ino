@@ -26,9 +26,9 @@ std::string buildAuthenticationMsg() {
    return temp;
 }
 
-std::string buildStatusMsg(){
+std::string buildStatusMsg(std::string function){
   std::string temp = Buildheader();
-  temp += "<function>sensorUpdate</function><context><password>" +wachtwoord+ "</password><type>stoel</type>";
+  temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>stoel</type>";
   
     for(int i = 0;i<AMOUNTOFSENSORS;i++){ //voeg elke keer neeiwe sensot toe
       delay(0);

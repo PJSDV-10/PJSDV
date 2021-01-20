@@ -37,11 +37,11 @@ const char *password = "programmer";
 const char *ip = "home.dutchellie.nl";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{0,0,4},{0,0,2}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
-std::string sensorNames[AMOUNTOFSENSORS][2] = {{"sensorBool","pushButton"},{"sensorInt","forceSensor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+int sensor[AMOUNTOFSENSORS][3] = {{0,0,2},{0,0,4}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{0,0,17},{0,0,5}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"actuatorBool","LED"},{"actuatorBool","VibrationMotor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+int actuator[AMOUNTOFACTUATORS][3] = {{0,0,5},{0,0,17}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
 
@@ -117,7 +117,7 @@ void loop() {
   }
   
   if (sendStatus){
-    sendData(buildStatusMsg());
+    sendData(buildStatusMsg("sensorUpdate"));
   }
   delay(1000);
 }
@@ -125,14 +125,15 @@ void loop() {
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[1].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
-    sendData(buildStatusMsg());
+    sendData(buildStatusMsg("answerToStatusRequest"));
     return 1;
   } else if (parsedMsg[1].compare("actuateBool") == 0) {
     for (int i = 3; i < (sizeof(parsedMsg)/sizeof(parsedMsg[0])) - 1; i++) {
-      actuator[i-2][1] = atoi(parsedMsg[i].c_str());
+      actuator[i-3][1] = atoi(parsedMsg[i].c_str());
     }
     return 1;
-  } else
+  } else if (parsedMsg[1].compare("keepalive") == 0) {
+      
     return 0;
 
 }
@@ -148,11 +149,11 @@ void updateActuators() {
         Serial.print(actuator[i][1]);
         
       // change the current value 
-      if (actuatorNames[i][0] == "actuateBool"){ // if the actuator is boolean, write a bool to the pin.
+      if (actuatorNames[i][0] == "bool"){ // if the actuator is boolean, write a bool to the pin.
         digitalWrite(actuator[i][2],actuator[i][1]);
         Serial.println(" using digitalWrite.");
         
-      } else if(actuatorNames[i][0] == "actuateInt"){ // if the actuator is analogue, write using PWM.
+      } else if(actuatorNames[i][0] == "int"){ // if the actuator is analogue, write using PWM.
         if(actuator[i][1] >= 255) // failsafe to catch values higher then 255.
           actuator[i][1] = 255;
         analogWrite(actuator[i][2],actuator[i][1]); // write the wanted value to the current value using analogwrite
@@ -233,10 +234,10 @@ void setupActuators() {
 
 void readSensors(){
     for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-    if (sensorNames[i][0].compare("sensorBool") == 0) {
+    if (sensorNames[i][0].compare("bool") == 0) {
       sensor[i][0] = digitalRead(sensor[i][2]);
       delay(0);
-    } else if (sensorNames[i][0].compare("sensorInt") == 0) {
+    } else if (sensorNames[i][0].compare("int") == 0) {
       sensor[i][0] = analogRead(sensor[i][2]);
     }
   }
