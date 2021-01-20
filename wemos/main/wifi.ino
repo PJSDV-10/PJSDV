@@ -22,7 +22,7 @@ const char* receiveData() {
     }
     
   } else{
-    Serial.println("client isn't availible");
+    //Serial.println("client isn't availible");
     return "NULL";
   }
 }

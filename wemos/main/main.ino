@@ -37,10 +37,10 @@ const char *password = "programmer";
 const char *ip = "home.dutchellie.nl";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{0,0,2},{0,0,4}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+int sensor[AMOUNTOFSENSORS][3] = {{0,0,0},{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{0,0,5},{0,0,17}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+int actuator[AMOUNTOFACTUATORS][3] = {{0,0,5},{0,1,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
@@ -66,47 +66,40 @@ void sendData(const char *);
 
 WiFiClient client;
 
+
+
+
+
+
 void setup() {
 
   
   Serial.begin(115200);
-  Serial.print("Test Message");
+  Serial.println("\n\n\rTest Message");
 
   setupWifi();
   setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  authenticating();
+  //authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
 }
 
+
+
+
+
+
 void loop() {
 
-  Serial.println("reading sensors now");
+  //----------sensors------------//
+  //Serial.println("reading sensors now");
   readSensors();
-  
-   
-  // if we receive a message, handle it  
-  Serial.println("checking if we received a msg");
-  
-  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
-  delay(0);
-  
-  if (receivedMsg.compare("NULL") != 0){
-    std::string parsedMsg[BUFFERSIZE];
-    parser(receivedMsg, parsedMsg); // parse the message, 
-    handleMessage(parsedMsg);
-    Serial.println("The received message has been parsed");
-  }
-  
 
-  Serial.println("updating actuators");
-  updateActuators();
-
-  // send msg
-    Serial.println("sending sensorupdate");
+  // if any of the sensors changed, we have to notify the server.
+    //Serial.println("sending sensorupdate");
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(1);
@@ -119,8 +112,39 @@ void loop() {
   if (sendStatus){
     sendData(buildStatusMsg("sensorUpdate"));
   }
-  delay(1000);
+
+
+  //-----------actuators-------------//
+  // if we receive a message, handle it  
+  //Serial.println("checking if we received a msg");
+  
+  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
+  delay(0);
+  
+  if (receivedMsg.compare("NULL") != 0){
+    std::string parsedMsg[BUFFERSIZE];
+    parser(receivedMsg, parsedMsg); // parse the message, 
+    handleMessage(parsedMsg);
+    //Serial.println("The received message has been parsed");
+  }
+  
+
+  //Serial.println("updating actuators");
+  updateActuators();
+
+
+  //---------misc functions---------//
+
+  
+  delay(1000); // delay can be 0, but still has to be present.
 }
+
+
+
+
+
+
+
 
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
@@ -133,7 +157,8 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
     }
     return 1;
   } else if (parsedMsg[1].compare("keepalive") == 0) {
-      
+
+  }
     return 0;
 
 }
@@ -143,7 +168,7 @@ void updateActuators() {
         delay(1);
     if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
       
-      Serial.print("we changed the ");
+        Serial.print("we changed the ");
         Serial.print(actuatorNames[i][1].c_str());
         Serial.print("'s value to: ");
         Serial.print(actuator[i][1]);
@@ -239,6 +264,14 @@ void readSensors(){
       delay(0);
     } else if (sensorNames[i][0].compare("int") == 0) {
       sensor[i][0] = analogRead(sensor[i][2]);
+    }
+    if (sensor[i][0] != sensor[i][1]) {
+      Serial.print("The sensor ");
+      Serial.print(sensorNames[i][1].c_str());
+      Serial.print(" changed from: ");
+      Serial.print(sensor[i][1]);
+      Serial.print(" to: ");
+      Serial.println(sensor[i][0]);
     }
   }
 }
