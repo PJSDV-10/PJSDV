@@ -8,17 +8,21 @@
 #include "wemos.h"
 #include <cmath>
 
-class product {
-
-};
-
 class Wall : public Wemos{
 
+public:
+    Wall(int fd, std::string clientName, std::string senderName);
+    ~Wall();
 };
+
 
 class Door : public Wemos{
 
+public:
+    Door(int fd, std::string clientName, std::string senderName);
+    ~Door();
 };
+
 
 class Column : public Wemos {
 private:
@@ -31,17 +35,29 @@ public:
     std::string handleSensorUpdate(XmlReader *);
 };
 
+
 class Bed : public Wemos{
 
+public:
+    Bed(int fd, std::string clientName, std::string senderName);
+    ~Bed();
 };
+
 
 class TableLamp : public Wemos{
 
+public:
+    TableLamp(int fd, std::string clientName, std::string senderName);
+    ~TableLamp();
 };
 
 class Fridge : public Wemos{
 
+public:
+    Fridge(int fd, std::string clientName, std::string senderName);
+    ~Fridge();
 };
+
 
 class Website : public Wemos{
 private:
@@ -54,7 +70,8 @@ public:
     //XmlReader* sendStatusRequest(fd_set* all_sockets);
 };
 
-class Stoel : public Wemos {
+
+class Chair : public Wemos {
 private:
     bool TEState;
     bool PBState;
@@ -62,8 +79,8 @@ private:
 protected:
 
 public:
-    Stoel(int fd, std::string clientName, std::string senderName);
-    ~Stoel();
+    Chair(std::string clientName, std::string senderName);
+    ~Chair();
     std::string handleSensorUpdate(XmlReader*);
     //XmlReader* sendStatusRequest(fd_set*);
 };
