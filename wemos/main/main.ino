@@ -7,7 +7,7 @@
 
 
 
-//allen loops hebben een delay nodig kan gewoon van 0 zijn maar anders crasht esp. hier meer over watchdogs
+//alle loops hebben een delay nodig kan gewoon van 0 zijn maar anders crasht esp. 
 // https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
 //https://forum.arduino.cc/index.php?topic=622991.0
 
@@ -26,25 +26,24 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "chair";
-std::string server = "testServer";
-std::string wachtwoord = "jemoeder";
+std::string wemosNaam = "chair1";
+std::string server = "Server";
+std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
 const char *ssid = "oop";
 const char *password = "programmer";
-const char *ip = "home.dutchellie.nl";
+const char *ip = "192.168.68.120";
 
 // sensor globals
 int sensor[AMOUNTOFSENSORS][3] = {{0,0,0},{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{0,0,5},{0,0,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+int actuator[AMOUNTOFACTUATORS][3] = {{1,1,5},{1,1,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
-
 
 //function declarations xml
 std::string buildcapabilities();
@@ -57,11 +56,10 @@ std::string intToString(int i);
 
 //function declaration wifi
 void setupWifi();
-
 const char* receiveData();
-
 const char* receiveData(int*);
 void sendData(const char *);
+
 
 
 WiFiClient client;
@@ -81,7 +79,7 @@ void setup() {
   setupPins(); 
   
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  //authenticating();
+  authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
@@ -102,7 +100,7 @@ void loop() {
     //Serial.println("sending sensorupdate");
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
-     delay(1);
+     delay(0);
      if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
       sendStatus = 1;
      }
@@ -116,12 +114,13 @@ void loop() {
 
   //-----------actuators-------------//
   // if we receive a message, handle it  
-  //Serial.println("checking if we received a msg");
+  //
   
   std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
   delay(0);
   
   if (receivedMsg.compare("NULL") != 0){
+    Serial.println("The received message is not empty.");
     std::string parsedMsg[BUFFERSIZE];
     parser(receivedMsg, parsedMsg); // parse the message, 
     handleMessage(parsedMsg);
@@ -134,9 +133,7 @@ void loop() {
 
 
   //---------misc functions---------//
-
-  Serial.println("");
-  delay(1000); // delay can be 0, but still has to be present.
+ delay(100); // delay can be 0, but still has to be present.
 }
 
 
@@ -148,19 +145,30 @@ void loop() {
 
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
-  if(parsedMsg[1].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
-    sendData(buildStatusMsg("answerToStatusRequest"));
+  if(parsedMsg[2].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
+    //Serial.println("Received a awnserToStatusRequest msg");
+    client.write(buildStatusMsg("answerToStatusRequest").c_str());
+    Serial.println("send a reply to the broadcast request\n\r");
     return 1;
-  } else if (parsedMsg[1].compare("actuateBool") == 0) {
-    for (int i = 3; i < (sizeof(parsedMsg)/sizeof(parsedMsg[0])) - 1; i++) {
+    
+  } else if (parsedMsg[2].compare("actuateBool") == 0) {
+    Serial.println("Received a actuateBool msg");
+    Serial.println(sizeof(parsedMsg)/sizeof(parsedMsg[0]));
+    for (int i = 3; i < (3 + AMOUNTOFACTUATORS); i++) {
+      Serial.print("the string in the parsed msg has this point of data as: ");
+      Serial.print(parsedMsg[i].c_str());
+      Serial.print(" and after atoi: ");
+      Serial.println(atoi(parsedMsg[i].c_str()));
       actuator[i-3][1] = atoi(parsedMsg[i].c_str());
+      delay(0);
     }
     return 1;
-  } else if (parsedMsg[1].compare("keepalive") == 0) {
-
-  }
-    return 0;
-
+    
+  } else //if (parsedMsg[1].compare("keepalive") == 0) {
+    
+  //}
+  Serial.println("couldn't handle the message\n\r");
+  return 0;
 }
 
 void updateActuators() {
@@ -205,7 +213,7 @@ void authenticating(){
   int receivedResponse = 0;
   const char* receivedMsg = "";
   do {receivedMsg = receiveData(&receivedResponse);
-  delay(0);
+  delay(1);
   }
   while(receivedResponse==0);
 
