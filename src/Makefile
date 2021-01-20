@@ -6,7 +6,7 @@ OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := $(BUILD)/bin
 TARGET   := program
 #INCLUDE  := -Iinclude/
-SRC      := $(wildcard *.cpp)
+SRC      := $(wildcard *.cpp) $(wildcard Devices/*.cpp) 
    #$(wildcard src/module1/*.cpp) \
    
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)

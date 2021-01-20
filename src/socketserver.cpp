@@ -301,7 +301,7 @@ int SocketServer::authWemos(int fd, XmlReader& msg){
         return 1;
     }
     if(msg.getType() == "stoel"){
-        wemosjes.emplace_back(new Stoel(fd, msg.getClientName(), msg.getSenderName()));
+        wemosjes.emplace_back(new Chair(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "website"){
         wemosjes.emplace_back(new Website(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "column"){

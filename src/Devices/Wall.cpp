@@ -4,12 +4,16 @@
 
 #include "../device.h"
 
-Column::Column(int fd, std::string clientName, std::string senderName) {
+Wall::Wall(int fd, std::string clientName, std::string senderName) {
     this->fd = fd;
     this->clientName = clientName;
     this->senderName = senderName;
-    this->wemosType = "Column";
+    this->wemosType = "wall";
 }
 
-Column::~Column() {
+Wall::~Wall() {
+}
+
+std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
+
 }

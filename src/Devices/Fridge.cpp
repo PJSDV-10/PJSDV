@@ -4,11 +4,15 @@
 
 #include "../device.h"
 
-Fridge ::Fridge(int fd, std::string clientName, std::string senderName) {
+Fridge::Fridge(int fd, std::string clientName, std::string senderName) {
     this-> fd = fd;
     this-> clientName = clientName;
     this->senderName = senderName;
-    this-> wemosType = "Fridge";
+    this-> wemosType = "fridge";
 }
 Fridge::~Fridge() {
+}
+
+std::string Fridge::handleSensorUpdate(XmlReader * xml_r) {
+
 }

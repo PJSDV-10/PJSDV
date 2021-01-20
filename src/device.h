@@ -13,6 +13,7 @@ class Wall : public Wemos{
 public:
     Wall(int fd, std::string clientName, std::string senderName);
     ~Wall();
+    std::string handleSensorUpdate(XmlReader *);
 };
 
 
@@ -21,6 +22,7 @@ class Door : public Wemos{
 public:
     Door(int fd, std::string clientName, std::string senderName);
     ~Door();
+    std::string handleSensorUpdate(XmlReader *);
 };
 
 
@@ -41,6 +43,7 @@ class Bed : public Wemos{
 public:
     Bed(int fd, std::string clientName, std::string senderName);
     ~Bed();
+    std::string handleSensorUpdate(XmlReader *);
 };
 
 
@@ -49,6 +52,7 @@ class TableLamp : public Wemos{
 public:
     TableLamp(int fd, std::string clientName, std::string senderName);
     ~TableLamp();
+    std::string handleSensorUpdate(XmlReader *);
 };
 
 class Fridge : public Wemos{
@@ -81,7 +85,7 @@ private:
 protected:
 
 public:
-    Chair(std::string clientName, std::string senderName);
+    Chair(int fd, std::string clientName, std::string senderName);
     ~Chair();
     std::string handleSensorUpdate(XmlReader*);
     //XmlReader* sendStatusRequest(fd_set*);

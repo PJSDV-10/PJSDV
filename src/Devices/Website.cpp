@@ -8,7 +8,7 @@ Website::Website(int fd, std::string clientName, std::string senderName){
     this->fd = fd;
     this->clientName = clientName;
     this->senderName = senderName;
-    this->wemosType = "stoel";
+    this->wemosType = "website";
 }
 
 Website::~Website(){
