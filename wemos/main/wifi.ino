@@ -49,13 +49,13 @@ const char* receiveData(int* receivedResponse) {
 }
 
 
-void sendData(std::string msg){
+void sendData(const char * msg){
   // sends the enclosed message to the connected client
   Serial.println("starting a transmission of the following message:");
-  Serial.println(msg.c_str());
+  Serial.println(msg);
   
     if(client.availableForWrite()&&client.connected()){
-          client.write(msg.c_str());
+          client.write(msg);
           Serial.println("The message has been send succesfully.");
           Serial.println("");
     }
@@ -88,6 +88,7 @@ void setupWifi(){
   }
   
 }
+
 
 void parser(std::string S1 ,std::string arr[]){
 //    this parser result in the folowing
