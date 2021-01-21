@@ -186,7 +186,7 @@ void SocketServer::handleRequest(int fd){
             closeConnection(fd);
         }
         // Destroyer
-        xml_w.~XmlWriter();
+        return;
     }
     else if (xml_r.getFunction() == "sensorUpdate")
     {
@@ -209,7 +209,7 @@ void SocketServer::handleRequest(int fd){
             closeConnection(fd);
         }
         // Destroy
-
+        return;
     }else if(xml_r.getFunction() == "getStatusAll"){
         /* 
             Handling for the getStatusAll request from the website. 
@@ -223,7 +223,6 @@ void SocketServer::handleRequest(int fd){
         XmlWriter xml_w("getStatusBroadcast", "allWemos");
         xml_w.buildXMLStatusRequest();
         std::string toBeSent = xml_w.getXML();
-        xml_w.~XmlWriter();
         std::cout << "Sending status request to all wemos devices" << std::endl;
         XmlWriter xml_ww("answerToStatusRequest", "website");
         xml_ww.buildXMLAnswerToSR();
@@ -258,7 +257,7 @@ void SocketServer::handleRequest(int fd){
                     {
                         std::cout << "Error receiving answer to broadcast, closing connection" << std::endl;
                         closeConnection(i);
-                        errno = 0;
+                        //errno = 0;
                     }
                     std::cout << "message received: " << buffer2 << std::endl;
                     XmlReader xml_rr(buffer2);
@@ -272,18 +271,18 @@ void SocketServer::handleRequest(int fd){
         xml_ww.finalizeAnswerToSR();
         std::string sendBack;
         sendBack = xml_ww.getXML();
-        ssize_t error = send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0);
-        if(error == -1 && errno != ENOTCONN){
+        std::cout << "Sending the following message back to the website: \n\r" << sendBack << std::endl;
+        if(send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0) == -1){
             perror("Error sending");
             exit(EXIT_FAILURE);
-        }else{
+        }/*else{
             std::cout << "The connection to the website was aborted during the building of the answer to it's status request.\n\rStuff will be fine, closing the socket was the next thing anyway." << std::endl;
-            errno = 0;
-        }
+            //errno = 0;
+        }*/
         // Close connection to website
         closeConnection(fd);
+        std::cout << "Returning" << std::endl;
         // Destroy
-
     }
     return;
 }
@@ -348,7 +347,7 @@ void SocketServer::removeWemosByFD(int fd){
 }
 
 void SocketServer::closeConnection(int fd){
-    std::cout << "Closing website connection" << std::endl;
+    //std::cout << "Closing website connection" << std::endl;
     close(fd);
     removeWemosByFD(fd);
     FD_CLR(fd, &all_sockets);
