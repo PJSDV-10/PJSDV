@@ -10,9 +10,9 @@ void XmlReader::parseDocument(){
             return;
         }
         clientName = context_node->first_node("clientName")->value();
-        parsedContext.emplace("clientName", clientName);
+        //parsedContext.emplace("clientName", clientName);
         type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
+        //parsedContext.emplace("type", type);
     }
     else if (function == "sensorUpdate")
     {
@@ -22,7 +22,7 @@ void XmlReader::parseDocument(){
             return;
         }
         type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
+        //parsedContext.emplace("type", type);
         
         // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
         parseDeviceData();
@@ -34,7 +34,7 @@ void XmlReader::parseDocument(){
             return;
         }
         type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
+        //parsedContext.emplace("type", type);
         parseDeviceData();
     }
 }
@@ -82,9 +82,9 @@ XmlReader::XmlReader(const char *xmldoc)
     xml_node<> *context_node = root_node->first_node("context");
     this->context_node = context_node;
 
-    parsedXML.emplace("sender", senderName);
-    parsedXML.emplace("receiver", receiverName);
-    parsedXML.emplace("function", function);
+    //parsedXML.emplace("sender", senderName);
+    //parsedXML.emplace("receiver", receiverName);
+    //parsedXML.emplace("function", function);
 }
 
 XmlReader::XmlReader(){

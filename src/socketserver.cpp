@@ -15,13 +15,25 @@ SocketServer::SocketServer(const char *port)
 
     This function returns 0 on a failure and a -1 on a success, making it suitable for an if statement.
     */
+    struct addrinfo hints, *serverInfo;
+    int opt = 1;
+
     if ((listen_fd = socket(PF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
-    fillInHints();
+    /* 
+    Here we populate a addrinfo struct with zeros and then set the following settings:
+    ai_family = AF_UNSPEC (IPv4 and IPv6 are fine)
+    ai_socktype = SOCK_STREAM (TCP stream socket)
+    ai_flags = AI_PASSIVE (automatically choose my IP)
+     */
+    memset(&hints, 0, sizeof hints); // make sure the struct is empty
+    hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
 
     //We retrieve the address information for the socket
     int status;
@@ -56,19 +68,6 @@ SocketServer::SocketServer(const char *port)
     freeaddrinfo(serverInfo);
 }
 
-/* fillInHints() sets the static settings for the later to be used getAddrInfo() function.
-Here we populate a addrinfo struct with zeros and then set the following settings:
-    ai_family = AF_UNSPEC (IPv4 and IPv6 are fine)
-    ai_socktype = SOCK_STREAM (TCP stream socket)
-    ai_flags = AI_PASSIVE (automatically choose my IP)*/
-void SocketServer::fillInHints()
-{
-    memset(&hints, 0, sizeof hints); // make sure the struct is empty
-    hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
-    hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
-}
-
 void SocketServer::ListenAndAccept()
 {
     if (listen(listen_fd, 20))
@@ -89,7 +88,7 @@ void SocketServer::ListenAndAccept()
     FD_ZERO(&error_checking_sockets);
     FD_SET(listen_fd, &all_sockets);
     FD_SET(listen_fd, &error_checking_sockets);
-
+    bool accepting = true;
     while (accepting)
     {
         ready_sockets = all_sockets;
@@ -163,7 +162,7 @@ void SocketServer::handleRequest(int fd){
     if(xml_r.error() == PARSING_ERROR){
         return;
     }
-    Map xml = xml_r.getParsedDoc();
+    //Map xml = xml_r.getParsedDoc();
     if(xml_r.getFunction() == "authentication"){ 
         std::cout << "The following device authenticated with the server:\n"
                     << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
@@ -314,7 +313,7 @@ int SocketServer::accept_connection(int fd){
         perror("Accepting failed");
         exit(EXIT_FAILURE);
     }
-
+    int opt = 1;
     setsockopt(r_fd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof opt);
     return r_fd;
 }

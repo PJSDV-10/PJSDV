@@ -19,8 +19,8 @@ private:
     std::vector<double> data;
     int err;
 
-    Map parsedXML;
-    Map parsedContext;
+    //Map parsedXML;
+    //Map parsedContext;
 
     //RapidXML variables
     rapidxml::xml_document<> *doc;
@@ -30,7 +30,6 @@ private:
     rapidxml::xml_node<> *context_node;
 
     //Different function context parsers
-    Map parseAuthContext();
     void parseDeviceData();
 
 public:
@@ -47,8 +46,8 @@ public:
     inline void reseterr() { err = 0; };
 
     //Getters
-    inline const Map getParsedDoc() const { return parsedXML; };
-    inline const Map getParsedContext() const { return parsedContext; };
+    //inline const Map getParsedDoc() const { return parsedXML; };
+    //inline const Map getParsedContext() const { return parsedContext; };
     inline const std::string getFunction() const { return function; };
     inline const std::string getSenderName() const { return senderName; };
     inline const std::string getReceiverName() const { return receiverName; };
