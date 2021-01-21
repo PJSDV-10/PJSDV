@@ -138,36 +138,25 @@ void parser(std::string S1 ,std::string arr[]){
           //signaleerd
                     S1.erase(0,SUB1+11);
                     //HIER GAAT HET FOUT:
-                    Serial.println(S1.c_str());
-                    SUB1 = S1.find(wemosNaam); //find wemosNaam in bestand
-                    int SUB3 = S1.find("allWemos");
-                    Serial.print("SUB1's value: ");
-                    Serial.println(SUB1);
-                    if( SUB1 == -1 && SUB3 == -1){
-                        arr[0]= "geen acties"; // geen actie uit te voeren want deze wemos komt niet voor in context
-                    }
-                    else{
                         
                         SUB1 = S1.find("<data1>"); //find sensor
                         SUB2 = S1.find("</data1>"); // find end sensor
-Serial.println("parsing the data now: ");
+                        Serial.println("parsing the data now: ");
                         for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){// look for context
                             delay(1);
                             
-                            char *intStr = itoa(i-2,intStr,10);
-                            std::string ronde =std::string(intStr); // int too string
+                            std::string roundd = intToString(i - 2);
                             
-                            SUB1 = S1.find("<data"+ronde+">"); //zfind sensor
-                            SUB2 = S1.find("</data"+ronde+">"); // find end sensor
+                            SUB1 = S1.find("<data"+roundd+">"); //zfind sensor
+                            SUB2 = S1.find("</data"+roundd+">"); // find end sensor
                             SUB1 += 7 ;
                             std::string temp = S1.substr(SUB1, SUB2 - SUB1);
                             arr[i] = temp;
-                            Serial.print("data: ");
-                            Serial.println(arr[i].c_str());
-                            S1.erase(SUB1,SUB2+7);
+                            //Serial.print("data: ");
+                            //Serial.println(arr[i].c_str());
                         }
                         Serial.println("Finished parsing the data.");
-                }
+                
         }
     }
 }

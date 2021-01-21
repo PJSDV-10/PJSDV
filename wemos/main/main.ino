@@ -32,8 +32,8 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "oop";
-const char *password = "programmer";
+const char *ssid = "Eetmijnpieniet";
+const char *password = "Merwic01";
 const char *ip = "192.168.68.120";
 
 // sensor globals
@@ -60,7 +60,7 @@ const char* receiveData();
 const char* receiveData(int*);
 void sendData(const char *);
 
-
+std::string test = "<message> <header> <sender>server</sender> <receiver>wemosnaam</receiver> </header> <function>actuateBool</function> <context> <data1>0</data1> <!-- Vibration motor --> <data2>1</data2> <!-- LED --> </context> </message>";
 
 WiFiClient client;
 
@@ -73,13 +73,13 @@ void setup() {
 
   
   Serial.begin(115200);
-  Serial.println("\n\n\rTest Message");
+
 
   setupWifi();
   setupPins(); 
-  
+
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  authenticating();
+  //authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
