@@ -29,9 +29,10 @@
         if(initialiseSocket()) {
             $msgs = requestAllSocket();
         }
-        foreach($msgs as $msg) {
+        echo $msgs;
+        /*foreach($msgs as $msg) {
             echo $msg['name'];
-        }
+        }*/
     ?></p>
 
 </div>
