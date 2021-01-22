@@ -107,20 +107,24 @@ void setupActuators() {
         Serial.print(actuator[i][1]);
         
       // change the current value 
-      if (actuatorNames[i][0] == "bool"){ // if the actuator is boolean, write a bool to the pin. 
+      if (actuatorNames[i][0].compare("bool")==0){ // if the actuator is boolean, write a bool to the pin. 
+        Serial.println("hij is hier");
         delay(0);
-        unsigned int stuur;
-        for(int H = 1; H==AMOUNTOFACTUATORS;H++){
-          if(actuatorNames[i][0] == "bool"){
-                      stuur = (actuator[H][1])  ;  //tel hier alen actuatoren die bool zijn op
+        uint8_t stuur=0;
+        for(int H = 0; !(H==AMOUNTOFACTUATORS);H++){
+          Serial.println("hallo");
+          if(actuatorNames[i][0] == "bool" && actuator[H][1] == 1 ){
+                      stuur += (actuator[H][2])  ;  //tel hier alen actuatoren die bool zijn op
           }
-
+           Serial.println(stuur);
         }
+        Serial.println(stuur);
         Wire.beginTransmission(WIBADRESD);
+        Wire.write(byte(0x01));          
         Wire.write(byte(stuur));
         Wire.endTransmission(); 
-        Serial.println(" transmit WIBADRESD.");
-        
+        Serial.println(" transmit WIBADRESD");
+        Serial.println(stuur);
       } 
       actuator[i][0] = actuator[i][1]; //update the currentvalue
     }
