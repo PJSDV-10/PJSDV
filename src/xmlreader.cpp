@@ -11,10 +11,14 @@ void XmlReader::parseDocument(){
         }
 
         clientName = context_node->first_node("clientName")->value();
+<<<<<<< HEAD
 
         parsedContext.emplace("clientName", clientName);
+=======
+        //parsedContext.emplace("clientName", clientName);
+>>>>>>> class-structure
         type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
+        //parsedContext.emplace("type", type);
     }
     else if (function == "sensorUpdate")
     {
@@ -24,8 +28,13 @@ void XmlReader::parseDocument(){
             return;
         }
         type = context_node->first_node("type")->value();
+<<<<<<< HEAD
         parsedContext.emplace("type", type);
 
+=======
+        //parsedContext.emplace("type", type);
+        
+>>>>>>> class-structure
         // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
         parseDeviceData();
     }
@@ -36,7 +45,7 @@ void XmlReader::parseDocument(){
             return;
         }
         type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
+        //parsedContext.emplace("type", type);
         parseDeviceData();
     }
 }
@@ -48,7 +57,34 @@ void XmlReader::parseDeviceData(){
 
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
         data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
-    }
+    }else if(type == "column"){
+        std::cout << "Column" << std::endl;
+
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+    }else if(type == "bed"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+    }else if(type == "tablelamp"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+
+    }else if(type == "door"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        
+    }else if(type == "wall"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        
+    }else if(type == "fridge"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        data.emplace_back(atoi(context_node->first_node("data3")->value()));
+
+
+    }else{
+        std::cout << "Unknown device type" << std::endl;
+    } 
 }
 
 XmlReader::XmlReader(const char *xmldoc)
@@ -84,9 +120,9 @@ XmlReader::XmlReader(const char *xmldoc)
     xml_node<> *context_node = root_node->first_node("context");
     this->context_node = context_node;
 
-    parsedXML.emplace("sender", senderName);
-    parsedXML.emplace("receiver", receiverName);
-    parsedXML.emplace("function", function);
+    //parsedXML.emplace("sender", senderName);
+    //parsedXML.emplace("receiver", receiverName);
+    //parsedXML.emplace("function", function);
 }
 
 XmlReader::XmlReader(){

@@ -68,7 +68,7 @@ void XmlWriter::addDataToAnswer(std::string type, std::string clientName, std::v
     for (std::size_t i = 0; i < data.size(); i++)
     {
         std::string dataNumber("data" + std::to_string(i + 1));
-        xml_node<> *data_node = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()), std::to_string(std::round(data[i])).c_str());
+        xml_node<> *data_node = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()), doc->allocate_string(std::to_string((int)std::round(data[i])).c_str()));
         wemos_node->append_node(data_node);
     }
     wemosjes_node->append_node(wemos_node);

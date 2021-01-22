@@ -4,6 +4,9 @@
 
 SocketServer::SocketServer(const char *port)
 {
+
+
+
     /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
     The arguments passed are:
     PF_INET:
@@ -15,13 +18,25 @@ SocketServer::SocketServer(const char *port)
 
     This function returns 0 on a failure and a -1 on a success, making it suitable for an if statement.
     */
+    struct addrinfo hints, *serverInfo;
+    int opt = 1;
+
     if ((listen_fd = socket(PF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
-    fillInHints();
+    /* 
+    Here we populate a addrinfo struct with zeros and then set the following settings:
+    ai_family = AF_UNSPEC (IPv4 and IPv6 are fine)
+    ai_socktype = SOCK_STREAM (TCP stream socket)
+    ai_flags = AI_PASSIVE (automatically choose my IP)
+     */
+    memset(&hints, 0, sizeof hints); // make sure the struct is empty
+    hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
 
     //We retrieve the address information for the socket
     int status;
@@ -56,19 +71,6 @@ SocketServer::SocketServer(const char *port)
     freeaddrinfo(serverInfo);
 }
 
-/* fillInHints() sets the static settings for the later to be used getAddrInfo() function.
-Here we populate a addrinfo struct with zeros and then set the following settings:
-    ai_family = AF_UNSPEC (IPv4 and IPv6 are fine)
-    ai_socktype = SOCK_STREAM (TCP stream socket)
-    ai_flags = AI_PASSIVE (automatically choose my IP)*/
-void SocketServer::fillInHints()
-{
-    memset(&hints, 0, sizeof hints); // make sure the struct is empty
-    hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
-    hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
-}
-
 void SocketServer::ListenAndAccept()
 {
     if (listen(listen_fd, 20))
@@ -89,7 +91,7 @@ void SocketServer::ListenAndAccept()
     FD_ZERO(&error_checking_sockets);
     FD_SET(listen_fd, &all_sockets);
     FD_SET(listen_fd, &error_checking_sockets);
-
+    bool accepting = true;
     while (accepting)
     {
         ready_sockets = all_sockets;
@@ -163,8 +165,13 @@ void SocketServer::handleRequest(int fd){
     if(xml_r.error() == PARSING_ERROR){
         return;
     }
+<<<<<<< HEAD
     Map xml = xml_r.getParsedDoc();
     if(xml_r.getFunction() == "authentication"){
+=======
+    //Map xml = xml_r.getParsedDoc();
+    if(xml_r.getFunction() == "authentication"){ 
+>>>>>>> class-structure
         std::cout << "The following device authenticated with the server:\n"
                     << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
@@ -186,7 +193,7 @@ void SocketServer::handleRequest(int fd){
             closeConnection(fd);
         }
         // Destroyer
-        xml_w.~XmlWriter();
+        return;
     }
     else if (xml_r.getFunction() == "sensorUpdate")
     {
@@ -209,7 +216,7 @@ void SocketServer::handleRequest(int fd){
             closeConnection(fd);
         }
         // Destroy
-
+        return;
     }else if(xml_r.getFunction() == "getStatusAll"){
         /*
             Handling for the getStatusAll request from the website.
@@ -223,7 +230,6 @@ void SocketServer::handleRequest(int fd){
         XmlWriter xml_w("getStatusBroadcast", "allWemos");
         xml_w.buildXMLStatusRequest();
         std::string toBeSent = xml_w.getXML();
-        xml_w.~XmlWriter();
         std::cout << "Sending status request to all wemos devices" << std::endl;
         XmlWriter xml_ww("answerToStatusRequest", "website");
         xml_ww.buildXMLAnswerToSR();
@@ -258,7 +264,7 @@ void SocketServer::handleRequest(int fd){
                     {
                         std::cout << "Error receiving answer to broadcast, closing connection" << std::endl;
                         closeConnection(i);
-                        errno = 0;
+                        //errno = 0;
                     }
                     std::cout << "message received: " << buffer2 << std::endl;
                     XmlReader xml_rr(buffer2);
@@ -272,21 +278,33 @@ void SocketServer::handleRequest(int fd){
         xml_ww.finalizeAnswerToSR();
         std::string sendBack;
         sendBack = xml_ww.getXML();
-        ssize_t error = send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0);
-        if(error == -1 && errno != ENOTCONN){
+        std::cout << "Sending the following message back to the website: \n\r" << sendBack << std::endl;
+        if(send(fd, sendBack.c_str(), strlen(sendBack.c_str()), 0) == -1){
             perror("Error sending");
             exit(EXIT_FAILURE);
-        }else{
+        }/*else{
             std::cout << "The connection to the website was aborted during the building of the answer to it's status request.\n\rStuff will be fine, closing the socket was the next thing anyway." << std::endl;
-            errno = 0;
-        }
+            //errno = 0;
+        }*/
         // Close connection to website
         closeConnection(fd);
+        std::cout << "Returning" << std::endl;
         // Destroy
-
     }
     return;
 }
+
+/*void SocketServer::checkWemosTimers(){
+    time_t current;
+    time(&current);
+    for (int i = 0; i < timers.size(); i++)
+    {
+        if(current - timers[i].oldTime > timers[i].setting){
+            timers[i].device.
+        }
+    }
+    
+}*/
 
 /* Returns a 1 if an error occurred */
 int SocketServer::authWemos(int fd, XmlReader& msg){
@@ -296,10 +314,23 @@ int SocketServer::authWemos(int fd, XmlReader& msg){
     }
     if(msg.getType() == "chair"){
         wemosjes.emplace_back(new Chair(fd, msg.getClientName(), msg.getSenderName()));
-    }else if(msg.getType() == "website2"){
+    }else if(msg.getType() == "website"){
         wemosjes.emplace_back(new Website(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "column"){
         wemosjes.emplace_back(new Column(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "bed"){
+        wemosjes.emplace_back(new Bed(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "tablelamp"){
+        wemosjes.emplace_back(new TableLamp(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "door"){
+        wemosjes.emplace_back(new Door(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "wall"){
+        wemosjes.emplace_back(new Wall(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "fridge"){
+        wemosjes.emplace_back(new Fridge(fd, msg.getClientName(), msg.getSenderName()));
+    }else{
+        std::cout << "Wrong or unknown type" << std::endl;
+        return 1;
     }
     return 0;
 }
@@ -315,7 +346,7 @@ int SocketServer::accept_connection(int fd){
         perror("Accepting failed");
         exit(EXIT_FAILURE);
     }
-
+    int opt = 1;
     setsockopt(r_fd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof opt);
     return r_fd;
 }
@@ -348,7 +379,7 @@ void SocketServer::removeWemosByFD(int fd){
 }
 
 void SocketServer::closeConnection(int fd){
-    std::cout << "Closing website connection" << std::endl;
+    //std::cout << "Closing website connection" << std::endl;
     close(fd);
     removeWemosByFD(fd);
     FD_CLR(fd, &all_sockets);
