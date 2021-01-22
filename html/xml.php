@@ -8,7 +8,7 @@ function xmlCheckAck($data) {
     }
 }
 
-function xmlParseDevice($data) {
+function xmlParseDevices($data) {
     $devices;
     $xml = simplexml_load_string($data) or die;
     foreach($xml->context->wemosjes->children() as $device) {
