@@ -25,10 +25,11 @@
     <h1>output:</h1>
     <p><?php
         require "socket.php";
+        $msg;
         if(initialiseSocket()) {
             $msgs = requestAllSocket();
         }
-        foreach($msgs as $msg) {
+        foreach($msgs->children() as $msg) {
             echo $msg['name'];
         }
     ?></p>
