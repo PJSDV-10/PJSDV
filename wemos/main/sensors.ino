@@ -75,17 +75,19 @@ void setupActuators() {
   unsigned int inputs = Wire.read();
 
   
-  
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     
-    if (sensorNames[i][0].compare("Bool") == 0) {
-      sensor[i][0] = (inputs & sensor[i][2]);
-      
-    } else 
+    if (sensorNames[i][0].compare("bool") == 0) {
+      if (inputs & sensor[i][2]) {
+        sensor[i][0] = 1;
+      } else 
+      sensor[i][0] = 0;
+    } 
     
+    if (sensorNames[i][0].compare("int") == 0) {
       sensor[i][0] = analogin[(sensor[i][2] - 300)];
+    }
   }
-  
 }
 
 

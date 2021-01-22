@@ -74,6 +74,8 @@ void setupActuators();
 void updateActuators();
 void readSensors();
 
+
+
 std::string test = "<message> <header> <sender>server</sender> <receiver>wemosnaam</receiver> </header> <function>actuateBool</function> <context> <data1>0</data1> <!-- Vibration motor --> <data2>1</data2> <!-- LED --> </context> </message>";
 
 WiFiClient client;
@@ -105,8 +107,18 @@ void loop() {
 
   //----------sensors------------//
   //Serial.println("reading sensors now");
+  Serial.println("Before reading: ");
+  Serial.println(sensor[0][0]);
+  Serial.println(sensor[1][0]);
+
   readSensors();
 
+  Serial.println("After reading: ");
+  Serial.println(sensor[0][0]);
+  Serial.println(sensor[1][0]);
+
+  delay(1000);
+/*
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
   int sendStatus = 0;
@@ -145,4 +157,5 @@ void loop() {
 
   //---------misc functions---------//
  delay(100); // delay can be 0, but still has to be present.
+ */
 }
