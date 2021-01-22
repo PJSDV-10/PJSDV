@@ -14,6 +14,7 @@ function xmlParseDevice($data, $i) {
     foreach($xml->context->wemosjes->children() as $device) {
         $devices[i] = $device;
     }
+    echo $devices[0]->name;
     return $devices;
 }
 
