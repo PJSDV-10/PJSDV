@@ -4,29 +4,29 @@ const char* receiveData() {
   // pretty rudementairy, if we can read a string we return it, if not we return 0.
   // TODO: add fancy error checking mechanism.
   //Serial.println("looking if we received a message");
-  if(client.available()){
-    delay(0);
+ // if(client.available()){
+    //delay(0);
 
     std::string plas(client.readString().c_str());
       
 
 
-    Serial.println("We received the following message");
-    Serial.println(plas.c_str());
-    Serial.println("");
+    //Serial.println("We received the following message");
+    //Serial.println(plas.c_str());
+    //Serial.println("");
     
     if (plas.compare("") != 0) {
       return plas.c_str();
     } else {
-      Serial.println("client is availible, but we received no message");
-      Serial.println("");
+      //Serial.println("client is availible, but we received no message");
+      //Serial.println("");
       return "NULL";
     }
     
-  } else{
+ // } else{
     //Serial.println("client isn't availible");
-    return "NULL";
-  }
+ //   return "NULL";
+  //}
 }
 
 const char* receiveData(int* receivedResponse) {
@@ -39,9 +39,9 @@ const char* receiveData(int* receivedResponse) {
       *receivedResponse = 1;
 
 
-          Serial.println("We received the following message");
-          Serial.println(plas.c_str());
-          Serial.println("");
+          //Serial.println("We received the following message");
+          //Serial.println(plas.c_str());
+          //Serial.println("");
 
           return plas.c_str();
     } else
@@ -51,14 +51,14 @@ const char* receiveData(int* receivedResponse) {
 
 void sendData(const char * msg){
   // sends the enclosed message to the connected client
-  Serial.println("starting a transmission of the following message:");
-  Serial.println(msg);
-  
-    if(client.availableForWrite()&&client.connected()){
+  //Serial.println("starting a transmission of the following message:");
+  //Serial.println(msg);
+  Serial.println("sending");
+    //if(client.availableForWrite()&&client.connected()) {
           client.write(msg);
-          Serial.println("The message has been send succesfully.");
-          Serial.println("");
-    }
+          //Serial.println("The message has been send succesfully.");
+          //Serial.println("");
+    //}
 }
 
 void setupWifi(){

@@ -36,8 +36,8 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "oop";
-const char *password = "programmer";
+const char *ssid = "WatEenRotTaart";
+const char *password = "KankerKanker";
 const char *ip = "home.dutchellie.nl";
 
 // sensor globals
@@ -117,9 +117,13 @@ void loop() {
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(0);
-     if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
-      sendStatus = 1;
-     }
+     if(sensorNames[i][0].compare("bool") == 0) {
+       if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
+         sendStatus = 1;
+       }
+     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10))) {
+          sendStatus = 1;
+        }
      sensor[i][1] = sensor[i][0]; // update the previous value
   }
   
@@ -133,10 +137,9 @@ void loop() {
   //
   
   std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
-  delay(0);
   
   if (receivedMsg.compare("NULL") != 0){
-    Serial.println("The received message is not empty.");
+    //Serial.println("The received message is not empty.");
     std::string parsedMsg[BUFFERSIZE];
     parser(receivedMsg, parsedMsg); // parse the message, 
     handleMessage(parsedMsg);
@@ -149,6 +152,6 @@ void loop() {
 
 
   //---------misc functions---------//
- delay(100); // delay can be 0, but still has to be present.
+ delay(0); // delay can be 0, but still has to be present.
  
 }
