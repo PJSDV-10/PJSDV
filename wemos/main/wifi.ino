@@ -142,7 +142,7 @@ void parser(std::string S1 ,std::string arr[]){
                         
                         SUB1 = S1.find("<data1>"); //find sensor
                         SUB2 = S1.find("</data1>"); // find end sensor
-                        Serial.println("parsing the data now: ");
+                        //Serial.println("parsing the data now: ");
                         for(int i = 3; SUB1==-1 || !(SUB2==-1|| i == NUMBER_OF_STRING); i++){// look for context
                             delay(1);
                             
@@ -156,7 +156,7 @@ void parser(std::string S1 ,std::string arr[]){
                             //Serial.print("data: ");
                             //Serial.println(arr[i].c_str());
                         }
-                        Serial.println("Finished parsing the data.");
+                        //Serial.println("Finished parsing the data.");
                 
         }
     }

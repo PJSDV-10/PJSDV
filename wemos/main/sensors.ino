@@ -1,6 +1,7 @@
 
 void setupPins() {
   // sets the wemos' pins in output, input or input_pullup mode depending on actuator/sensor type.
+  // not needed anymore, ddr on wib is always 00001111.
   setupSensors();
   setupActuators();
   Serial.println("pin setup complete");
@@ -9,6 +10,7 @@ void setupPins() {
 void setupSensors() {
   // puts the pins in input or input_pullup mode depending on the type of sensor
   // TODO: also enables the needed TWI if we are using a TWI sensor.
+  /*
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
       delay(1);
       Serial.print(sensorNames[i][1].c_str());
@@ -22,10 +24,12 @@ void setupSensors() {
       Serial.println("input");
     }
   }
+  */
 }
 
 void setupActuators() {
   // sets the actuator's pins in output mode
+  /*
   for (int i = 0; i < AMOUNTOFACTUATORS; i++) {
     delay(1);
     Serial.print(sensorNames[i][1].c_str());
@@ -33,8 +37,10 @@ void setupActuators() {
     pinMode(actuator[i][2],OUTPUT);
     Serial.println("output");
   }
+  */
 }
   void readSensors(){
+    
     for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     if (sensorNames[i][0].compare("bool") == 0) {
       sensor[i][0] = digitalRead(sensor[i][2]);
@@ -51,6 +57,7 @@ void setupActuators() {
       Serial.println(sensor[i][0]);
     }
   }
+  
 }
 
 

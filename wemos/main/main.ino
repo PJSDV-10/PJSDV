@@ -17,6 +17,7 @@
 //#include <tinyxml.h>
 #include <string>
 #include <sstream> 
+#include <Wire.h>
 
 #define AMOUNTOFSENSORS 2
 #define AMOUNTOFACTUATORS 2
@@ -32,6 +33,7 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
+const char *ssid = "oop";
 const char *password = "programmer";
 const char *ip = "192.168.68.120";
 
@@ -82,8 +84,8 @@ void setup() {
 
   
   Serial.begin(115200);
-
-
+  Wire.begin();
+  
   setupWifi();
   setupPins(); 
 
