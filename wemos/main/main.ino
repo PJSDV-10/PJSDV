@@ -22,6 +22,8 @@
 #define AMOUNTOFSENSORS 2
 #define AMOUNTOFACTUATORS 2
 #define BUFFERSIZE 20
+#define WIBADRESD 0x38
+#define WIBADRESA 0x36
 
 // voor parser
 int NUMBER_OF_STRING = 10;
@@ -38,10 +40,11 @@ const char *password = "programmer";
 const char *ip = "192.168.68.120";
 
 // sensor globals
-int sensor[AMOUNTOFSENSORS][3] = {{0,0,0},{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+// sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
+unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{0,1,5},{0,1,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,0,32},{0,0,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
@@ -74,9 +77,6 @@ void readSensors();
 std::string test = "<message> <header> <sender>server</sender> <receiver>wemosnaam</receiver> </header> <function>actuateBool</function> <context> <data1>0</data1> <!-- Vibration motor --> <data2>1</data2> <!-- LED --> </context> </message>";
 
 WiFiClient client;
-
-
-
 
 
 

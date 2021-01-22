@@ -40,7 +40,7 @@ void setupActuators() {
   */
 }
   void readSensors(){
-    
+    /*
     for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     if (sensorNames[i][0].compare("bool") == 0) {
       sensor[i][0] = digitalRead(sensor[i][2]);
@@ -56,6 +56,34 @@ void setupActuators() {
       Serial.print(" to: ");
       Serial.println(sensor[i][0]);
     }
+  }*/
+  unsigned int analogin[2];
+  Wire.requestFrom(WIBADRESA, 4);   
+  //read AI0
+  analogin[0] = Wire.read()&0x03;  //read byte 1
+  analogin[0]=analogin[0]<<8;
+  analogin[0] = analogin[0]|Wire.read();  // read byte 0
+  //read AI1
+  analogin[1] = Wire.read()&0x03;  //read byte 1
+  analogin[1]=analogin[1]<<8;
+  analogin[1] = analogin[1]|Wire.read(); //read byte 0
+  
+  Wire.beginTransmission(WIBADRESD); 
+  Wire.write(byte(0x00));      
+  Wire.endTransmission();
+  Wire.requestFrom(0x38, 1);   
+  unsigned int inputs = Wire.read();
+
+  
+  
+  for (int i = 0; i < AMOUNTOFSENSORS; i++) {
+    
+    if (sensorNames[i][0].compare("Bool") == 0) {
+      sensor[i][0] = (inputs & sensor[i][2]);
+      
+    } else 
+    
+      sensor[i][0] = analogin[(sensor[i][2] - 300)];
   }
   
 }
