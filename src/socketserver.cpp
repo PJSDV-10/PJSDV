@@ -193,7 +193,6 @@ void SocketServer::handleRequest(int fd){
     else if (xml_r.getFunction() == "sensorUpdate")
     {
         /*std::cout << "Sensor update received from:\n" << xml_r.getSenderName() << std::endl;*/
-
         std::string respondmsg;
         for (std::size_t i = 0; i < wemosjes.size(); i++){
             //std::cout << "trying to find right wemos" << std::endl;
