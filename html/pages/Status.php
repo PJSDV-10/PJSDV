@@ -25,7 +25,7 @@
     <h1>output:</h1>
     <p><?php
         require "socket.php";
-        $msg;
+        $msgs;
         if(initialiseSocket()) {
             $msgs = requestAllSocket();
         }
