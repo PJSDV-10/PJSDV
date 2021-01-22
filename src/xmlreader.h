@@ -16,11 +16,9 @@ private:
     std::string receiverName;
     std::string clientName;
     std::string type;
-<<<<<<< HEAD
     std::vector<double> data;
     int err;
-=======
->>>>>>> 12-db
+
 
     Map parsedXML;
     Map parsedContext;
