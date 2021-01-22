@@ -23,6 +23,14 @@
     </table>-->
 
     <h1>output:</h1>
-    <p><?php require "socket.php"; $msg = initialiseSocket(); echo $msg; ?></p>
+    <p><?php
+        require "socket.php";
+        if(initialiseSocket()) {
+            $msgs = requestAllSocket();
+        }
+        foreach($msgs as $msg) {
+            echo $msg['name'];
+        }
+    ?></p>
 
 </div>

@@ -1,4 +1,6 @@
 <?php
+require "xml.php";
+
 $sock_IP = "127.0.0.1";
 $sock_Port = 8080;
 
@@ -8,10 +10,11 @@ $sock_Port = 8080;
  * @return message if the connection was succesful, if not it'll return 0.
 **/
 function messageSocket($out) {
-	$fp = fsockopen(global $sock_IP, global $sock_Port, $errno, $errstr, 1);
+	global $sock_IP; global $sock_Port;
+	$fp = fsockopen($sock_IP, $sock_Port, $errno, $errstr, 1);
 	if(!$fp) {
-		echo "$errstr ($errno)<br>";
-		return 0;
+		//echo "$errstr ($errno)<br>";
+		return false;
 	} else {
 		fwrite($fp, $out);
 		$in = "";
@@ -37,7 +40,7 @@ function initialiseSocket() {
 	$out .= "</context>";
 	$out .= "</message>";
 
-	return messageSocket($out);
+	return xmlCheckAck(messageSocket($out));
 }
 
 function requestAllSocket() {
