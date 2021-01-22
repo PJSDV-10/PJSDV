@@ -2,9 +2,13 @@
 void setupPins() {
   // sets the wemos' pins in output, input or input_pullup mode depending on actuator/sensor type.
   // not needed anymore, ddr on wib is always 00001111.
-  setupSensors();
+ /* setupSensors();
   setupActuators();
-  Serial.println("pin setup complete");
+  Serial.println("pin setup complete");*/
+  Wire.beginTransmission(WIBADRESD);
+  Wire.write(byte(0x03));         
+  Wire.write(byte(0x0F));       
+  Wire.endTransmission();
 }
 
 void setupSensors() {
@@ -92,7 +96,38 @@ void setupActuators() {
 
 
 
-void updateActuators() {
+    void updateActuators() {
+  for(int i = 0; i < AMOUNTOFACTUATORS; i++){
+        delay(1);
+    if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
+      
+        Serial.print("we changed the ");
+        Serial.print(actuatorNames[i][1].c_str());
+        Serial.print("'s value to: ");
+        Serial.print(actuator[i][1]);
+        
+      // change the current value 
+      if (actuatorNames[i][0] == "bool"){ // if the actuator is boolean, write a bool to the pin. 
+        delay(0);
+        unsigned int stuur;
+        for(int H = 1; H==AMOUNTOFACTUATORS;H++){
+          if(actuatorNames[i][0] == "bool"){
+                      stuur = (actuator[H][1])  ;  //tel hier alen actuatoren die bool zijn op
+          }
+
+        }
+        Wire.beginTransmission(WIBADRESD);
+        Wire.write(byte(stuur));
+        Wire.endTransmission(); 
+        Serial.println(" transmit WIBADRESD.");
+        
+      } 
+      actuator[i][0] = actuator[i][1]; //update the currentvalue
+    }
+  }
+}
+
+/*
     for(int i = 0; i < AMOUNTOFACTUATORS; i++){
         delay(1);
     if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
@@ -117,4 +152,4 @@ void updateActuators() {
       actuator[i][0] = actuator[i][1]; //update the currentvalue
     }
   }
-}
+}*/
