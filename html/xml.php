@@ -8,11 +8,11 @@ function xmlCheckAck($data) {
     }
 }
 
-function xmlParseDevice($data, $i) {
+function xmlParseDevice($data) {
     $devices;
     $xml = simplexml_load_string($data) or die;
     foreach($xml->context->wemosjes->children() as $device) {
-        $devices[i] = $device;
+        $devices = $device;
     }
     echo $devices[0]->name;
     return $devices;

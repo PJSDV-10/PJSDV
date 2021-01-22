@@ -27,7 +27,7 @@
         require "socket.php";
         $msgs;
         if(initialiseSocket()) {
-            $msgs = xmlParseDevice(requestAllSocket());
+            $msgs = xmlParseDevices(requestAllSocket());
         }
         //echo $msgs;
         foreach($msgs as $msg) {
