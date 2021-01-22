@@ -11,12 +11,7 @@ void XmlReader::parseDocument(){
         }
 
         clientName = context_node->first_node("clientName")->value();
-<<<<<<< HEAD
-
-        parsedContext.emplace("clientName", clientName);
-=======
         //parsedContext.emplace("clientName", clientName);
->>>>>>> class-structure
         type = context_node->first_node("type")->value();
         //parsedContext.emplace("type", type);
     }
@@ -28,13 +23,8 @@ void XmlReader::parseDocument(){
             return;
         }
         type = context_node->first_node("type")->value();
-<<<<<<< HEAD
-        parsedContext.emplace("type", type);
-
-=======
         //parsedContext.emplace("type", type);
-        
->>>>>>> class-structure
+
         // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
         parseDeviceData();
     }
@@ -71,11 +61,11 @@ void XmlReader::parseDeviceData(){
     }else if(type == "door"){
         data.emplace_back(atoi(context_node->first_node("data1")->value()));
         data.emplace_back(atoi(context_node->first_node("data2")->value()));
-        
+
     }else if(type == "wall"){
         data.emplace_back(atoi(context_node->first_node("data1")->value()));
         data.emplace_back(atoi(context_node->first_node("data2")->value()));
-        
+
     }else if(type == "fridge"){
         data.emplace_back(atoi(context_node->first_node("data1")->value()));
         data.emplace_back(atoi(context_node->first_node("data2")->value()));
@@ -84,7 +74,7 @@ void XmlReader::parseDeviceData(){
 
     }else{
         std::cout << "Unknown device type" << std::endl;
-    } 
+    }
 }
 
 XmlReader::XmlReader(const char *xmldoc)

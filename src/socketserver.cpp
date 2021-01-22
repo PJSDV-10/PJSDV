@@ -27,7 +27,7 @@ SocketServer::SocketServer(const char *port)
         exit(EXIT_FAILURE);
     }
 
-    /* 
+    /*
     Here we populate a addrinfo struct with zeros and then set the following settings:
     ai_family = AF_UNSPEC (IPv4 and IPv6 are fine)
     ai_socktype = SOCK_STREAM (TCP stream socket)
@@ -165,13 +165,8 @@ void SocketServer::handleRequest(int fd){
     if(xml_r.error() == PARSING_ERROR){
         return;
     }
-<<<<<<< HEAD
-    Map xml = xml_r.getParsedDoc();
-    if(xml_r.getFunction() == "authentication"){
-=======
     //Map xml = xml_r.getParsedDoc();
-    if(xml_r.getFunction() == "authentication"){ 
->>>>>>> class-structure
+    if(xml_r.getFunction() == "authentication"){
         std::cout << "The following device authenticated with the server:\n"
                     << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
@@ -303,7 +298,7 @@ void SocketServer::handleRequest(int fd){
             timers[i].device.
         }
     }
-    
+
 }*/
 
 /* Returns a 1 if an error occurred */

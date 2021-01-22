@@ -19,14 +19,8 @@ private:
     std::vector<double> data;
     int err;
 
-<<<<<<< HEAD
-
-    Map parsedXML;
-    Map parsedContext;
-=======
     //Map parsedXML;
     //Map parsedContext;
->>>>>>> class-structure
 
     //RapidXML variables
     rapidxml::xml_document<> *doc;
