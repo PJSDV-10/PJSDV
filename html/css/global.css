@@ -1,0 +1,69 @@
+/* global settings */
+* {
+	background-color: #5C757C;
+	color: #CFCFCF;
+	box-sizing: border-box;
+	font-family: "Comic Sans";
+}
+
+
+/* header settings */
+.header {
+    height: 100px;
+	width: 100%;
+	position: fixed;
+    background-color: #506066;
+    border-radius: 25px;
+}
+
+.box {
+	float: left;
+	width: 33%;
+	background-color: inherit;
+}
+
+.title {
+	text-align: center;
+	background-color: inherit;
+}
+
+.filler {
+	margin-top: 1px; /* no clue why it works, but it does, so let's keep it */
+	background-color: rgba(0, 0, 0, 0);
+}
+
+.button.right {
+	float: right;
+	margin-right: 25px;
+}
+
+.info {
+	margin-left: 10%;
+	background-color: inherit;
+}
+
+/* content settings */
+.main {
+	margin: auto;
+	padding-top: 120px;
+	width: 80%;
+    text-align: center;
+	clear: left;
+}
+
+
+/* make buttons nicer */
+.button {
+	width: auto;
+	height: 40px;
+	margin-top: 30px;
+	opacity: 75%;
+	border: solid;
+	border-radius: 20px;
+}
+
+.button:hover {
+	opacity: 100%;
+	border-color: white;
+	color: white;
+}

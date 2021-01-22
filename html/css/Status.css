@@ -1,0 +1,16 @@
+table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid black;
+}
+
+#but:hover {
+    color: blue;
+}
+
+#but:active {
+    color: brown;
+}
