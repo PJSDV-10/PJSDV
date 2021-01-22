@@ -21,6 +21,7 @@
 
 #define AMOUNTOFSENSORS 2
 #define AMOUNTOFACTUATORS 2
+
 #define BUFFERSIZE 20
 #define WIBADRESD 0x38
 #define WIBADRESA 0x36
@@ -37,7 +38,7 @@ std::string type = "chair";
 // Network SSID
 const char *ssid = "oop";
 const char *password = "programmer";
-const char *ip = "192.168.68.120";
+const char *ip = "home.dutchellie.nl";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
@@ -92,7 +93,7 @@ void setup() {
   setupPins(); 
 
   // first we must authenticate with the server, if this can't happen we can't send any data.
-  //authenticating();
+  authenticating();
 
   Serial.println("Entering main program loop now.");
   delay(0);
@@ -107,20 +108,10 @@ void loop() {
 
   //----------sensors------------//
   //Serial.println("reading sensors now");
- /* Serial.println("Before reading: ");
-  Serial.println(sensor[0][0]);
-  Serial.println(sensor[1][0]);
+
 
   readSensors();
 
-  Serial.println("After reading: ");
-  Serial.println(sensor[0][0]);
-  Serial.println(sensor[1][0]);
-
-  delay(1000);*/
-
-updateActuators();
-/*
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
   int sendStatus = 0;
@@ -159,5 +150,5 @@ updateActuators();
 
   //---------misc functions---------//
  delay(100); // delay can be 0, but still has to be present.
- */
+ 
 }
