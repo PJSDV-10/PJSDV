@@ -29,7 +29,7 @@
         if(initialiseSocket()) {
             $msgs = requestAllSocket();
         }
-        foreach($msgs->children() as $msg) {
+        foreach($msgs as $msg) {
             echo $msg['name'];
         }
     ?></p>
