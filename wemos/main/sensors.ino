@@ -11,7 +11,10 @@ void setupSensors() {
   // TODO: also enables the needed TWI if we are using a TWI sensor.
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
       delay(1);
+      Serial.print(sensorNames[i][1].c_str());
+      Serial.print(" was initialised using: ");
     if(sensorNames[i][1].compare("pushButton") == 0) {
+
       pinMode(sensor[i][2],INPUT_PULLUP);
       Serial.println("input_pullup");
     }else {
@@ -25,6 +28,8 @@ void setupActuators() {
   // sets the actuator's pins in output mode
   for (int i = 0; i < AMOUNTOFACTUATORS; i++) {
     delay(1);
+    Serial.print(sensorNames[i][1].c_str());
+    Serial.print(" was initialised using: ");
     pinMode(actuator[i][2],OUTPUT);
     Serial.println("output");
   }

@@ -14,7 +14,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <tinyxml.h>
+//#include <tinyxml.h>
 #include <string>
 #include <sstream> 
 
@@ -26,21 +26,20 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "chair1";
+std::string wemosNaam = "chair";
 std::string server = "Server";
 std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "Eetmijnpieniet";
-const char *password = "Merwic01";
+const char *password = "programmer";
 const char *ip = "192.168.68.120";
 
 // sensor globals
 int sensor[AMOUNTOFSENSORS][3] = {{0,0,0},{0,0,16}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-int actuator[AMOUNTOFACTUATORS][3] = {{1,1,5},{1,1,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+int actuator[AMOUNTOFACTUATORS][3] = {{0,1,5},{0,1,4}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
