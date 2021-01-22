@@ -134,12 +134,12 @@ Dan wanneer alles terug is gegaan naar de server gaat het volgende naar de websi
             <wemos>
                 <name>UniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
                 <type>stoel</type>
-                <data>0</data>
+                <data1>0</data1>
             </wemos>
             <wemos>
                 <name>AndereUniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
                 <type>lamp</type>
-                <data>1</data>
+                <data1>1</data1>
             </wemos>
         </wemosjes>
     </context>
