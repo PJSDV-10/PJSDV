@@ -15,7 +15,7 @@ function xmlParseDevices($data) {
         $devices[$i] = $device;
         $i++;
     }
-    echo $devices[0]->name;
+    echo $devices[0];
     return $devices;
 }
 

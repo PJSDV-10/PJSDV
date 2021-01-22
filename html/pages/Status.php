@@ -31,7 +31,7 @@
         }
         //echo $msgs;
         foreach($msgs as $msg) {
-            echo $msg['name'];
+            echo $msg;
         }
     ?></p>
 
