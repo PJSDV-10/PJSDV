@@ -46,7 +46,34 @@ void XmlReader::parseDeviceData(){
         
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
         data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
-    }
+    }else if(type == "column"){
+        std::cout << "Column" << std::endl;
+
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+    }else if(type == "bed"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+    }else if(type == "tablelamp"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+
+    }else if(type == "door"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        
+    }else if(type == "wall"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        
+    }else if(type == "fridge"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        data.emplace_back(atoi(context_node->first_node("data3")->value()));
+
+
+    }else{
+        std::cout << "Unknown device type" << std::endl;
+    } 
 }
 
 XmlReader::XmlReader(const char *xmldoc)

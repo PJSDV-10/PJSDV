@@ -21,6 +21,7 @@ class Door : public Wemos{
 private:
     bool PBStateOutside;
     bool PBStateInside;
+    bool DoorState;
 
 public:
     Door(int fd, std::string clientName, std::string senderName);
@@ -45,15 +46,18 @@ class Bed : public Wemos{
 private:
     bool PBState;
     bool FSState;
+    struct timeval timer;
 
 public:
     Bed(int fd, std::string clientName, std::string senderName);
     ~Bed();
-    std::string handleSensorUpdate(XmlReader *);
+    std::string handleSensorUpdate(XmlReader *); 
 };
 
 
 class TableLamp : public Wemos{
+private:
+    bool PIRState;
 
 public:
     TableLamp(int fd, std::string clientName, std::string senderName);

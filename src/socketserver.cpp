@@ -4,6 +4,9 @@
 
 SocketServer::SocketServer(const char *port)
 {
+
+
+
     /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
     The arguments passed are:
     PF_INET:
@@ -286,6 +289,18 @@ void SocketServer::handleRequest(int fd){
     return;
 }
 
+/*void SocketServer::checkWemosTimers(){
+    time_t current;
+    time(&current);
+    for (int i = 0; i < timers.size(); i++)
+    {
+        if(current - timers[i].oldTime > timers[i].setting){
+            timers[i].device.
+        }
+    }
+    
+}*/
+
 /* Returns a 1 if an error occurred */
 int SocketServer::authWemos(int fd, XmlReader& msg){
     if(checkIfWemosExists(msg.getSenderName()) == 1){
@@ -294,10 +309,23 @@ int SocketServer::authWemos(int fd, XmlReader& msg){
     }
     if(msg.getType() == "chair"){
         wemosjes.emplace_back(new Chair(fd, msg.getClientName(), msg.getSenderName()));
-    }else if(msg.getType() == "website2"){
+    }else if(msg.getType() == "website"){
         wemosjes.emplace_back(new Website(fd, msg.getClientName(), msg.getSenderName()));
     }else if(msg.getType() == "column"){
         wemosjes.emplace_back(new Column(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "bed"){
+        wemosjes.emplace_back(new Bed(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "tablelamp"){
+        wemosjes.emplace_back(new TableLamp(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "door"){
+        wemosjes.emplace_back(new Door(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "wall"){
+        wemosjes.emplace_back(new Wall(fd, msg.getClientName(), msg.getSenderName()));
+    }else if(msg.getType() == "fridge"){
+        wemosjes.emplace_back(new Fridge(fd, msg.getClientName(), msg.getSenderName()));
+    }else{
+        std::cout << "Wrong or unknown type" << std::endl;
+        return 1;
     }
     return 0;
 }

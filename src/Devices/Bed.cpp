@@ -11,6 +11,8 @@ Bed::Bed(int fd, std::string clientName, std::string senderName) {
     this->wemosType = "bed";
     PBState = false;
     FSState = false;
+    timer.tv_sec = 0;
+    timer.tv_usec = 0;
 }
 
 Bed::~Bed() {
@@ -55,6 +57,8 @@ std::string Bed::handleSensorUpdate(XmlReader * xml_r) {
     }else{
         sendStatus.push_back(0);
     }
+
+    
 
     /* Todo: add a third logic thing */
     XmlWriter xml_w("actuateBool", destination);

@@ -34,17 +34,31 @@ std::string Door::handleSensorUpdate(XmlReader * xml_r) {
 
         Sending order:
         1: LED (buiten)
-        2: L
+        2: LED (binnen)
+        3: Servo (0 is closed, is 1 open)
 
         first:
-            make pushbutton to switch using PBState
-        second:
-            turn on LED is pbstate is true
-        third: 
-            save the time and compare it ever time before the select function in socketServer...
-            The LED has to turn off after 30 minutes automatically.
+            if push button binnen and/or push button buiten en doorstate false
+                servo 1
+                led buiten 1
+                led binnen 1
+            if push button binnen and/or push button buiten en doorstate true
+                servo 2
+                led buiten 0
+                led binnen 0
     */
 
+    if(((int)std::round(sentStatus[0]) || (int)std::round(sentStatus[1])) && DoorState == false){
+        sendStatus.push_back(1); //led buiten
+        sendStatus.push_back(1); //led binnen
+        sendStatus.push_back(1); //servo
+        DoorState = true;
+    }else if((int)std::round(sentStatus[0]) || (int)std::round(sentStatus[1]) && DoorState == true){
+        sendStatus.push_back(0); //led buiten
+        sendStatus.push_back(0); //led binnen
+        sendStatus.push_back(0); //servo
+        DoorState = false;
+    }
     
     XmlWriter xml_w("actuateBool", destination);
     xml_w.buildXMLActuate(sendStatus);
