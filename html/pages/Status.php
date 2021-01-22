@@ -27,12 +27,12 @@
         require "socket.php";
         $msgs;
         if(initialiseSocket()) {
-            $msgs = requestAllSocket();
+            $msgs = xmlParseDevice(requestAllSocket());
         }
-        echo $msgs;
-        /*foreach($msgs as $msg) {
+        //echo $msgs;
+        foreach($msgs as $msg) {
             echo $msg['name'];
-        }*/
+        }
     ?></p>
 
 </div>
