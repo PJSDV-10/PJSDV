@@ -53,7 +53,7 @@ std::string Door::handleSensorUpdate(XmlReader * xml_r) {
         sendStatus.push_back(1); //led binnen
         sendStatus.push_back(1); //servo
         DoorState = true;
-    }else if((int)std::round(sentStatus[0]) || (int)std::round(sentStatus[1]) && DoorState == true){
+    }else if(((int)std::round(sentStatus[0]) || (int)std::round(sentStatus[1])) && DoorState == true){
         sendStatus.push_back(0); //led buiten
         sendStatus.push_back(0); //led binnen
         sendStatus.push_back(0); //servo
