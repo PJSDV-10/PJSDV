@@ -1,26 +1,58 @@
 <?php
-$fp = fsockopen("127.0.0.1", 8080, $errno, $errstr, 1);
-if(!$fp) {
-	echo "$errstr ($errno)<br>";
-} else {
-	$out = "<message>
-	    <header>
-	        <sender>website</sender>
-	        <receiver>server</receiver>
-	    </header>
-	    <function>authentication</function>
-	    <context>
-	        <password>JeMoederIsEenWachtwoord</password>
-	        <clientName>Website</clientName>
-	        <type>website</type>
-	    </context>
-	</message>";
+$sock_IP = "127.0.0.1";
+$sock_Port = 8080;
 
-	fwrite($fp,$out);
-	while(!feof($fp)) {
-		echo fgets($fp, 128);
+/**
+ * Sends the given message to the socketserver
+ * @param out the message that has to be sent to the server.
+ * @return message if the connection was succesful, if not it'll return 0.
+**/
+function messageSocket($out) {
+	$fp = fsockopen(global $sock_IP, global $sock_Port, $errno, $errstr, 1);
+	if(!$fp) {
+		echo "$errstr ($errno)<br>";
+		return 0;
+	} else {
+		fwrite($fp, $out);
+		$in = "";
+		while(!feof($fp)) {
+			$in .= fgets($fp, 128);
+		}
+		fclose($fp);
+		return $in;
 	}
-	fclose($fp);
+}
+
+function initialiseSocket() {
+	$out = "<message>";
+	$out .= "<header>";
+	$out .= "<sender>website</sender>";
+	$out .= "<receiver>server</receiver>";
+	$out .= "</header>";
+	$out .= "<function>authentication</function>";
+	$out .= "<context>";
+	$out .= "<password>JeMoederIsEenWachtwoord</password>";
+	$out .= "<clientName>Website</clientName>";
+	$out .= "<type>website</type>";
+	$out .= "</context>";
+	$out .= "</message>";
+
+	return messageSocket($out);
+}
+
+function requestAllSocket() {
+	$out = "<message>";
+	$out .= "<header>";
+	$out .= "<sender>website</sender>";
+	$out .= "<receiver>server</receiver>";
+	$out .= "</header>";
+	$out .= "<function>getStatusAll</function>";
+	$out .= "<context>";
+	$out .= "<password>JeMoederIsEenWachtwoord</password>";
+	$out .= "</context>";
+	$out .= "</message>";
+
+	return messageSocket($out);
 }
 
 ?>
