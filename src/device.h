@@ -67,6 +67,8 @@ public:
 
 class Fridge : public Wemos{
 
+
+
 public:
     Fridge(int fd, std::string clientName, std::string senderName);
     ~Fridge();
