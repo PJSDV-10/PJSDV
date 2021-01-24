@@ -247,6 +247,8 @@ void SocketServer::handleRequest(int fd){
                 if (FD_ISSET(i, &wemosSet) && i != fd)
                 {
                     std::cout << "Sending broadcast to this device" << std::endl;
+                    // Getting garbage before actually doing anything
+                    // recv(i, NULL, 4096, 0);
                     if (send(i, toBeSent.c_str(), strlen(toBeSent.c_str()), 0) == -1)
                     {
                         perror("Error sending status broadcast to wemos devices");

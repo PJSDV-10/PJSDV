@@ -30,6 +30,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     //std::cout << "data gotten" << std::endl;
     std::string toBeReturned;
     /* 
+        OBSOLETE SINCE WEMOS FIX
         Check if the pushbutton changed. It should act as a switch, which is only implemented here.
 
         If button is true && !stepState
@@ -39,14 +40,14 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
             stepState = false
     */
 
-    if((int)std::round(sentStatus[1]) && !stepState){
+    /*if((int)std::round(sentStatus[1]) && !stepState){
         stepState = true;
     }
 
     if(!(int)std::round(sentStatus[1]) && stepState){
         PBState = !PBState;
         stepState = false;
-    }
+    }*/
 
     std::cout << "PBState status: " << PBState << std::endl;
     
