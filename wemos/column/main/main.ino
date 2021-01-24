@@ -42,11 +42,11 @@ const char *ip = "home.dutchellie.nl";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
-unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
-std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","gassensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,1},{0,0,300}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"bool","pushButton"},{"int","gassensor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,32},{0,1,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","LED"},{"bool","BUZZER"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,1,16},{1,0,32}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","BUZZER"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
 
