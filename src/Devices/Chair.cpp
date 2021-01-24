@@ -47,7 +47,6 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     if(!(int)std::round(sentStatus[1]) && stepState){
         PBState = !PBState;
         stepState = false;
-        
     }*/
 
     std::cout << "PBState status: " << PBState << std::endl;
