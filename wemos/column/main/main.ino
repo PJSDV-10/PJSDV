@@ -117,11 +117,15 @@ void loop() {
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(0);
-     if(sensorNames[i][0].compare("bool") == 0) {
+     if(sensorNames[i][1].compare("pushButton") == 0) {
+      if (( sensor[i][0] == 1 )&&( sensor[i][1] == 1 ) {
+        sendStatus = 1;
+      }
+     }else if(sensorNames[i][0].compare("bool") == 0 && sensorNames[i][1].compare("pushButton") != 0) {
        if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
          sendStatus = 1;
        }
-     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10))) {
+     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10)) && sensorNames[i][1].compare("pushButton") != 0) {
           sendStatus = 1;
         }
      sensor[i][1] = sensor[i][0]; // update the previous value

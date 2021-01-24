@@ -40,6 +40,21 @@ const char *ssid = "WatEenRotTaart";
 const char *password = "KankerKanker";
 const char *ip = "home.dutchellie.nl";
 
+
+/*  sensornames:
+ *    pushButton
+ *    forceSensor
+ *    
+ *    bool
+ *    int
+ * 
+ *  Actuatornames:
+ *    VibrationMotor
+ *    LED
+ *    
+ *    bool
+ *    int
+ */
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
 unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
@@ -90,7 +105,7 @@ void setup() {
   Wire.begin();
   
   setupWifi();
-  setupPins(); 
+  //setupPins(); 
 
   // first we must authenticate with the server, if this can't happen we can't send any data.
   authenticating();
@@ -117,11 +132,15 @@ void loop() {
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(0);
-     if(sensorNames[i][0].compare("bool") == 0) {
+     if(sensorNames[i][1].compare("pushButton") == 0) {
+      if (( sensor[i][0] == 1 )&&( sensor[i][1] == 1 )) {
+        sendStatus = 1;
+      }
+     }else if(sensorNames[i][0].compare("bool") == 0 && sensorNames[i][1].compare("pushButton") != 0) {
        if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
          sendStatus = 1;
        }
-     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10))) {
+     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10)) && sensorNames[i][1].compare("pushButton") != 0) {
           sendStatus = 1;
         }
      sensor[i][1] = sensor[i][0]; // update the previous value
