@@ -93,7 +93,7 @@ class Chair : public Wemos {
 private:
     bool TEState;
     bool PBState;
-
+    bool stepState;
 protected:
 
 public:

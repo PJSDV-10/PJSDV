@@ -163,6 +163,7 @@ void SocketServer::handleRequest(int fd){
     XmlReader xml_r(buffer);
     xml_r.parseDocument();
     if(xml_r.error() == PARSING_ERROR){
+        std::cout << "Parsing error occured" << std::endl;
         return;
     }
     //Map xml = xml_r.getParsedDoc();
@@ -171,8 +172,7 @@ void SocketServer::handleRequest(int fd){
                     << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
             std::cout << "Wemos failure with authentication" << std::endl;
-            //send message back?
-            return;
+            
         }
         std::string respondmsg;
         XmlWriter xml_w(xml_r);
@@ -185,7 +185,7 @@ void SocketServer::handleRequest(int fd){
 
         /* Close socket in case that the client is the website */
         if(xml_r.getType() == "website"){
-            closeConnection(fd);
+            //closeConnection(fd);
         }
         // Destroyer
         return;
@@ -207,7 +207,7 @@ void SocketServer::handleRequest(int fd){
 
         /* Close socket in case that the client is the website */
         if(xml_r.getType() == "website"){
-            closeConnection(fd);
+            //closeConnection(fd);
         }
         // Destroy
         return;
@@ -373,7 +373,7 @@ void SocketServer::removeWemosByFD(int fd){
 }
 
 void SocketServer::closeConnection(int fd){
-    //std::cout << "Closing website connection" << std::endl;
+    std::cout << "\n\n\n\nClosing website connection\n\n\n\n\n\n" << std::endl;
     close(fd);
     removeWemosByFD(fd);
     FD_CLR(fd, &all_sockets);

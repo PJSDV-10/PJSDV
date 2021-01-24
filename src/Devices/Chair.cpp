@@ -12,6 +12,7 @@ Chair::Chair(int fd, std::string clientName, std::string senderName){
     this->wemosType = "chair";
     PBState = false;
     TEState = false;
+    stepState = false;
 }
 
 Chair::~Chair(){
@@ -30,26 +31,39 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     std::string toBeReturned;
     /* 
         Check if the pushbutton changed. It should act as a switch, which is only implemented here.
+
+        If button is true && !stepState
+            stepState = true
+        If button is false && stepState
+            PBState = true
+            stepState = false
     */
-    if (PBState != (int)std::round(sentStatus[1]))
-    {
-        PBState = !PBState; // Invert
+
+    if((int)std::round(sentStatus[1]) && !stepState){
+        stepState = true;
     }
 
+    if(!(int)std::round(sentStatus[1]) && stepState){
+        PBState = !PBState;
+        stepState = false;
+    }
+
+    std::cout << "PBState status: " << PBState << std::endl;
+    
     /*
         force sensor + push button
         if both are on, then send 1, otherwise 0. XOR them
     */
     if ((int)std::round(sentStatus[0]) && PBState)
     {
-        //std::cout << "both are on" << std::endl;
+        std::cout << "both are on" << std::endl;
         sendStatus.push_back(1);
         sendStatus.push_back(1);
         TEState = 1;
         PBState = 1;
     }
     else{
-        //std::cout << "not both are on" << std::endl;
+        std::cout << "not both are on" << std::endl;
         sendStatus.push_back(0);
         sendStatus.push_back(0);
         TEState = 0;
