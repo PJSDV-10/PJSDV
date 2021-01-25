@@ -9,6 +9,7 @@ void XmlReader::parseDocument(){
         if(!checkPassword(context_node->first_node("password")->value())){
             return;
         }
+
         clientName = context_node->first_node("clientName")->value();
         //parsedContext.emplace("clientName", clientName);
         type = context_node->first_node("type")->value();
@@ -23,7 +24,7 @@ void XmlReader::parseDocument(){
         }
         type = context_node->first_node("type")->value();
         //parsedContext.emplace("type", type);
-        
+
         // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
         parseDeviceData();
     }
@@ -43,7 +44,7 @@ void XmlReader::parseDeviceData(){
     using namespace rapidxml;
     if(type == "chair"){
         std::cout << "Stoel identified" << std::endl;
-        
+
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
         data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
     }else if(type == "column"){
@@ -60,11 +61,11 @@ void XmlReader::parseDeviceData(){
     }else if(type == "door"){
         data.emplace_back(atoi(context_node->first_node("data1")->value()));
         data.emplace_back(atoi(context_node->first_node("data2")->value()));
-        
+
     }else if(type == "wall"){
         data.emplace_back(atoi(context_node->first_node("data1")->value()));
         data.emplace_back(atoi(context_node->first_node("data2")->value()));
-        
+
     }else if(type == "fridge"){
         data.emplace_back(atoi(context_node->first_node("data1")->value()));
         data.emplace_back(atoi(context_node->first_node("data2")->value()));
@@ -73,7 +74,7 @@ void XmlReader::parseDeviceData(){
 
     }else{
         std::cout << "Unknown device type" << std::endl;
-    } 
+    }
 }
 
 XmlReader::XmlReader(const char *xmldoc)

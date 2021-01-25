@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Test</title>
-	</head>
+<?php
+	session_start();
+	if(!isset($_SESSION['username'])) {
+		header("Location: Login.php?p=Login");
+		die;
+	} else {
+		if(isset($_GET['p'])) {
+			$page = $_GET['p'];
+		} else {
+			$page = "Home";
+		}
+	}
 
-	<body>
-		<h1><?php print("Hallo wereld!"); ?></h1>
-	</body>
-</html>
+	require "header.php";
+	include "pages/{$page}.php";
+	require "footer.php";
+?>

@@ -27,7 +27,7 @@ SocketServer::SocketServer(const char *port)
         exit(EXIT_FAILURE);
     }
 
-    /* 
+    /*
     Here we populate a addrinfo struct with zeros and then set the following settings:
     ai_family = AF_UNSPEC (IPv4 and IPv6 are fine)
     ai_socktype = SOCK_STREAM (TCP stream socket)
@@ -78,11 +78,11 @@ void SocketServer::ListenAndAccept()
         perror("Listening failed");
         exit(EXIT_FAILURE);
     }
-    /* 
+    /*
         all_sockets here is the set of all sockets. This includes the listening socket
         as well as all the open sockets to wemos devices.
         ready_sockets is filled with the select function, making it the set of all sockets
-        that are ready to read. 
+        that are ready to read.
         error_checking_sockets checks for every socket if there can be messages sent to it.
         if you cannot, that means the connection is broken. So close the socket you fool!
     */
@@ -123,7 +123,7 @@ void SocketServer::ListenAndAccept()
                 }
             }
         }
-        
+
         /*for (int i = 0; i < FD_SETSIZE; i++)
         {
             if(FD_ISSET(i, &error_checking_sockets) && i != listen_fd){
@@ -131,7 +131,7 @@ void SocketServer::ListenAndAccept()
                 if (error = send(i, keepalive_msg.c_str(), strlen(keepalive_msg.c_str()), 0); error == -1)
                 {
                     if(errno == ECONNRESET){
-                        // A client disconnected 
+                        // A client disconnected
                         std::cout << "A client failed to receive any data.\n\rClosing socket" << std::endl;
                         FD_CLR(i, &all_sockets);
                         close(i);
@@ -161,12 +161,13 @@ void SocketServer::handleRequest(int fd){
 
     std::cout << "The following message was received:\n\r" << buffer << std::endl;
     XmlReader xml_r(buffer);
+	std::cout << "reader made" << std::endl;
     xml_r.parseDocument();
     if(xml_r.error() == PARSING_ERROR){
         return;
     }
     //Map xml = xml_r.getParsedDoc();
-    if(xml_r.getFunction() == "authentication"){ 
+    if(xml_r.getFunction() == "authentication"){
         std::cout << "The following device authenticated with the server:\n"
                     << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
@@ -212,8 +213,8 @@ void SocketServer::handleRequest(int fd){
         // Destroy
         return;
     }else if(xml_r.getFunction() == "getStatusAll"){
-        /* 
-            Handling for the getStatusAll request from the website. 
+        /*
+            Handling for the getStatusAll request from the website.
             Let's hope this actually goddamn works XD
 
             A thing you can try when it doesn't work is to add a select() call to make sure you can actually
@@ -234,7 +235,7 @@ void SocketServer::handleRequest(int fd){
         {
             shortTime.tv_usec = 100000;
             if (select(FD_SETSIZE, NULL, &wemosSet, NULL, &shortTime) < 0)
-            { 
+            {
                 perror("Select failed");
                 exit(EXIT_FAILURE);
             }
@@ -297,7 +298,7 @@ void SocketServer::handleRequest(int fd){
             timers[i].device.
         }
     }
-    
+
 }*/
 
 /* Returns a 1 if an error occurred */
