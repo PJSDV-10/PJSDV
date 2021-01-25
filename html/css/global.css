@@ -35,6 +35,7 @@
 .button.right {
 	float: right;
 	margin-right: 25px;
+	margin-top: 30px !important;
 }
 
 .info {
