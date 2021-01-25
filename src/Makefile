@@ -6,9 +6,9 @@ OBJ_DIR  := $(BUILD)/obj
 APP_DIR  := $(BUILD)/bin
 TARGET   := program
 #INCLUDE  := -Iinclude/
-SRC      := $(wildcard *.cpp)
+SRC      := $(wildcard *.cpp) $(wildcard Devices/*.cpp) 
    #$(wildcard src/module1/*.cpp) \
-
+   
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 DEPENDENCIES := $(OBJECTS:.o=.d)
 
@@ -38,6 +38,9 @@ arm: all
 
 arm32: CC = arm-linux-gnueabi-g++-7
 arm32: all
+
+lars: CC = arm-linux-gnueabi-g++
+lars: all
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*

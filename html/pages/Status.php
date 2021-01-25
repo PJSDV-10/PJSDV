@@ -1,5 +1,5 @@
 <div class="main">
-    <table style="width:100%">
+    <!--<table style="width:100%">
         <tr>
             <th>apparaat</th>
             <th>status</th>
@@ -20,6 +20,19 @@
             <td>lamp</td>
             <td id='but'>uit</td>
         </tr>
-    </table>
+    </table>-->
+
+    <h1>output:</h1>
+    <p><?php
+        require "socket.php";
+        $msgs;
+        if(initialiseSocket()) {
+            $msgs = xmlParseDevices(requestAllSocket());
+        }
+        //echo $msgs;
+        foreach($msgs as $msg) {
+            echo $msg;
+        }
+    ?></p>
 
 </div>

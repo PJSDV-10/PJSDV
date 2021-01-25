@@ -1,55 +1,81 @@
 #include "xmlreader.h"
 
+
 void XmlReader::parseDocument(){
     using namespace rapidxml;
 
     if(function == "authentication"){
-        /*if(!checkPassword(context_node->first_node("password")->value())){
-            return;
-        }*/
-        
-        clientName = context_node->first_node("clientName")->value();
-        
-        parsedContext.emplace("clientName", clientName);
-        std::cout << "clientName gotten" << std::endl;
-        type = context_node->first_node("type")->value();
-        parsedContext.emplace("type", type);
-        std::cout << "type gotten" << std::endl;
-        Array capabilities;
-        for (xml_node<> *func_node = context_node->first_node("capabilities")->first_node("func"); func_node; func_node = func_node->next_sibling())
-        {
-            std::string type, funcName;
-            type = func_node->first_node("type")->value();
-            funcName = func_node->first_node("funcName")->value();
-            Map function;
-            function.emplace("type", type);
-            function.emplace("name", funcName);
-            capabilities.push_back(Wrapper(function));
-        }
-        parsedContext.emplace("capabilities", capabilities);
-        parsedXML.emplace("context", parsedContext);
-
-        /* 
-        ParsedXML
-            senderName : string
-            receiverName : string
-            function : string
-            ParsedContext : map
-                clientName : string
-                capabilities : array
-                    type : string
-                    func : string
-         */
-    }else if(function == "sensorUpdate"){
+        //Password check turned off because Wemos team thought "not validating" meant "don't send it to me"
         if(!checkPassword(context_node->first_node("password")->value())){
             return;
         }
+
+        clientName = context_node->first_node("clientName")->value();
+        //parsedContext.emplace("clientName", clientName);
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+    }
+    else if (function == "sensorUpdate")
+    {
+        //std::cout << "Sensorupdate handling" << std::endl;
+        if (!checkPassword(context_node->first_node("password")->value()))
+        {
+            return;
+        }
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+
         // Currently works only for stoel, waiting for Ernest to finish breaking up wemos types
-        
+        parseDeviceData();
+    }
+    else if (function == "answerToStatusRequest")
+    {
+        if (!checkPassword(context_node->first_node("password")->value()))
+        {
+            return;
+        }
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
     }
 }
 
+void XmlReader::parseDeviceData(){
+    using namespace rapidxml;
+    if(type == "chair"){
+        std::cout << "Stoel identified" << std::endl;
 
+        data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
+        data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
+    }else if(type == "column"){
+        std::cout << "Column" << std::endl;
+
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+    }else if(type == "bed"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+    }else if(type == "tablelamp"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+
+    }else if(type == "door"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+
+    }else if(type == "wall"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+
+    }else if(type == "fridge"){
+        data.emplace_back(atoi(context_node->first_node("data1")->value()));
+        data.emplace_back(atoi(context_node->first_node("data2")->value()));
+        data.emplace_back(atoi(context_node->first_node("data3")->value()));
+
+
+    }else{
+        std::cout << "Unknown device type" << std::endl;
+    }
+}
 
 XmlReader::XmlReader(const char *xmldoc)
 {
@@ -63,6 +89,7 @@ XmlReader::XmlReader(const char *xmldoc)
         doc->parse<0>(xml);
     }catch(parse_error){
         std::cout << "A parsing error occured. Document is not valid XML" << std::endl;
+        err = PARSING_ERROR;
         return;
     }
     xml_node<> *root_node = doc->first_node("message");
@@ -83,13 +110,17 @@ XmlReader::XmlReader(const char *xmldoc)
     xml_node<> *context_node = root_node->first_node("context");
     this->context_node = context_node;
 
-    parsedXML.emplace("sender", senderName);
-    parsedXML.emplace("receiver", receiverName);
-    parsedXML.emplace("function", function);
+    //parsedXML.emplace("sender", senderName);
+    //parsedXML.emplace("receiver", receiverName);
+    //parsedXML.emplace("function", function);
 }
 
 XmlReader::XmlReader(){
     std::cout << "Please do not call the constructor without any arguments" << std::endl;
+}
+
+XmlReader::~XmlReader(){
+
 }
 
 bool XmlReader::checkPassword(std::string password)
@@ -97,4 +128,9 @@ bool XmlReader::checkPassword(std::string password)
     //This has to be implemented still
 
     return true;
+}
+
+bool XmlReader::empty(){
+    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented.\n\rPlease don't use it, it will always return false for safety" << std::endl;
+    return false;
 }
