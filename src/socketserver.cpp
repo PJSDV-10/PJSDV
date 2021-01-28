@@ -163,6 +163,7 @@ void SocketServer::handleRequest(int fd){
     XmlReader xml_r(buffer);
     xml_r.parseDocument();
     if(xml_r.error() == PARSING_ERROR){
+        xml_r.reseterr();
         std::cout << "Parsing error occured" << std::endl;
         return;
     }
@@ -185,7 +186,7 @@ void SocketServer::handleRequest(int fd){
 
         /* Close socket in case that the client is the website */
         if(xml_r.getType() == "website"){
-            //closeConnection(fd);
+            closeConnection(fd);
         }
         // Destroyer
         return;
@@ -207,7 +208,7 @@ void SocketServer::handleRequest(int fd){
 
         /* Close socket in case that the client is the website */
         if(xml_r.getType() == "website"){
-            //closeConnection(fd);
+            closeConnection(fd);
         }
         // Destroy
         return;
