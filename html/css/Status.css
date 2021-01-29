@@ -1,16 +1,16 @@
 table, th, td {
-    border: 2px solid black;
+    border: 1px solid black;
     border-collapse: collapse;
 }
 
-td {
-    border: 1px solid black;
+table {
+    width: 100%;
 }
 
-#but:hover {
-    color: blue;
+th {
+    border: 2px solid black;
 }
 
-#but:active {
-    color: brown;
+.button {
+    margin: auto !important;
 }
