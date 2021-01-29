@@ -378,7 +378,7 @@ void SocketServer::removeWemosByFD(int fd){
 void SocketServer::closeConnection(int fd){
     std::cout << "\n\n\n\nClosing website connection\n\n\n\n\n\n" << std::endl;
     close(fd);
-    removeWemosByFD(fd);
+    //removeWemosByFD(fd);
     FD_CLR(fd, &all_sockets);
     return;
 }
