@@ -14,13 +14,13 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-//#include <tinyxml.h>
 #include <string>
 #include <sstream> 
 #include <Wire.h>
+#include <FastLED.h>
 
-#define AMOUNTOFSENSORS 2
-#define AMOUNTOFACTUATORS 2
+#define AMOUNTOFSENSORS 1
+#define AMOUNTOFACTUATORS 1
 
 #define BUFFERSIZE 20
 #define WIBADRESD 0x38
@@ -38,30 +38,29 @@ std::string type = "chair";
 // Network SSID
 const char *ssid = "WatEenRotTaart";
 const char *password = "KankerKanker";
-const char *ip = "192.168.152.128";
+const char *ip = "home.dutchellie.nl";
 
 
 /*  sensornames:
- *    pushButton
- *    forceSensor
+ *    PIR
  *    
  *    bool
  *    int
  * 
  *  Actuatornames:
  *    VibrationMotor
- *    LED
+ *    RGBLED
  *    
  *    bool
  *    int
  */
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
-unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
-std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"bool","PIR"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,32},{0,1,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,1,500}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","RGB"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
 
@@ -140,7 +139,7 @@ void loop() {
        if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
          sendStatus = 1;
        }
-     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10)) && sensorNames[i][0].compare("int") == 0) {
+     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10)) && sensorNames[i][1].compare("pushButton") != 0) {
           sendStatus = 1;
         }
      sensor[i][1] = sensor[i][0]; // update the previous value
