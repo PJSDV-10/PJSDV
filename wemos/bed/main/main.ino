@@ -38,7 +38,7 @@ std::string type = "bed";
 // Network SSID
 const char *ssid = "WatEenRotTaart";
 const char *password = "KankerKanker";
-const char *ip = "home.dutchellie.nl";
+const char *ip = "192.168.152.128";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
@@ -53,7 +53,7 @@ this way we don't have to worry about the different types of actuators, like twi
 //function declarations xml
 std::string buildcapabilities();
 std::string Buildheader();
-std::string buildStatusMsg();
+std::string buildStatusMsg(std::string function);
 std::string buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
 std::string intToString(int i);
@@ -117,22 +117,27 @@ void loop() {
   int sendStatus = 0;
   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(0);
-     if(sensorNames[i][1].compare("pushButton") == 0) {
-      if (( sensor[i][0] == 1 )&&( sensor[i][1] == 1 ) {
+     for(int i = 0; i < AMOUNTOFSENSORS; i++){
+     delay(0);
+     if (sensorNames[i][1].compare("pushButton") == 0) {
+      if (sensor[i][1] == 0 && sensor[i][0] == 1) {
         sendStatus = 1;
       }
-     } else if(sensorNames[i][0].compare("bool") == 0 && sensorNames[i][1].compare("pushButton") != 0) {
-       if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
-         sendStatus = 1;
-       }
-     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10)) && sensorNames[i][1].compare("pushButton") != 0) {
+      if (sensor[i][1] == 1 && sensor[i][0] == 0) {
+        sendStatus = 0;
+      }
+      
+     } else if ((sensor[i][0] >= 200) && sensorNames[i][1].compare("pushButton") != 0) {
           sendStatus = 1;
         }
+        
      sensor[i][1] = sensor[i][0]; // update the previous value
   }
   
   if (sendStatus){
-    sendData(buildStatusMsg("sensorUpdate").c_str());
+    
+  std::string f = "sensorUpdate";
+    sendData(buildStatusMsg(f).c_str());
   }
 
 

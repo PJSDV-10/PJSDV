@@ -20,6 +20,12 @@ std::string buildStatusMsg(std::string function){
       
        std::string roundd = intToString(i + 1); // int too string
        std::string worth = intToString(sensor[i][0]);
+       if (sensorNames[i][1].compare("forceSensor") == 0) {
+       if (sensor[i][0] > 100) {
+        worth = "1";
+       } else
+        worth = "0";
+       }
        
       temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
       delay(0);
