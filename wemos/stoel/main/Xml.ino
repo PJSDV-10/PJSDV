@@ -15,7 +15,7 @@ std::string buildStatusMsg(std::string function){
   std::string temp = Buildheader();
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";
   
-    for (int i = 0;i<AMOUNTOFSENSORS;i++) { //voeg elke keer neeiwe sensot toe
+    for (int i = 0; i<AMOUNTOFSENSORS; i++) { //voeg elke keer nieuwe sensor toe
       delay(0);
       
        std::string roundd = intToString(i + 1); // int too string
@@ -29,13 +29,15 @@ std::string buildStatusMsg(std::string function){
           knopAan = 0;
        }
        
-       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) {
+       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[1][0] == 1) {
         if (knopAan) {
           worth = "0";
           knopAan = 0;
+          //Serial.println("Turning buttons off");
         } else {
           worth = "1";
           knopAan = 1;
+          //Serial.println("Turning buttons on");
         }
        }
        
