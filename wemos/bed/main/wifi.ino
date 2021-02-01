@@ -1,32 +1,14 @@
 
 
 const char* receiveData() {
-  // pretty rudementairy, if we can read a string we return it, if not we return 0.
-  // TODO: add fancy error checking mechanism.
-  //Serial.println("looking if we received a message");
- // if(client.available()){
-    //delay(0);
 
     std::string plas(client.readString().c_str());
-      
-
-
-    //Serial.println("We received the following message");
-    //Serial.println(plas.c_str());
-    //Serial.println("");
     
     if (plas.compare("") != 0) {
       return plas.c_str();
     } else {
-      //Serial.println("client is availible, but we received no message");
-      //Serial.println("");
       return "NULL";
     }
-    
- // } else{
-    //Serial.println("client isn't availible");
- //   return "NULL";
-  //}
 }
 
 const char* receiveData(int* receivedResponse) {
