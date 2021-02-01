@@ -1,9 +1,9 @@
 /*
  * authors: PJSDV group 10
+ * device: Chair
  * Version: 2.0
  * 
  * 
- * This is code for the chair wemos
  * It works like this:
  * 
  * setup {
