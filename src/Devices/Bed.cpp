@@ -52,11 +52,11 @@ std::string Bed::handleSensorUpdate(XmlReader * xml_r) {
     }
 
     // Second logic
-    if(PBState){
-        sendStatus.push_back(1);
-    }else{
-        sendStatus.push_back(0);
-    }
+   // if(PBState){
+    //    sendStatus.push_back(1);
+ //   }else{
+ //       sendStatus.push_back(0);
+  //  }
 
     
 
