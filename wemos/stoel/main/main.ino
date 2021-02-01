@@ -1,20 +1,36 @@
-// This is testcode for now, since we need to make 7 different wemos codes eventually
-// authentication problably works, but didn't have time to test yet
-// based on the "wall" wemos from the excel file on blackboard 
-
-
-// I also want to make very clear that i HATE the arduino IDE.
-
-
-
-//alle loops hebben een delay nodig kan gewoon van 0 zijn maar anders crasht esp. 
-// https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
-//https://forum.arduino.cc/index.php?topic=622991.0
+/*
+ * authors: PJSDV group 10
+ * Version: 2.0
+ * 
+ * 
+ * This is code for the chair wemos
+ * It works like this:
+ * 
+ * setup {
+ *  setupwifi
+ *  setup the I2C
+ *  authenticate with server
+ * }
+ *  
+ * loop {
+ *  read sensors
+ *  if a sensor has changed
+ *    send senorupdate to server
+ *  check if we received a message
+ *  if we received a message:
+ *    parse the message
+ *    handle the request
+ *  update the actuator's status.
+ * }
+ * 
+ * sensors are connected to a Wemos Interface Board: WIB
+ * we read them via I2C using the WIRE.h library
+ * actuators are connected to the same board, and are written to in the same way.
+ */
 
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-//#include <tinyxml.h>
 #include <string>
 #include <sstream> 
 #include <Wire.h>
@@ -36,12 +52,12 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "FD-74";
-const char *password = "faggot123";
-const char *ip = "192.168.43.201  ";
+const char *ssid = "EetMijnPieNiet";
+const char *password = "Merwic01";
+const char *ip = "192.168.43.201";
 
 // sensor globals
-// sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
+// sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte. A0/1 + 300, D5 = 500;
 unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
@@ -69,7 +85,7 @@ const char* receiveData();
 const char* receiveData(int*);
 void sendData(const char *);
 
-//function declaration 
+//function declaration  sensors
 void setupPins();
 void setupSensors() ;
 void setupActuators();
@@ -77,8 +93,6 @@ void updateActuators();
 void readSensors();
 
 
-
-std::string test = "<message> <header> <sender>server</sender> <receiver>wemosnaam</receiver> </header> <function>actuateBool</function> <context> <data1>0</data1> <!-- Vibration motor --> <data2>1</data2> <!-- LED --> </context> </message>";
 
 WiFiClient client;
 
@@ -120,6 +134,7 @@ void loop() {
      delay(0);
      
      if ((((sensor[0][0] > 100) && (sensor[0][1] < 100)) || ((sensor[0][0] < 100) && (sensor[0][1] > 100))) || ((sensor[1][0] == 1) && (sensor[1][1] == 0))) {
+      // if ((force sensor has just turned of or off) or the pushbutton has just turned on);
         sendData(buildStatusMsg("sensorUpdate").c_str());
      }
      
