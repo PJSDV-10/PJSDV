@@ -34,7 +34,7 @@ const char* receiveData(int* receivedResponse) {
 void sendData(const char * msg){
   // sends the enclosed message to the connected client
   //Serial.println("starting a transmission of the following message:");
-  Serial.println(msg);
+  //Serial.println(msg);
   Serial.println("sending");
     //if(client.availableForWrite()&&client.connected()) {
           client.write(msg);

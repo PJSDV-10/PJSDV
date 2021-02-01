@@ -26,6 +26,7 @@ std::string buildStatusMsg(std::string function){
           worth = "1";
         } else
           worth = "0";
+          knopAan = "0";
        }
        
        if (sensorNames[i][1].compare("pushButton") == 0 && sensor[1][0] == 1) {
