@@ -144,7 +144,7 @@ void loop() {
 
 
   //-----------actuators-------------//
-  // if we receive a message, handle it  s
+  // if we receive a message, handle it  
   //
   if (client.peek() != -1) {
     std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
