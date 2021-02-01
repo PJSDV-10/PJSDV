@@ -1,8 +1,32 @@
-// This is testcode for now, since we need to make 7 different wemos codes eventually
-// authentication problably works, but didn't have time to test yet
-// based on the "wall" wemos from the excel file on blackboard 
-
-
+ /*
+ * authors: PJSDV group 10
+ * Version: 2.0
+ * 
+ * 
+ * This is code for the chair wemos
+ * It works like this:
+ * 
+ * setup {
+ *  setupwifi
+ *  setup the I2C
+ *  authenticate with server
+ * }
+ *  
+ * loop {
+ *  read sensors
+ *  if a sensor has changed
+ *    send senorupdate to server
+ *  check if we received a message
+ *  if we received a message:
+ *    parse the message
+ *    handle the request
+ *  update the actuator's status.
+ * }
+ * 
+ * sensors are connected to a Wemos Interface Board: WIB
+ * we read them via I2C using the WIRE.h library
+ * actuators are connected to the same board, and are written to in the same way.
+ */
 // I also want to make very clear that i HATE the arduino IDE.
 
 
@@ -30,7 +54,7 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "chair";
+std::string wemosNaam = "bed1";
 std::string server = "Server";
 std::string wachtwoord = "solarwinds123";
 std::string type = "bed";
@@ -130,7 +154,7 @@ void loop() {
   //-----------actuators-------------//
   // if we receive a message, handle it  
   //
-  
+if (client.peek() != -1) {
   std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
   
   if (receivedMsg.compare("NULL") != 0){
@@ -140,6 +164,7 @@ void loop() {
     handleMessage(parsedMsg);
     //Serial.println("The received message has been parsed");
   }
+}
   
 
   //Serial.println("updating actuators");
