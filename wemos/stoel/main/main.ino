@@ -52,8 +52,8 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "FD-74";
-const char *password = "faggot123";
+const char *ssid = "EetMijnPieNiet";
+const char *password = "Merwic01";
 const char *ip = "192.168.43.201";
 
 // sensor globals
@@ -61,7 +61,7 @@ const char *ip = "192.168.43.201";
 unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,32},{1,0,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber} 
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,0,32},{0,0,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
@@ -146,16 +146,15 @@ void loop() {
   //-----------actuators-------------//
   // if we receive a message, handle it  
   //
-  if (client.peek() != -1) {
-    std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
   
-    if (receivedMsg.compare("NULL") != 0){
+  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
+  
+  if (receivedMsg.compare("NULL") != 0){
     //Serial.println("The received message is not empty.");
-      std::string parsedMsg[BUFFERSIZE];
-      parser(receivedMsg, parsedMsg); // parse the message, 
-      handleMessage(parsedMsg);
+    std::string parsedMsg[BUFFERSIZE];
+    parser(receivedMsg, parsedMsg); // parse the message, 
+    handleMessage(parsedMsg);
     //Serial.println("The received message has been parsed");
-    }
   }
   
 
