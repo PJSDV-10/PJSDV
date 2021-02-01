@@ -22,7 +22,7 @@ const char* receiveData(int* receivedResponse) {
 
 
           //Serial.println("We received the following message");
-          Serial.println(plas.c_str());
+          //Serial.println(plas.c_str());
           //Serial.println("");
 
           return plas.c_str();
@@ -34,7 +34,7 @@ const char* receiveData(int* receivedResponse) {
 void sendData(const char * msg){
   // sends the enclosed message to the connected client
   //Serial.println("starting a transmission of the following message:");
-  Serial.println(msg);
+  //Serial.println(msg);
   Serial.println("sending");
     //if(client.availableForWrite()&&client.connected()) {
           client.write(msg);

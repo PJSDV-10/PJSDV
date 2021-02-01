@@ -46,15 +46,15 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "chair1";
+std::string wemosNaam = "chair";
 std::string server = "Server";
 std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "Eetmijnpieniet";
-const char *password = "Merwic01";
-const char *ip = "192.168.137.48";
+const char *ssid = "FD-74";
+const char *password = "faggot123";
+const char *ip = "192.168.43.201";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte. A0/1 + 300, D5 = 500;
@@ -134,7 +134,7 @@ void loop() {
      delay(0);
      
      if ((((sensor[0][0] > 100) && (sensor[0][1] < 100)) || ((sensor[0][0] < 100) && (sensor[0][1] > 100))) || ((sensor[1][0] == 1) && (sensor[1][1] == 0))) {
-      // if ((force sensor has just turned on or off) or the pushbutton has just turned on);
+      // if ((force sensor has just turned of or off) or the pushbutton has just turned on);
         sendData(buildStatusMsg("sensorUpdate").c_str());
      }
      
