@@ -55,7 +55,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
         force sensor + push button
         if both are on, then send 1, otherwise 0. XOR them
     */
-    if ((int)std::round(sentStatus[0]) && PBState)
+    if ((int)std::round(sentStatus[0]) && sentStatus[1])
     {
         std::cout << "both are on" << std::endl;
         sendStatus.push_back(1);
