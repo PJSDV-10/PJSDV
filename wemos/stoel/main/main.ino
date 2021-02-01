@@ -52,9 +52,9 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "EetMijnPieNiet";
+const char *ssid = "Eetmijnpieniet";
 const char *password = "Merwic01";
-const char *ip = "192.168.43.201";
+const char *ip = "192.168.137.48";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte. A0/1 + 300, D5 = 500;
@@ -70,7 +70,7 @@ bool knopAan = 0;
 //function declarations xml
 std::string buildcapabilities();
 std::string Buildheader();
-std::string buildStatusMsg();
+std::string buildStatusMsg(std::string);
 std::string buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
 std::string intToString(int i);
@@ -148,14 +148,17 @@ void loop() {
   //
   
   std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
+ 
+  //if (client.peek() != -1) {
+    if (receivedMsg.compare("NULL") != 0){
+      //Serial.println("The received message is not empty.");
+      std::string parsedMsg[BUFFERSIZE];
+      parser(receivedMsg, parsedMsg); // parse the message, 
+      handleMessage(parsedMsg);
+      //Serial.println("The received message has been parsed");
+    }
+  //}
   
-  if (receivedMsg.compare("NULL") != 0){
-    //Serial.println("The received message is not empty.");
-    std::string parsedMsg[BUFFERSIZE];
-    parser(receivedMsg, parsedMsg); // parse the message, 
-    handleMessage(parsedMsg);
-    //Serial.println("The received message has been parsed");
-  }
   
 
   //Serial.println("updating actuators");
