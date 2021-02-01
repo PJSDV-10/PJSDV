@@ -11,7 +11,7 @@ std::string buildAuthenticationMsg() {
    return temp;
 }
 
-std::string buildStatusMsg(std::string function) {
+std::string buildStatusMsg(std::string function){
   
   std::string temp = Buildheader();
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";

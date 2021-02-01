@@ -168,7 +168,7 @@ void loop() {
   //-----------actuators-------------//
   // if we receive a message, handle it  
   //
-if (client.peek() != -1) {
+
   std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
   
   if (receivedMsg.compare("NULL") != 0){
@@ -178,7 +178,7 @@ if (client.peek() != -1) {
     handleMessage(parsedMsg);
     //Serial.println("The received message has been parsed");
   }
-}
+
   
 
   //Serial.println("updating actuators");
