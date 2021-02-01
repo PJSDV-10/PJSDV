@@ -30,31 +30,30 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "chair";
+std::string wemosNaam = "bed1";
 std::string server = "Server";
 std::string wachtwoord = "solarwinds123";
 std::string type = "bed";
 
 // Network SSID
-const char *ssid = "Eetmijnpieniet";
-const char *password = "Merwic01";
-const char *ip = "192.168.137.48";
+const char *ssid = "WatEenRotTaart";
+const char *password = "KankerKanker";
+const char *ip = "192.168.152.128";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
 unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,1},{0,0,300}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"bool","pushButton"},{"int","forceSensor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,0,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,1,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
-bool knopAan = 0;
 
 //function declarations xml
 std::string buildcapabilities();
 std::string Buildheader();
-std::string buildStatusMsg();
+std::string buildStatusMsg(std::string function);
 std::string buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
 std::string intToString(int i);
@@ -115,16 +114,30 @@ void loop() {
 
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
-    
-
+  int sendStatus = 0;
+  for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(0);
-     
-     if ((((sensor[1][0] > 100) && (sensor[1][1] < 100)) || ((sensor[1][0] < 100) && (sensor[1][1] > 100))) || ((sensor[0][0] == 1) && (sensor[0][1] == 0))) {
-        sendData(buildStatusMsg("sensorUpdate").c_str());
-     }
-     
-  for(int i = 0; i < AMOUNTOFSENSORS; i++){  
+     for(int i = 0; i < AMOUNTOFSENSORS; i++){
+     delay(0);
+     if (sensorNames[i][1].compare("pushButton") == 0) {
+      if (sensor[i][1] == 0 && sensor[i][0] == 1) {
+        sendStatus = 1;
+      }
+      if (sensor[i][1] == 1 && sensor[i][0] == 0) {
+        sendStatus = 0;
+      }
+      
+     } else if ((sensor[i][0] >= 200) && sensorNames[i][1].compare("pushButton") != 0) {
+          sendStatus = 1;
+        }
+        
      sensor[i][1] = sensor[i][0]; // update the previous value
+  }
+  
+  if (sendStatus){
+    
+  std::string f = "sensorUpdate";
+    sendData(buildStatusMsg(f).c_str());
   }
 
 

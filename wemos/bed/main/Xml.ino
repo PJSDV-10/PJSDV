@@ -11,32 +11,22 @@ std::string buildAuthenticationMsg() {
    return temp;
 }
 
-std::string buildStatusMsg(std::string function){
+std::string buildStatusMsg(std::string function) {
+  
   std::string temp = Buildheader();
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";
   
-    for (int i = 0;i<AMOUNTOFSENSORS;i++) { //voeg elke keer neeiwe sensot toe
+    for(int i = 0;i<AMOUNTOFSENSORS;i++){ //voeg elke keer neeiwe sensot toe
       delay(0);
       
-       std::string roundd = intToString(i + 1); // int too string
-       std::string worth = intToString(sensor[i][0]);
-       
-       if (sensorNames[i][1].compare("forceSensor") == 0) {
-        if (sensor[i][0] > 100) {
-          worth = "1";
-        } else
-          worth = "0";
-       }
-       
-       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[1][0] == 1) {
-        if (knopAan) {
-          worth = "0";
-          knopAan = 0;
-        } else {
-          worth = "1";
-          knopAan = 1;
-        }
-       }
+     std::string roundd = intToString(i + 1); // int too string
+     std::string worth = intToString(sensor[i][0]);
+     if (sensorNames[i][1].compare("forceSensor") == 0) {
+      if (sensor[i][0] > 100) {
+        worth = "1";
+      } else
+      worth = "0";
+     }
        
       temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
       delay(0);
