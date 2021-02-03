@@ -1,13 +1,13 @@
 <div class="main">
 <br>
 <?php
-    //require "socket.php";
+    require "socket.php";
     $devices;
-    //if(initialiseSocket()) {
-    //    $devices = xmlParseDevices(requestAllSocket());
-    //}
-    require "xml.php";
-    $devices = xmlParseDevices("<message>
+    if(initialiseSocket()) {
+        $devices = xmlParseDevices(requestAllSocket());
+    }
+    //require "xml.php";
+    /*$devices = xmlParseDevices("<message>
             <header>
                 <sender>server</sender>
                 <receiver>website</receiver>
@@ -27,7 +27,7 @@
                     </wemos>
                 </wemosjes>
             </context>
-    </message>");
+    </message>");*/
 ?>
 <table class="">
     <thead>
