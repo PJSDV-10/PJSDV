@@ -1,6 +1,9 @@
-//TiXmlDocument*//
+
+
+
+
 std::string Buildheader() {  //build header with the gloals specified
-    std::string temp ="<message><header><sender>"+ wemosNaam +"</sender><receiver>"+ server +"</receiver></header>"; 
+    std::string temp = "<message><header><sender>"+ wemosNaam +"</sender><receiver>"+ server +"</receiver></header>"; 
     return temp;
 }
 
@@ -11,7 +14,7 @@ std::string buildAuthenticationMsg() {
    return temp;
 }
 
-std::string buildStatusMsg(std::string function){
+std::string buildStatusMsg(std::string function) {
   
   std::string temp = Buildheader();
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";

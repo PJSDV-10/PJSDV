@@ -3,12 +3,12 @@
  * Version: 2.0
  * 
  * 
- * This is code for the chair wemos
+ * This is code for the bed wemos
  * It works like this:
  * 
  * setup {
  *  setupwifi
- *  setup the I2C
+ *  setup the I2C to the Wemos interface board
  *  authenticate with server
  * }
  *  
@@ -60,9 +60,9 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "bed";
 
 // Network SSID
-const char *ssid = "WatEenRotTaart";
-const char *password = "KankerKanker";
-const char *ip = "192.168.152.128";
+const char *ssid = "FD-74";
+const char *password = "faggot123";
+const char *ip = "192.168.43.201";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
@@ -139,9 +139,7 @@ void loop() {
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
   int sendStatus = 0;
-  for(int i = 0; i < AMOUNTOFSENSORS; i++){
-     delay(0);
-     for(int i = 0; i < AMOUNTOFSENSORS; i++){
+   for(int i = 0; i < AMOUNTOFSENSORS; i++){
      delay(0);
      if (sensorNames[i][1].compare("pushButton") == 0) {
       if (sensor[i][1] == 0 && sensor[i][0] == 1) {
