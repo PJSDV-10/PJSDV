@@ -1,13 +1,13 @@
 <div class="main">
 <br>
 <?php
-    //require "socket.php";
+    require "socket.php";
     $devices;
-    //if(initialiseSocket()) {
-    //    $devices = xmlParseDevices(requestAllSocket());
-    //}
-    require "xml.php";
-    $devices = xmlParseDevices("<message>
+    if(initialiseSocket()) {
+        $devices = xmlParseDevices(requestAllSocket());
+    }
+    //require "xml.php";
+    /*$devices = xmlParseDevices("<message>
             <header>
                 <sender>server</sender>
                 <receiver>website</receiver>
@@ -27,7 +27,7 @@
                     </wemos>
                 </wemosjes>
             </context>
-    </message>");
+    </message>");*/
 ?>
 <table class="">
     <thead>
@@ -66,6 +66,8 @@ for($i; $i >= 0; $i--) {
     if(isset($_POST[$i])) {
         echo "<br>Switching mode of ".$devices[$i]->type;
         //stel er zou iets bij de server zitten kon ik hiervoor een echte actie kunnen sturen...
+        toggleDevice($devices[$i]->name, $devices[$i]->type, $devices[$i]->data1, if(isset($devices[$i]->data2)) {$devices[$i]->data2} else {NULL});
+        header("/?p=Status");
     }
 }
 
