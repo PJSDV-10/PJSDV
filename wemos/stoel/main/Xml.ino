@@ -11,7 +11,7 @@ std::string buildAuthenticationMsg() {
    return temp;
 }
 
-std::string buildStatusMsg(std::string function){
+std::string buildStatusMsg(std::string function, bool knop){
   std::string temp = Buildheader();
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";
   
@@ -22,18 +22,21 @@ std::string buildStatusMsg(std::string function){
        std::string worth = intToString(sensor[i][0]);
        
        if (sensorNames[i][1].compare("forceSensor") == 0) {
-        if (sensor[i][0] > 100) {
+        if (sensor[i][0] > 200) {
           worth = "1";
         } else
           worth = "0";
           knopAan = "0";
        }
        
-       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[1][0] == 1) {
-        if (knopAan) {
+       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) {
+        Serial.println(knop);
+        if (knop) {
+          Serial.println("knop=aan");
           worth = "0";
           knopAan = 0;
         } else {
+          Serial.println("knop=uit");
           worth = "1";
           knopAan = 1;
         }
@@ -62,7 +65,7 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[2].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
     //Serial.println("Received a awnserToStatusRequest msg");
-    client.write(buildStatusMsg("answerToStatusRequest").c_str());
+    client.write(buildStatusMsg("answerToStatusRequest", knopAan).c_str());
     //Serial.println("send a reply to the broadcast request\n\r");
     return 1;
     
