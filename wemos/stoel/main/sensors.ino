@@ -1,96 +1,50 @@
 
 void setupPins() {
-  // sets the wemos' pins in output, input or input_pullup mode depending on actuator/sensor type.
-  // not needed anymore, ddr on wib is always 00001111.
- /* setupSensors();
-  setupActuators();
-  Serial.println("pin setup complete");*/
+  // sets up the i2c connection with the Wemos interface board.
+
   Wire.beginTransmission(WIBADRESD);
   Wire.write(byte(0x03));         
   Wire.write(byte(0x0F));       
   Wire.endTransmission();
 }
 
-void setupSensors() {
-  // puts the pins in input or input_pullup mode depending on the type of sensor
-  // TODO: also enables the needed TWI if we are using a TWI sensor.
-  /*
-  for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-      delay(1);
-      Serial.print(sensorNames[i][1].c_str());
-      Serial.print(" was initialised using: ");
-    if(sensorNames[i][1].compare("pushButton") == 0) {
-
-      pinMode(sensor[i][2],INPUT_PULLUP);
-      Serial.println("input_pullup");
-    }else {
-      pinMode(sensor[i][2],INPUT);
-      Serial.println("input");
-    }
-  }
-  */
-}
-
-void setupActuators() {
-  // sets the actuator's pins in output mode
-  /*
-  for (int i = 0; i < AMOUNTOFACTUATORS; i++) {
-    delay(1);
-    Serial.print(sensorNames[i][1].c_str());
-    Serial.print(" was initialised using: ");
-    pinMode(actuator[i][2],OUTPUT);
-    Serial.println("output");
-  }
-  */
-}
-
 void readSensors(){
-    /*
-    for (int i = 0; i < AMOUNTOFSENSORS; i++) {
-    if (sensorNames[i][0].compare("bool") == 0) {
-      sensor[i][0] = digitalRead(sensor[i][2]);
-      delay(0);
-    } else if (sensorNames[i][0].compare("int") == 0) {
-      sensor[i][0] = analogRead(sensor[i][2]);
-    }
-    if (sensor[i][0] != sensor[i][1]) {
-      Serial.print("The sensor ");
-      Serial.print(sensorNames[i][1].c_str());
-      Serial.print(" changed from: ");
-      Serial.print(sensor[i][1]);
-      Serial.print(" to: ");
-      Serial.println(sensor[i][0]);
-    }
-  }*/
-  unsigned int analogin[2];
-  Wire.requestFrom(WIBADRESA, 4);   
+  // the analog input registers are in series, so we can start a session on the first(WIBADRESA) and sequentially read the rest
+  // the digital input registers are on a different address, WIBADRESBD so we have to start another session,
+  
+  
+  unsigned int analogin[2]; //will contain both of the analog input variables.
+  
+  Wire.requestFrom(WIBADRESA, 4);   // begin a reading session at the lowest byte.
   //read AI0
-  analogin[0] = Wire.read()&0x03;  //read byte 1
-  analogin[0]=analogin[0]<<8;
-  analogin[0] = analogin[0]|Wire.read();  // read byte 0
+  analogin[0] = Wire.read()&0x03;  //read the high byte
+  analogin[0]=analogin[0]<<8; // shift the high byte to the highest 8 bits of the 16 bit integer
+  analogin[0] = analogin[0]|Wire.read();  // read the low byte.
+  
   //read AI1
-  analogin[1] = Wire.read()&0x03;  //read byte 1
-  analogin[1]=analogin[1]<<8;
-  analogin[1] = analogin[1]|Wire.read(); //read byte 0
+  analogin[1] = Wire.read()&0x03;  //read the high byte
+  analogin[1]=analogin[1]<<8; // shift the high byte to the highest 8 bits of the 16 bit integer
+  analogin[1] = analogin[1]|Wire.read(); // read the low byte.
   
   Wire.beginTransmission(WIBADRESD); 
   Wire.write(byte(0x00));      
   Wire.endTransmission();
   Wire.requestFrom(0x38, 1);   
-  unsigned int inputs = Wire.read();
+  unsigned int inputs = Wire.read(); // read the digital inputs.
 
   
+  // now that we have aquired the sensor values from the wemos interface board, put them in the array.
   for (int i = 0; i < AMOUNTOFSENSORS; i++) {
     
     if (sensorNames[i][0].compare("bool") == 0) {
-      if (inputs & sensor[i][2]) {
+      if (inputs & sensor[i][2]) {// if the bit in the input byte, AND the bit in the address byte are both one, put the bool value as true.
         sensor[i][0] = 1;
-      } else 
+      } else // otherwise, put the bool value down as false.
       sensor[i][0] = 0;
     } 
     
-    if (sensorNames[i][0].compare("int") == 0) {
-      sensor[i][0] = analogin[(sensor[i][2] - 300)];
+    if (sensorNames[i][0].compare("int") == 0) { 
+      sensor[i][0] = analogin[(sensor[i][2] - 300)]; // if a sensor is analogue, put an analog value in the array.
     }
   }
 }
@@ -102,10 +56,10 @@ void readSensors(){
         delay(1);
     if (actuator[i][1] != actuator[i][0]) { // if the wanted value != current value we have to change the current value
       
-        //Serial.print("we changed the ");
-        //Serial.print(actuatorNames[i][1].c_str());
-        //Serial.print("'s value to: ");
-        //Serial.print(actuator[i][1]);
+        Serial.print("we changed the ");
+        Serial.print(actuatorNames[i][1].c_str());
+        Serial.print("'s value to: ");
+        Serial.println(actuator[i][1]);
         
       // change the current value 
       if (actuatorNames[i][0].compare("bool")==0){ // if the actuator is boolean, write a bool to the pin. 

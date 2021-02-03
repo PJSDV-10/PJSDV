@@ -60,8 +60,8 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "bed";
 
 // Network SSID
-const char *ssid = "FD-74";
-const char *password = "faggot123";
+const char *ssid = "PJSDV-10";
+const char *password = "PJSDV-10";
 const char *ip = "192.168.43.201";
 
 // sensor globals

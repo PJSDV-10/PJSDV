@@ -36,8 +36,8 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
 
 // Network SSID
-const char *ssid = "WatEenRotTaart";
-const char *password = "KankerKanker";
+const char *ssid = "PJSDV-10";
+const char *password = "PJSDV-10";
 const char *ip = "home.dutchellie.nl";
 
 

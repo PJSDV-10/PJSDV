@@ -36,9 +36,9 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "column";
 
 // Network SSID
-const char *ssid = "WatEenRotTaart";
-const char *password = "KankerKanker";
-const char *ip = "home.dutchellie.nl";
+const char *ssid = "PJSDV-10";
+const char *password = "PJSDV-10";
+const char *ip = "192.168.43.201";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
@@ -115,25 +115,15 @@ void loop() {
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
   int sendStatus = 0;
-  for(int i = 0; i < AMOUNTOFSENSORS; i++){
-     delay(0);
-     if(sensorNames[i][1].compare("pushButton") == 0) {
-      if (( sensor[i][0] == 1 )&&( sensor[i][1] == 1 ) {
-        sendStatus = 1;
-      }
-     }else if(sensorNames[i][0].compare("bool") == 0 && sensorNames[i][1].compare("pushButton") != 0) {
-       if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
-         sendStatus = 1;
-       }
-     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10)) && sensorNames[i][1].compare("pushButton") != 0) {
-          sendStatus = 1;
-        }
+     if ((((sensor[0][0] > 200) && (sensor[0][1] < 200)) || ((sensor[0][0] < 200) && (sensor[0][1] > 200))) || ((sensor[1][0] == 1) && (sensor[1][1] == 0))) {
+       // if ((force sensor has just turned of or off) or the pushbutton has just turned on);
+       sendData(buildStatusMsg("sensorUpdate", knopAan).c_str());
+     }
+     
+  for(int i = 0; i < AMOUNTOFSENSORS; i++){  
      sensor[i][1] = sensor[i][0]; // update the previous value
   }
-  
-  if (sendStatus){
-    sendData(buildStatusMsg("sensorUpdate").c_str());
-  }
+
 
 
   //-----------actuators-------------//

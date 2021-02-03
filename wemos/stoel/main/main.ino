@@ -53,9 +53,9 @@ std::string type = "chair";
 
 // Network SSID
 
-const char *ssid = "FD-74";
-const char *password = "faggot123";
-const char *ip = "192.168.43.201";
+const char *ssid = "PJSDV-10"; // ssid of the wifi
+const char *password = "PJSDV-10"; // password of the wifi
+const char *ip = "192.168.43.201"; // ip adress of the server
 
 
 // sensor globals
@@ -65,9 +65,13 @@ std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","forceSensor"},{"bool","pu
 
 unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,32},{1,0,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","VibrationMotor"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
-this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
-bool knopAan = 0;
+this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message
+*/
+
+
+bool knopAan = 0; // global bool to turn a static button into a switch.
 
 //function declarations xml
 std::string buildcapabilities();
@@ -105,15 +109,14 @@ void setup() {
   
   Serial.begin(115200);
   Wire.begin();
-  
+
+
+  // setup our wifi, connect to the server and connect to the i2c wemos interface board.
   setupWifi();
   setupPins(); 
 
   // first we must authenticate with the server, if this can't happen we can't send any data.
   authenticating();
-
-  Serial.print("knopAan = ");
-  Serial.println(knopAan);
 
   Serial.println("Entering main program loop now.");
   delay(0);
@@ -125,16 +128,10 @@ void setup() {
 
 
 void loop() {
-  Serial.println(knopAan);
-
   //----------sensors------------//
   //Serial.println("reading sensors now");
-
-
   readSensors();
-  Serial.print(sensor[0][0]);
-  Serial.print("  ");
-  Serial.println(sensor[1][10]);
+
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
     
@@ -155,29 +152,28 @@ void loop() {
   // if we receive a message, handle it  
   //
 
-/*
+
   std::string receivedMsg = "NULL";
   
   if (client.peek() != -1) {
   receivedMsg = receiveData(); // receive some data, if there is nothing to receive, the string is "NULL"
   Serial.println("received data");
   }
-  */
+  
 
   
-    std::string receivedMsg = receiveData(); // receive some data, if there is nothing to receive, the string is "NULL"
+    //std::string receivedMsg = receiveData(); // receive some data, if there is nothing to receive, the string is "NULL"
     
     if (receivedMsg.compare("NULL") != 0){
-      //Serial.println("handling message");
+      
       std::string parsedMsg[BUFFERSIZE];
       parser(receivedMsg, parsedMsg); // parse the message, 
       handleMessage(parsedMsg);
-      //Serial.println("The received message has been parsed");
+      
     }
   
   
 
-  //Serial.println("updating actuators");
   updateActuators();
 
 
