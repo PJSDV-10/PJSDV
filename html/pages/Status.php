@@ -66,6 +66,8 @@ for($i; $i >= 0; $i--) {
     if(isset($_POST[$i])) {
         echo "<br>Switching mode of ".$devices[$i]->type;
         //stel er zou iets bij de server zitten kon ik hiervoor een echte actie kunnen sturen...
+        toggleDevice($devices[$i]->name, $devices[$i]->type, $devices[$i]->data1, if(isset($devices[$i]->data2)) {$devices[$i]->data2} else {NULL});
+        header("/?p=Status");
     }
 }
 
