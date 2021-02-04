@@ -62,7 +62,7 @@ std::string Chair::website(XmlReader * xml_r, int i) {
     destination = xml_r->getClientName();
     std::string toBeSend;
 
-    if (i = 1){
+    if (i == 1){
         data.push_back(1);
         data.push_back(1);
     }else {
