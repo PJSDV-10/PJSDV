@@ -296,14 +296,16 @@ void SocketServer::handleRequest(int fd){
         for (std::size_t i = 0; i < wemosjes.size(); i++){
             std::cout << "trying to find right wemos" << std::endl;
             std::cout << "wemos name: "<< wemosjes[i]->getClientName() << '\n';
+            std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
             if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
                 statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r);
                 break;
-                }
             }
-            send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
-            //std::cout << "Reply to sensorUpdate sent" << std::endl;
+        }
+        std::cout << statusmsg << std:endl;
+        send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        //std::cout << "Reply to sensorUpdate sent" << std::endl;
 
         /* Close socket in case that the client is the website */
         if(xml_r.getSenderName() == "website"){
