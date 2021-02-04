@@ -3,7 +3,7 @@
  * Version: 2.0
  * 
  * 
- * This is code for the chair wemos
+ * This is code for the bed wemos
  * It works like this:
  * 
  * setup {
@@ -41,8 +41,8 @@
 #define AMOUNTOFACTUATORS 1
 
 #define BUFFERSIZE 20
-#define WIBADRESD 0x38
-#define WIBADRESA 0x36
+#define WIBADRESD 0x38 // Wemos Interface Board ADRES Digital
+#define WIBADRESA 0x36 // Wemos Interface Board ADRES Analog
 
 // voor parser
 int NUMBER_OF_STRING = 10;
@@ -107,8 +107,8 @@ WiFiClient client;
 void setup() {
 
   
-  Serial.begin(115200);
-  Wire.begin();
+  Serial.begin(115200); // start a serial session for debugging
+  Wire.begin(); // start a wire session for i2c communication.
 
 
   // setup our wifi, connect to the server and connect to the i2c wemos interface board.
@@ -138,9 +138,6 @@ void loop() {
 
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
-    
-
-     delay(0);
      
      if ((((sensor[1][0] > 200) && (sensor[1][1] < 200)) || ((sensor[1][0] < 200) && (sensor[1][1] > 200))) || ((sensor[0][0] == 1) && (sensor[0][1] == 0))) {
        // if ((force sensor has just turned of or off) or the pushbutton has just turned on);
