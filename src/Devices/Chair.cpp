@@ -57,7 +57,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
 }
 
 std::string Chair::website(XmlReader * xml_r, int i) {
-    std::vector<int> data;
+    std::vector<double> data;
     std::string destination;
     destination = xml_r->getClientName();
     std::string toBeSend;
