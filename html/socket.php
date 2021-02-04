@@ -83,7 +83,12 @@ function toggleDevice($name, $type, $data0, $data1) {
 	$out .= "<sender>website</sender>";
 	$out .= "<receiver>server</receiver>";
 	$out .= "</header>";
-	$out .= "<function>changeStatus</function>";
+	if($data0 > 0) {
+		$dt = "Aan";
+	} else {
+		$dt = "Uit";
+	}
+	$out .= "<function>changeStatus${dt}</function>";
 	$out .= "<context>";
 	$out .= "<password>JeMoederIsEenWachtwoord</password>";
 	$out .= "<clientName>${name}</clientName>";
