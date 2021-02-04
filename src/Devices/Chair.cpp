@@ -70,6 +70,7 @@ std::string Chair::website(XmlReader * xml_r, int i) {
         data.push_back(0);
     }
 
+    std::cout << data[0] << data[1] << std::endl;
     XmlWriter xml_w("actuateBool", destination);
     xml_w.buildXMLActuate(data);
     toBeSend = xml_w.getXML();
