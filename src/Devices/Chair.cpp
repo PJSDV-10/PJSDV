@@ -21,8 +21,8 @@ Chair::~Chair(){
 std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     //std::cout << "reading destination" << std::endl;
     destination = xml_r->getSenderName();
     //std::cout << "getting data" << std::endl;
@@ -57,7 +57,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
 }
 
 std::string Chair::website(XmlReader * xml_r, int i) {
-    std::vector<double> data;
+    std::vector<float> data;
     std::string destination;
     destination = xml_r->getClientName();
     std::string toBeSend;
@@ -82,8 +82,8 @@ std::string Chair::website(XmlReader * xml_r, int i) {
 std::string Chair::handleWebsiteUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     //std::cout << "reading destination" << std::endl;
     destination = xml_r->getClientName();
     //std::cout << "getting data" << std::endl;

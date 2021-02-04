@@ -17,7 +17,7 @@ void XmlWriter::buildXMLAck(){
     }
 }
 
-void XmlWriter::buildXMLActuate(std::vector<double> &status){
+void XmlWriter::buildXMLActuate(std::vector<float> &status){
     using namespace rapidxml;
 
     if(function == "actuateBool"){
@@ -58,7 +58,7 @@ void XmlWriter::finalizeAnswerToSR(){
     doc->append_node(root_node);
 }
 
-void XmlWriter::addDataToAnswer(std::string type, std::string clientName, std::vector<double> data){
+void XmlWriter::addDataToAnswer(std::string type, std::string clientName, std::vector<float> data){
     using namespace rapidxml;
     xml_node<> *wemos_node = doc->allocate_node(node_element, "wemos");
     xml_node<> *clientName_node = doc->allocate_node(node_element, "name", clientName.c_str());
@@ -75,7 +75,7 @@ void XmlWriter::addDataToAnswer(std::string type, std::string clientName, std::v
     wemosjes_node->append_node(wemos_node);
 }
 
-void XmlWriter::buildActuateContext(std::vector<double> &status){
+void XmlWriter::buildActuateContext(std::vector<float> &status){
     using namespace rapidxml;
     function_node = doc->allocate_node(node_element, "function", "actuateBool");
     context_node = doc->allocate_node(node_element, "context", 0);

@@ -17,8 +17,8 @@ Website::~Website(){
 std::string Website::handleSensorUpdate(XmlReader* xml_r){
     /* Realistically the actual function is called getStatusAll, but this works fine too */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     std::cout << "reading destination" << std::endl;
     destination = xml_r->getSenderName();
 
@@ -32,8 +32,8 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
 
 std::string Website::handleWebsiteUpdate(XmlReader* xml_r) {
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     std::cout << "reading destination" << std::endl;
     destination = xml_r->getSenderName();
 

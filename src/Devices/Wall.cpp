@@ -17,8 +17,8 @@ Wall::~Wall() {
 std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
 
     destination = xml_r->getSenderName();
     sentStatus = xml_r->getData();
@@ -73,8 +73,8 @@ std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
 std::string Wall::handleWebsiteUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     //std::cout << "reading destination" << std::endl;
     destination = xml_r->getClientName();
     //std::cout << "getting data" << std::endl;

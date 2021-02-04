@@ -18,8 +18,8 @@ TableLamp::~TableLamp() {
 std::string TableLamp::handleSensorUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
 
     destination = xml_r->getSenderName();
     sentStatus = xml_r->getData();
@@ -61,8 +61,8 @@ std::string TableLamp::handleSensorUpdate(XmlReader * xml_r) {
 std::string TableLamp::handleWebsiteUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     //std::cout << "reading destination" << std::endl;
     destination = xml_r->getClientName();
     //std::cout << "getting data" << std::endl;

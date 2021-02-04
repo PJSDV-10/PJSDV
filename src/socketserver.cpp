@@ -291,7 +291,7 @@ void SocketServer::handleRequest(int fd){
 
         std::string statusmsg;
         std::cout << "update for wemos: " << xml_r.getClientName() << '\n';
-        std::vector<double> tmp =  xml_r.getData();
+        std::vector<float> tmp =  xml_r.getData();
         std::cout << "data for wemos: " << tmp[0] << tmp[1] << std::endl;
 
         for (std::size_t i = 0; i < wemosjes.size(); i++){

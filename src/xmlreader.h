@@ -16,7 +16,7 @@ private:
     std::string receiverName;
     std::string clientName;
     std::string type;
-    std::vector<double> data;
+    std::vector<float> data;
     int err;
 
     //Map parsedXML;
@@ -53,6 +53,6 @@ public:
     inline const std::string getReceiverName() const { return receiverName; };
     inline const std::string getClientName() const { return clientName; };
     inline const std::string getType() const { return type; };
-    inline std::vector<double> getData() { return data; };
+    inline std::vector<float> getData() { return data; };
     inline const int error() const { return err; };
 };
