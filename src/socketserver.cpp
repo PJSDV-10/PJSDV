@@ -216,7 +216,7 @@ void SocketServer::handleRequest(int fd){
         /*
             Handling for the getStatusAll request from the website.
             Let's hope this actually goddamn works XD
-senderName compa
+            senderName compa
             A thing you can try when it doesn't work is to add a select() call to make sure you can actually
             write to the sockets.
             */
@@ -292,7 +292,6 @@ senderName compa
         std::string statusmsg;
         std::cout << "Status update received from: " << xml_r.getSenderName() << std::endl;
         std::cout << "update for wemos: " << xml_r.getClientName() << '\n';
-
 
         for (std::size_t i = 0; i < wemosjes.size(); i++){
             std::cout << "trying to find right wemos" << std::endl;

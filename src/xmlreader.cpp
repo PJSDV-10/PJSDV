@@ -38,6 +38,13 @@ void XmlReader::parseDocument(){
         //parsedContext.emplace("type", type);
         parseDeviceData();
     }
+    else if (function == "changeStatus")
+    {
+        clientName = context_node->first_node("clientName")->value();
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
+    }
 }
 
 void XmlReader::parseDeviceData(){
