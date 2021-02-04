@@ -35,6 +35,38 @@ Acknowledgement:
 </message>
 ```
 
+status update:
+```xml
+<message>
+    <header>
+        <sender>Wemosnaam</sender>
+        <receiver>server</receiver>
+    </header>
+    <function>sensorUpdate</function>
+    <context>
+        <type>x</type>    
+        <data1>0</data1>
+        <data2>0</data2>  
+    </context>
+</message>
+```
+
+actuateBool
+
+```xml
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>wemosnaam</receiver>
+    </header>
+    <function>actuateBool</function>
+    <context>
+        <data1>0</data1> 
+        <data2>0</data2> 
+    </context>
+</message>
+```
+
 #### Get status broadcast
 Request:
 ```xml
