@@ -1,4 +1,4 @@
-<meta http-equiv="refresh" content="1" >
+<meta http-equiv="refresh" content="10" >
 
 <div class="main">
 <br>
@@ -7,6 +7,8 @@
     $devices; // scoping
     if(initialiseSocket()) { // test of initialisatie slaagt
         $devices = xmlParseDevices(requestAllSocket()); // haalt alle data op en parsed het
+    } else {
+	$devices = NULL;
     }
 ?>
 <table class="">
@@ -46,10 +48,18 @@
 for($i; $i >= 0; $i--) {
     if(isset($_POST[$i])) { //checkt of er op een schakel knop gedrukt is.
         echo "<br>Switching mode of ".$devices[$i]->type;
+
         // stuurt de vereiste data naar de server met een verzoek tot aanpassen
-        toggleDevice($devices[$i]->name, $devices[$i]->type, $devices[$i]->data1, if(isset($devices[$i]->data2)) {$devices[$i]->data2} else {NULL});
+	$data2;
+	if(isset($devices[$i]->data2)) {
+		$data2 = $devices[$i]->data2;
+	} else {
+		$data2 = NULL;
+	}
+        toggleDevice($devices[$i]->name, $devices[$i]->type, $devices[$i]->data1, );
+
         // herlaad de pagina.
-        header("/?p=Status");
+        //header("/?p=Status");
     }
 }
 
