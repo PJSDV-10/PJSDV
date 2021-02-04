@@ -44,7 +44,7 @@
 #include <WiFiClient.h>
 #include <string>
 #include <sstream> 
-#include <Wire.h> // I2C
+#include <Wire.h> // I2C library
 
 #define AMOUNTOFSENSORS 2
 #define AMOUNTOFACTUATORS 2
@@ -73,7 +73,7 @@ unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,1},{0,0,300}}; // sensor array w
 std::string sensorNames[AMOUNTOFSENSORS][2] = {{"bool","pushButton"},{"int","gassensor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
 
-unsigned int actuator[AMOUNTOFACTUATORS][3] = {{0,0,16},{0,0,32}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,16},{1,0,32}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
 std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","BUZZER"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
@@ -147,7 +147,7 @@ void loop() {
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
      
-     if ((((sensor[1][0] > 200) && (sensor[1][1] < 200)) || ((sensor[1][0] < 200) && (sensor[1][1] > 200))) || ((sensor[0][0] == 1) && (sensor[0][1] == 0))) {
+     if ((((sensor[1][0] > 900) && (sensor[1][1] < 900)) || ((sensor[1][0] < 900) && (sensor[1][1] > 900))) || ((sensor[0][0] == 1) && (sensor[0][1] == 0))) {
        // if ((force sensor has just turned of or off) or the pushbutton has just turned on);
        sendData(buildStatusMsg("sensorUpdate", knopAan).c_str());
      }

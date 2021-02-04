@@ -25,7 +25,7 @@ std::string buildStatusMsg(std::string function, bool knop){
 
        if (sensorNames[i][1].compare("gasSensor") == 0) { // if the sensor is a gas sensor:
         
-        if (sensor[i][0] > 200) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
+        if (sensor[i][0] > 900) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
           worth = "1";
         } else {
           worth = "0";
