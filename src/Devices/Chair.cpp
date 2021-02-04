@@ -31,7 +31,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     std::string toBeReturned;
 
     std::cout << "PBState status: " << PBState << std::endl;
-    
+
 
     if ((int)std::round(sentStatus[0]) && (int)std::round(sentStatus[1]))
     {
@@ -56,7 +56,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     return toBeReturned;
 }
 
-std::string Chair::handleWebsiteUpdate(XmlReader *) {
+std::string Chair::handleWebsiteUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
     std::vector<double> sentStatus;

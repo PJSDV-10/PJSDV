@@ -42,7 +42,7 @@ void XmlReader::parseDocument(){
 
 void XmlReader::parseDeviceData(){
     using namespace rapidxml;
-    if(type == "chair"){tablelamp
+    if(type == "chair"){
         std::cout << "Stoel identified" << std::endl;
 
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor

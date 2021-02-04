@@ -173,7 +173,7 @@ void SocketServer::handleRequest(int fd){
                     << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
             std::cout << "Wemos failure with authentication" << std::endl;
-            
+
         }
         std::string respondmsg;
         XmlWriter xml_w(xml_r);
@@ -290,7 +290,7 @@ void SocketServer::handleRequest(int fd){
     } else if(xml_r.getFunction() == "changeStatus"){
 
         std::string statusmsg;
-        *std::cout << "Status update received for:\n" << xml_r.getSenderName() << std::endl;
+        std::cout << "Status update received for:\n" << xml_r.getSenderName() << std::endl;
 
 
         for (std::size_t i = 0; i < wemosjes.size(); i++){
