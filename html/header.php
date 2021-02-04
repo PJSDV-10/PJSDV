@@ -12,6 +12,7 @@
 		<link rel="stylesheet" type="text/css" href="css/<?php echo $page; ?>.css">
 		<link rel="shortcut icon" href="favicon.png">
 	</head>
+	<meta http-equiv="refresh" content="1" > 
 
 	<body>
 		<div class="header">
