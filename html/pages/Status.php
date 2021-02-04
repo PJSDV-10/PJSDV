@@ -1,3 +1,5 @@
+<meta http-equiv="refresh" content="1" >
+
 <div class="main">
 <br>
 <?php

@@ -1,6 +1,6 @@
 <?php
 	session_start(); // start sessie
-
+	$page;
 	//checkt of de sessie geinitialiseerd is.
 	if(!isset($_SESSION['username'])) {
 		// geen sessie is doorsturen naar login
@@ -17,6 +17,6 @@
 	}
 
 	require "header.php";
-	include "pages/{$page}.php";
-	require "footer.php";
+	require "pages/{$page}.php";
+	include "footer.php";
 ?>
