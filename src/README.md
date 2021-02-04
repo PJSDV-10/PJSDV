@@ -169,8 +169,9 @@ server to selected wemos:
     </header>
     <function>actuateBool</function>
     <context>
-        <data1>0</data1> <!-- Vibration motor -->
-        <data2>0</data2> <!-- LED -->
+        <data1>0</data1> 
+        <data2>0</data2>
+		etc...
     </context>
 ```
 </message>
