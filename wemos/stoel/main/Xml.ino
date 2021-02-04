@@ -26,9 +26,10 @@ std::string buildStatusMsg(std::string function, bool knop){
        if (sensorNames[i][1].compare("forceSensor") == 0) { // if the sensor is a force sensor:
         if (sensor[i][0] > 200) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
           worth = "1";
-        } else
+        } else {
           worth = "0";
           knopAan = "0";
+        }
        }
        
        if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) { // the bushbutton has to function as a switch, so we toggle a bool variable "knopAan". 
