@@ -22,8 +22,9 @@ std::string buildStatusMsg(std::string function, bool knop){
       
        std::string roundd = intToString(i + 1); // this will be the number x in <datax> in the xml message
        std::string worth = ""; // this varable will contain the data y in <datax>y</datax>
-       
-       if (sensorNames[i][1].compare("forceSensor") == 0) { // if the sensor is a force sensor:
+
+       if (sensorNames[i][1].compare("gasSensor") == 0) { // if the sensor is a gas sensor:
+        
         if (sensor[i][0] > 200) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
           worth = "1";
         } else {
