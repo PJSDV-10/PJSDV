@@ -41,7 +41,6 @@ private:
     //std::vector<Timer> timers;
     std::string password = "solarwinds123";
 
-    void checkWemosTimers();
     int authWemos(int fd, XmlReader& msg);
     bool checkPassword(std::string);
     int accept_connection(int fd);

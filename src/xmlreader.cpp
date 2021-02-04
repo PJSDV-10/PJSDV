@@ -42,7 +42,7 @@ void XmlReader::parseDocument(){
 
 void XmlReader::parseDeviceData(){
     using namespace rapidxml;
-    if(type == "chair"){
+    if(type == "chair"){tablelamp
         std::cout << "Stoel identified" << std::endl;
 
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
@@ -131,6 +131,7 @@ bool XmlReader::checkPassword(std::string password)
 }
 
 bool XmlReader::empty(){
-    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented.\n\rPlease don't use it, it will always return false for safety" << std::endl;
+    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented."
+                 "\n\rPlease don't use it, it will always return false for safety" << std::endl;
     return false;
 }
