@@ -68,17 +68,17 @@ std::string Chair::handleWebsiteUpdate(XmlReader * xml_r) {
     //std::cout << "data gotten" << std::endl;
     std::string toBeSend;
 
-    // if site is 1 data is 1 else data is 0
-    if (sentStatus[0]){
-        sendStatus.push_back(1);
-        sendStatus.push_back(1);
-    } else {
-        sendStatus.push_back(0);
-        sendStatus.push_back(0);
-    }
+//    // if site is 1 data is 1 else data is 0
+//    if (sentStatus[0]){
+//        sendStatus.push_back(1);
+//        sendStatus.push_back(1);
+//    } else {
+//        sendStatus.push_back(0);
+//        sendStatus.push_back(0);
+//    }
 
     XmlWriter xml_w("actuateBool", destination);
-    xml_w.buildXMLActuate(sendStatus);
+    xml_w.buildXMLActuate(sentStatus);
     toBeSend = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeSend;
