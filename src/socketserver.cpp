@@ -303,7 +303,7 @@ void SocketServer::handleRequest(int fd){
                 break;
             }
         }
-        std::cout << statusmsg << std:endl;
+        std::cout << statusmsg << std::endl;
         send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
         //std::cout << "Reply to sensorUpdate sent" << std::endl;
 
