@@ -86,16 +86,12 @@ function toggleDevice($name, $type, $data0, $data1) {
 	$out .= "<function>changeStatus</function>";
 	$out .= "<context>";
 	$out .= "<password>JeMoederIsEenWachtwoord</password>";
-	$out .= "<wemosjes>";
-	$out .= "<wemos>";
-	$out .= "<name>${name}</name>";
+	$out .= "<clientName>${name}</clientName>";
 	$out .= "<type>${type}</type>";
 	$out .= "<data1>${data0}</data1>";
 	if(isset($data1) && $data1 != NULL) {
 		$out .= "<data2>${data1}</data2>";
 	}
-	$out .= "</wemos>";
-	$out .= "</wemosjes>";
 	$out .= "</context>";
 	$out .= "</message>";
 
