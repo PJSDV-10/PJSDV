@@ -26,6 +26,12 @@ function messageSocket($out) {
 	}
 }
 
+/**
+  * Initialiseert de socketverbinding met de server.
+  * @param void
+  * @return bool eerst wordt het opgestelde bericht verzonden via socket,
+  *				 daarna wordt de xml die resulteert door checkack heen gehaald
+**/
 function initialiseSocket() {
 	$out = "<message>";
 	$out .= "<header>";
@@ -43,6 +49,11 @@ function initialiseSocket() {
 	return xmlCheckAck(messageSocket($out));
 }
 
+/**
+  * Stuur een verzoek aan de server voor alle data aangaande de wemosjes
+  * @param void
+  * @return out een xml object met alle data aangaande de wemosjes
+**/
 function requestAllSocket() {
 	$out = "<message>";
 	$out .= "<header>";
@@ -58,6 +69,14 @@ function requestAllSocket() {
 	return messageSocket($out);
 }
 
+/**
+  * Stuurt een verzoek aan de server om een wemosje van status te laten veranderen.
+  * @param name is de unieke naam van de wemos
+  * @param type soort apparaat dat aan de wemos hangt
+  * @param data0 waarde van de data die bij het apparaat hoort
+  * @param data1 waarde van een extra datapunt van het apparaat
+  * @return out het xml object dat terug komt van de server
+**/
 function toggleDevice($name, $type, $data0, $data1) {
 	$out = "<message>";
 	$out .= "<header>";
@@ -72,7 +91,7 @@ function toggleDevice($name, $type, $data0, $data1) {
 	$out .= "<name>${name}</name>";
 	$out .= "<type>${type}</type>";
 	$out .= "<data1>${data0}</data1>";
-	if(isset($data1)) {
+	if(isset($data1) && $data1 != NULL) {
 		$out .= "<data2>${data1}</data2>";
 	}
 	$out .= "</wemos>";
