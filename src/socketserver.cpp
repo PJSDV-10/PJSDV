@@ -287,21 +287,32 @@ void SocketServer::handleRequest(int fd){
         closeConnection(fd);
         std::cout << "Returning" << std::endl;
         // Destroy
+    } else if(xml_r.getFunction() == "changeStatus"){
+
+        std::string statusmsg;
+        *std::cout << "Status update received for:\n" << xml_r.getSenderName() << std::endl;
+
+
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            std::cout << "trying to find right wemos" << std::endl;
+            if (wemosjes[i]->getSenderName() == xml_r.getClientName())
+            {
+                statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r);
+                break;
+                }
+            }
+            send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+            //std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getSenderName() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+        return;
     }
-    return;
 }
 
-/*void SocketServer::checkWemosTimers(){
-    time_t current;
-    time(&current);
-    for (int i = 0; i < timers.size(); i++)
-    {
-        if(current - timers[i].oldTime > timers[i].setting){
-            timers[i].device.
-        }
-    }
-
-}*/
 
 /* Returns a 1 if an error occurred */
 int SocketServer::authWemos(int fd, XmlReader& msg){

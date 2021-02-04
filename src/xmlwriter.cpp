@@ -68,7 +68,8 @@ void XmlWriter::addDataToAnswer(std::string type, std::string clientName, std::v
     for (std::size_t i = 0; i < data.size(); i++)
     {
         std::string dataNumber("data" + std::to_string(i + 1));
-        xml_node<> *data_node = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()), doc->allocate_string(std::to_string((int)std::round(data[i])).c_str()));
+        xml_node<> *data_node = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()),
+                                                   doc->allocate_string(std::to_string((int)std::round(data[i])).c_str()));
         wemos_node->append_node(data_node);
     }
     wemosjes_node->append_node(wemos_node);
@@ -80,7 +81,8 @@ void XmlWriter::buildActuateContext(std::vector<double> &status){
     context_node = doc->allocate_node(node_element, "context", 0);
     for (size_t i = 0; i < status.size(); i++){
         std::string dataNumber("data" + std::to_string(i + 1));
-        xml_node<> *dataNode = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()), doc->allocate_string(std::to_string((int)std::round(status[i])).c_str()));
+        xml_node<> *dataNode = doc->allocate_node(node_element, doc->allocate_string(dataNumber.c_str()),
+                                                  doc->allocate_string(std::to_string((int)std::round(status[i])).c_str()));
         context_node->append_node(dataNode);
     }
     root_node->append_node(function_node);

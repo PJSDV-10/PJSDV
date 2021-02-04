@@ -18,7 +18,6 @@
     <tbody>
 <?php
     $i = 0;
-    // print alle gevonden apparaten in een overzichtelijke tabel
     foreach($devices as $device) {
         echo "<tr>";
         echo "<td>".$device->type."</td>";
@@ -50,5 +49,6 @@ for($i; $i >= 0; $i--) {
         header("/?p=Status");
     }
 }
+
 
 ?>

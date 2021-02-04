@@ -114,7 +114,7 @@ Request:
 
 Reply:
 ```xml
-message>
+<message>
     <header>
         <sender>server</sender>
         <receiver>website</receiver>
@@ -148,13 +148,11 @@ Request:
 	<function>changeStatus</function>
 	<context>
 		<password>JeMoederIsEenWachtwoord</password>
-		<wemosjes>
-			<wemos>
-				<name>UniekeWemosNaam</name>
-				<type>lamp</type>
-				<data1>1</data1>
-			</wemos>
-		</wemosjes>
+        <wemos>
+            <clientName>UniekeWemosNaam</clientName>
+            <type>lamp</type>
+            <data1>1</data1>
+        </wemos>
 	</context>
 </message>
 ```
