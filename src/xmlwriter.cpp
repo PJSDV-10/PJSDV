@@ -9,7 +9,7 @@ std::string XmlWriter::getXML(){
 
 void XmlWriter::buildXMLAck(){
     using namespace rapidxml;
-    
+
     if(function == "authentication"){
         buildHeader();
         buildAckContext();
@@ -94,14 +94,14 @@ void XmlWriter::buildHeader(){
     doc = new xml_document<>;
     root_node = doc->allocate_node(node_element, "message");
     char *node_name = doc->allocate_string("header");
-    header_node = doc->allocate_node(node_element, node_name); 
+    header_node = doc->allocate_node(node_element, node_name);
     sender_node = doc->allocate_node(node_element, "sender", senderName.c_str());
     receiver_node = doc->allocate_node(node_element, "receiver", receiverName.c_str());
     header_node->append_node(sender_node);
     header_node->append_node(receiver_node);
     root_node->append_node(header_node);
 
-    
+
 }
 
 void XmlWriter::buildStatusRequestContext(){

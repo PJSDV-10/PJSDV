@@ -290,13 +290,11 @@ void SocketServer::handleRequest(int fd){
     } else if(xml_r.getFunction() == "changeStatus"){
 
         std::string statusmsg;
-        std::cout << "Status update received from: " << xml_r.getSenderName() << std::endl;
         std::cout << "update for wemos: " << xml_r.getClientName() << '\n';
+        std::vector<double> tmp =  xml_r.getData();
+        std::cout << "data for wemos: " << tmp[0] << tmp[1] << std::endl;
 
         for (std::size_t i = 0; i < wemosjes.size(); i++){
-            std::cout << "trying to find right wemos" << std::endl;
-            std::cout << "wemos name: "<< wemosjes[i]->getClientName() << '\n';
-            std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
             if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
                 statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r);

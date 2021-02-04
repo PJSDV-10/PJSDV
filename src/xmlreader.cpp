@@ -1,4 +1,5 @@
 #include "xmlreader.h"
+#include <cmath>
 
 
 void XmlReader::parseDocument(){
@@ -54,6 +55,9 @@ void XmlReader::parseDeviceData(){
 
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
         data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
+        std::cout << "data1 in XmlReader: " << data[0] << '\n';
+        std::cout << "data2 in XmlReader: " << data[1] << '\n';
+
     }else if(type == "column"){
         std::cout << "Column" << std::endl;
 

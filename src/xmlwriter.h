@@ -38,7 +38,7 @@ private:
 
 public:
     XmlWriter();
-    /* Type is the function that is sent in the final message, 
+    /* Type is the function that is sent in the final message,
     dest is the sendername from whence your message came*/
     XmlWriter(std::string type, std::string dest);
     XmlWriter(XmlReader &xml_r);

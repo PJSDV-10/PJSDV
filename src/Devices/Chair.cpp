@@ -79,8 +79,9 @@ std::string Chair::handleWebsiteUpdate(XmlReader * xml_r) {
         sendStatus.push_back(0);
     }
 
+    std::cout << "sentStatus: "<< (sentStatus[0]) << sentStatus[1] << '\n';
     XmlWriter xml_w("actuateBool", destination);
-    xml_w.buildXMLActuate(sendStatus);
+    xml_w.buildXMLActuate(sentStatus);
     toBeSend = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeSend;
