@@ -15,6 +15,8 @@ public:
     ~Wall();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+
 };
 
 
@@ -29,6 +31,8 @@ public:
     ~Door();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+
 };
 
 
@@ -42,6 +46,8 @@ public:
     ~Column();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+
 };
 
 
@@ -56,6 +62,8 @@ public:
     ~Bed();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+
 };
 
 
@@ -67,7 +75,9 @@ public:
     TableLamp(int fd, std::string clientName, std::string senderName);
     ~TableLamp();
     std::string handleSensorUpdate(XmlReader *);
-    std::string handleWebsiteUpdate(XmlReader *);};
+    std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+};
 
 class Fridge : public Wemos{
 
@@ -78,6 +88,8 @@ public:
     ~Fridge();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+
 };
 
 
@@ -90,6 +102,8 @@ public:
     ~Website();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
+
     //XmlReader* sendStatusRequest(fd_set* all_sockets);
 };
 
@@ -106,6 +120,7 @@ public:
     ~Chair();
     std::string handleSensorUpdate(XmlReader *);
     std::string handleWebsiteUpdate(XmlReader *);
+    std::string website(XmlReader *,int);
     //XmlReader* sendStatusRequest(fd_set*);
 };
 

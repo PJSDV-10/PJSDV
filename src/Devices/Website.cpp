@@ -44,6 +44,10 @@ std::string Website::handleWebsiteUpdate(XmlReader* xml_r) {
     toBeReturned = "<message><header><sender>server</sender><receiver>website</receiver></header><function>answerToUpdateRequest</function><context></context></message>";
     return toBeReturned;
 }
+std::string Chair::website(XmlReader * xml_r, int i) {
+
+    return 0;
+}
 
 /*XmlReader *Website::sendStatusRequest(fd_set* all_sockets){
     XmlWriter xml_w("getStatusBroadcast", "allWemos");

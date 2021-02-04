@@ -78,3 +78,7 @@ std::string Column::handleWebsiteUpdate(XmlReader * xml_r) {
     xml_w.~XmlWriter();
     return toBeSend;
 }
+std::string Chair::website(XmlReader * xml_r, int i) {
+
+    return 0;
+}

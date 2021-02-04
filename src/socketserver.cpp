@@ -312,6 +312,54 @@ void SocketServer::handleRequest(int fd){
         // Destroy
         return;
     }
+
+    else if(xml_r.getFunction() == "changeStatusAan"){
+
+        std::string statusmsg;
+
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
+            if (wemosjes[i]->getClientName() == xml_r.getClientName())
+            {
+                statusmsg = wemosjes[i]->website(&xml_r,1);
+                break;
+            }
+        }
+        std::cout << statusmsg << std::endl;
+        send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        //std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getSenderName() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+        return;
+    }
+    else if(xml_r.getFunction() == "changeStatusUit"){
+
+        std::string statusmsg;
+
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
+            if (wemosjes[i]->getClientName() == xml_r.getClientName())
+            {
+                statusmsg = wemosjes[i]->website(&xml_r,0);
+                break;
+            }
+        }
+        std::cout << statusmsg << std::endl;
+        send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        //std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getSenderName() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+        return;
+    }
+
 }
 
 
