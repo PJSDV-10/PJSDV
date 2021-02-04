@@ -266,7 +266,7 @@ void SocketServer::handleRequest(int fd){
                     std::cout << "message received: " << buffer2 << std::endl;
                     XmlReader xml_rr(buffer2);
                     xml_rr.parseDocument();
-                    xml_ww.addDataToAnswer(xml_rr.getType(), xml_rr.getClientName(), xml_rr.getData());
+                    xml_ww.addDataToAnswer(xml_rr.getType(), xml_rr.getSenderName(), xml_rr.getData());
                 }
             }
         }

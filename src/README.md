@@ -148,11 +148,9 @@ Request:
 	<function>changeStatus</function>
 	<context>
 		<password>JeMoederIsEenWachtwoord</password>
-        <wemos>
-            <clientName>UniekeWemosNaam</clientName>
-            <type>lamp</type>
-            <data1>1</data1>
-        </wemos>
+        <clientName>UniekeWemosNaam</clientName>
+        <type>lamp</type>
+        <data1>1</data1>
 	</context>
 </message>
 ```
