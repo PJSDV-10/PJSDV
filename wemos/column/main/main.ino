@@ -1,23 +1,50 @@
-// This is testcode for now, since we need to make 7 different wemos codes eventually
-// authentication problably works, but didn't have time to test yet
-// based on the "wall" wemos from the excel file on blackboard 
+/*
+ * authors: PJSDV group 10
+ * Version: 2.0
+ * 
+ * This is code for the column wemos
+ * 
+ * It works like this:
+ * 
+ * setup {
+ *  setupwifi
+ *  setup the I2C
+ *  authenticate with server
+ * }
+ *  
+ * loop {
+ *  read sensors
+ *  if a sensor has changed
+ *    send senorupdate to server
+ *  check if we received a message
+ *  if we received a message:
+ *    parse the message
+ *    handle the request
+ *  update the actuator's status.
+ * }
+ * 
+ * sensors are connected to a Wemos Interface Board: WIB
+ * we read them via I2C using the WIRE.h library
+ * actuators are connected to the same board, and are written to in the same way.
+ * 
+ * 
+ * The connected sensors:
+ *  Push Button on pin DI0
+ *  gas sensor on pin AI0
+ * 
+ * the connected actuators:
+ *  buzzer on pin DO4
+ *  LED om pin DO5
+ */
 
 
-// I also want to make very clear that i HATE the arduino IDE.
-
-
-
-//alle loops hebben een delay nodig kan gewoon van 0 zijn maar anders crasht esp. 
-// https://www.sigmdel.ca/michel/program/esp8266/arduino/watchdogs_en.html
-//https://forum.arduino.cc/index.php?topic=622991.0
 
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-//#include <tinyxml.h>
 #include <string>
 #include <sstream> 
-#include <Wire.h>
+#include <Wire.h> // I2C library
 
 #define AMOUNTOFSENSORS 2
 #define AMOUNTOFACTUATORS 2
@@ -36,24 +63,28 @@ std::string wachtwoord = "solarwinds123";
 std::string type = "column";
 
 // Network SSID
-const char *ssid = "WatEenRotTaart";
-const char *password = "KankerKanker";
-const char *ip = "home.dutchellie.nl";
+const char *ssid = "PJSDV-10";
+const char *password = "PJSDV-10";
+const char *ip = "192.168.43.201";
 
 // sensor globals
 // sensor pin number = de waarde van een 1 op de plek van het pin nummer in een byte.
-unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,300},{0,0,1}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
-std::string sensorNames[AMOUNTOFSENSORS][2] = {{"int","gassensor"},{"bool","pushButton"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
+unsigned int sensor[AMOUNTOFSENSORS][3] = {{0,0,1},{0,0,300}}; // sensor array will be {currentvalue,previousvalue, pinnumber} // please put this in te right order otherwise crash
+std::string sensorNames[AMOUNTOFSENSORS][2] = {{"bool","pushButton"},{"int","gassensor"}}; // each sensor has a name, but this can't be stored in an int array. {type,name}
 
-unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,32},{0,1,16}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
-std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","LED"},{"bool","BUZZER"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
+
+unsigned int actuator[AMOUNTOFACTUATORS][3] = {{1,0,16},{1,0,32}}; // actuator array will be {currentvalue, wantedvalue, pinnumber}
+std::string actuatorNames[AMOUNTOFACTUATORS][2] = {{"bool","BUZZER"},{"bool","LED"}}; // each sensor has a name, but this can't be stored in an int array. {type,name} 
 /* if we receive a message to change an actuatorvalue, put the received value in the wanted value entry of the array.
 this way we don't have to worry about the different types of actuators, like twi of analog or binairy, etc when we handle the message*/
+
+
+bool knopAan = 0; // global bool to turn a static button into a switch.
 
 //function declarations xml
 std::string buildcapabilities();
 std::string Buildheader();
-std::string buildStatusMsg();
+std::string buildStatusMsg(std::string, bool);
 std::string buildAuthenticationMsg();
 void parser(std::string S1 ,std::string arr[]);
 std::string intToString(int i);
@@ -68,7 +99,7 @@ const char* receiveData();
 const char* receiveData(int*);
 void sendData(const char *);
 
-//function declaration 
+//function declaration  sensors
 void setupPins();
 void setupSensors() ;
 void setupActuators();
@@ -77,8 +108,6 @@ void readSensors();
 
 
 
-std::string test = "<message> <header> <sender>server</sender> <receiver>wemosnaam</receiver> </header> <function>actuateBool</function> <context> <data1>0</data1> <!-- Vibration motor --> <data2>1</data2> <!-- LED --> </context> </message>";
-
 WiFiClient client;
 
 
@@ -86,9 +115,11 @@ WiFiClient client;
 void setup() {
 
   
-  Serial.begin(115200);
-  Wire.begin();
-  
+  Serial.begin(115200); // start a serial session for debugging
+  Wire.begin(); // start a wire session for i2c communication.
+
+
+  // setup our wifi, connect to the server and connect to the i2c wemos interface board.
   setupWifi();
   setupPins(); 
 
@@ -105,49 +136,53 @@ void setup() {
 
 
 void loop() {
-
   //----------sensors------------//
   //Serial.println("reading sensors now");
-
-
   readSensors();
+
+  Serial.print(sensor[0][0]);
+  Serial.print("  ");
+  Serial.println(sensor[1][0]);
 
   // if any of the sensors changed, we have to notify the server.
     //Serial.println("sending sensorupdate");
-  int sendStatus = 0;
-  for(int i = 0; i < AMOUNTOFSENSORS; i++){
-     delay(0);
-     if(sensorNames[i][0].compare("bool") == 0) {
-       if (sensor[i][0] != sensor[i][1]) { // if (current sensorvalue != previous sensorvalue); logic could be different in different devices
-         sendStatus = 1;
-       }
-     } else if ((sensor[i][0] >= (sensor[i][1] + 10) || sensor[i][0] <= (sensor[i][1] - 10))) {
-          sendStatus = 1;
-        }
+     
+     if ((((sensor[1][0] > 900) && (sensor[1][1] < 900)) || ((sensor[1][0] < 900) && (sensor[1][1] > 900))) || ((sensor[0][0] == 1) && (sensor[0][1] == 0))) {
+       // if ((force sensor has just turned of or off) or the pushbutton has just turned on);
+       sendData(buildStatusMsg("sensorUpdate", knopAan).c_str());
+     }
+     
+  for(int i = 0; i < AMOUNTOFSENSORS; i++){  
      sensor[i][1] = sensor[i][0]; // update the previous value
-  }
-  
-  if (sendStatus){
-    sendData(buildStatusMsg("sensorUpdate").c_str());
   }
 
 
   //-----------actuators-------------//
   // if we receive a message, handle it  
   //
+
+
+  std::string receivedMsg = "NULL";
   
-  std::string receivedMsg(receiveData()); // receive some data, if there is nothing to receive, the string is "NULL"
-  
-  if (receivedMsg.compare("NULL") != 0){
-    //Serial.println("The received message is not empty.");
-    std::string parsedMsg[BUFFERSIZE];
-    parser(receivedMsg, parsedMsg); // parse the message, 
-    handleMessage(parsedMsg);
-    //Serial.println("The received message has been parsed");
+  if (client.peek() != -1) {
+  receivedMsg = receiveData(); // receive some data, if there is nothing to receive, the string is "NULL"
+  Serial.println("received data");
   }
   
 
-  //Serial.println("updating actuators");
+  
+    //std::string receivedMsg = receiveData(); // receive some data, if there is nothing to receive, the string is "NULL"
+    
+    if (receivedMsg.compare("NULL") != 0){
+      
+      std::string parsedMsg[BUFFERSIZE];
+      parser(receivedMsg, parsedMsg); // parse the message, 
+      handleMessage(parsedMsg);
+      
+    }
+  
+  
+
   updateActuators();
 
 

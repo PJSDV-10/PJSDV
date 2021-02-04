@@ -1,37 +1,21 @@
 
 
 const char* receiveData() {
-  // pretty rudementairy, if we can read a string we return it, if not we return 0.
-  // TODO: add fancy error checking mechanism.
-  //Serial.println("looking if we received a message");
- // if(client.available()){
-    //delay(0);
-
+  // receives data from socket, this is really slow so only adress this function when sure there is something in buffer.
     std::string plas(client.readString().c_str());
-      
-
-
-    //Serial.println("We received the following message");
-    //Serial.println(plas.c_str());
-    //Serial.println("");
     
-    if (plas.compare("") != 0) {
+    if (plas.compare("") != 0) { // if the message we received is empty, return "NULL", else return the message
       return plas.c_str();
     } else {
-      //Serial.println("client is availible, but we received no message");
-      //Serial.println("");
       return "NULL";
     }
-    
- // } else{
-    //Serial.println("client isn't availible");
- //   return "NULL";
-  //}
 }
 
 const char* receiveData(int* receivedResponse) {
-  // pretty rudementairy, if we can read a string we return it, if not we return 0.
-  // TODO: add fancy error checking mechanism.
+ // receives data from socket, this is really slow so only adress this function when sure there is something in buffer.
+    //This version also sets a bool to true if we actually received something.
+    // oly user to stop the program from entering loop whilst not connected to the server.
+    
     if(client.available()){
     
 
@@ -51,17 +35,17 @@ const char* receiveData(int* receivedResponse) {
 
 void sendData(const char * msg){
   // sends the enclosed message to the connected client
-  //Serial.println("starting a transmission of the following message:");
-  //Serial.println(msg);
-  Serial.println("sending");
+  
+  Serial.println("starting a transmission of the following message:");
+  Serial.println(msg);
+  
     //if(client.availableForWrite()&&client.connected()) {
           client.write(msg);
-          //Serial.println("The message has been send succesfully.");
-          //Serial.println("");
     //}
 }
 
 void setupWifi(){
+  //--- wifi setup ---//
   WiFi.begin(ssid, password); // Connect to the network
   Serial.print("Connecting to ");
   Serial.print(ssid);
@@ -70,6 +54,7 @@ void setupWifi(){
   int i = 0;
   while (WiFi.status() != WL_CONNECTED)
   { // Wait for the Wi-Fi to connect
+    // simple counter for debugging purposes
     delay(1000);
     Serial.print(++i);
     Serial.print(' ');
@@ -80,8 +65,9 @@ void setupWifi(){
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP()); // Send the IP address of the ESP8266 to the computer
   
-  // connect to server
-  if (client.connect(ip, 8080)) {
+  //--- connect to server ---//
+  
+  if (client.connect(ip, 8080)) { // opens a socket connection with the server at the specified ip adres on port 8080
     Serial.println("Connected to server");
   }else{
     Serial.println("Not connected to server");
