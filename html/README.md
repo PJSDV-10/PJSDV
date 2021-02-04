@@ -10,10 +10,11 @@
 4. enjoy our glorious site which automagically updates when the git repo get's pulled
 
 ### SQL database
-1. `$ apt install mariadb`
+1. `$ apt install mariadb-server
+   `
 2. `$ sudo mysql`
 3. `\> CREATE USER 'PJSDV'@localhost IDENTIFIED BY 'gaatjeniksaan';`
-4. `\> GRANT ALL PRIVILEGES ON 'PJSDV'.* TO 'PJSDV'@localhost IDENTIFIED BY 'gaatjeniksaan';`
+4. `\> GRANT ALL PRIVILEGES ON *.* TO 'PJSDV'@localhost IDENTIFIED BY 'gaatjeniksaan';`
 5. `\> FLUSH PRIVILEGES;`
 6. `\> [plak inhoud bestand db.sql]`
 7. `\> quit`
