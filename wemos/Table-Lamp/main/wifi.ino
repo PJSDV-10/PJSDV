@@ -2,10 +2,11 @@
 
 const char* receiveData() {
   // receives data from socket, this is really slow so only adress this function when sure there is something in buffer.
-    std::string plas(client.readString().c_str());
+    std::string msg(client.readString().c_str());
+    Serial.println(msg.c_str());
     
-    if (plas.compare("") != 0) { // if the message we received is empty, return "NULL", else return the message
-      return plas.c_str();
+    if (msg.compare("") != 0) { // if the message we received is empty, return "NULL", else return the message
+      return msg.c_str();
     } else {
       return "NULL";
     }
@@ -19,15 +20,15 @@ const char* receiveData(int* receivedResponse) {
     if(client.available()){
     
 
-      std::string plas(client.readString().c_str());
+      std::string msg(client.readString().c_str());
       *receivedResponse = 1;
 
 
           //Serial.println("We received the following message");
-          //Serial.println(plas.c_str());
+          //Serial.println(msg.c_str());
           //Serial.println("");
 
-          return plas.c_str();
+          return msg.c_str();
     } else
     return "NULL";
 }

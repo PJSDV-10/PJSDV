@@ -17,23 +17,22 @@ std::string buildStatusMsg(std::string function, bool knop){
   std::string temp = Buildheader(); // message starts off with a header
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";
   
-    for (int i = 0;i<AMOUNTOFSENSORS;i++) { //voeg elke keer nieuwe <data> vakken toe aan de statusmessage 
+    for (int i = 0;i<AMOUNTOFSENSORS;i++) { //voeg elke keer neeiwe sensot toe
       delay(0);
       
-       std::string roundd = intToString(i + 1); // this will be the number x in <datax> in the xml message
-       std::string worth = ""; // this varable will contain the data y in <datax>y</datax>
-
-       if (sensorNames[i][1].compare("gasSensor") == 0) { // if the sensor is a gas sensor:
-        
-        if (sensor[i][0] > 900) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
+       std::string roundd = intToString(i + 1); // this will be the number x in <datax>y</datax>
+       std::string worth = intToString(sensor[i][0]); // this varable will contain the data y in <datax>y</datax>
+       
+       /*if (sensorNames[i][1].compare("forceSensor") == 0) { // if the sensor is a force sensor:
+        if (sensor[i][0] > 200) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
           worth = "1";
-        } else {
+        } else
           worth = "0";
           knopAan = "0";
-        }
        }
        
        if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) { // the bushbutton has to function as a switch, so we toggle a bool variable "knopAan". 
+        
         if (knop) { // if the switch is currently on, and the button was pressed: turn the switch off.
           worth = "0";
           knopAan = 0;
@@ -41,9 +40,7 @@ std::string buildStatusMsg(std::string function, bool knop){
           worth = "1";
           knopAan = 1;
         }
-       } //else {
-        //worth = "0";
-       //}
+       }*/
        
       temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
       delay(0);
@@ -72,20 +69,16 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
     Serial.println("send a reply to the broadcast request\n\r");
     return 1;
     
-  } else if (parsedMsg[2].compare("actuateBool") == 0) {
-    Serial.println("we received a actuateBool message");
-    for (int i = 3; i < (3 + AMOUNTOFACTUATORS); i++) {
-
-      // we want to change the actuator's wanted value to the one in the message:
-      actuator[i-3][1] = atoi(parsedMsg[i].c_str()); //atoi(): sting to int
-      delay(0);
+    } else if (parsedMsg[2].compare("actuateBool") == 0) {
+      Serial.println("we received a actuateBool message");
+      setLedColour(atoi(parsedMsg[3].c_str()),atoi(parsedMsg[4].c_str()),atoi(parsedMsg[5].c_str()));
+      return 1;
+    } else {
+    // if we don't understand the message, return  0.
+      Serial.println("couldn't handle the message\n\r");
+      return 0;
     }
-    return 1;
-    
-  } else 
-    // if we don't understand the message, return a 0.
-  Serial.println("couldn't handle the message\n\r");
-  return 0;
+    return 0;
 }
 
 
