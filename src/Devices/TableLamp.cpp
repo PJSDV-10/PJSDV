@@ -26,10 +26,10 @@ std::string TableLamp::handleSensorUpdate(XmlReader * xml_r) {
 
     std::string toBeReturned;
 
-    /* 
+    /*
         Sensors:
             1. PIR
-        
+
         Actuators:
             1. RGB Led
 
@@ -56,4 +56,32 @@ std::string TableLamp::handleSensorUpdate(XmlReader * xml_r) {
     toBeReturned = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeReturned;
+}
+
+std::string TableLamp::handleWebsiteUpdate(XmlReader * xml_r) {
+    /* init variables to be used */
+    std::string destination;
+    std::vector<double> sentStatus;
+    std::vector<double> sendStatus;
+    //std::cout << "reading destination" << std::endl;
+    destination = xml_r->getClientName();
+    //std::cout << "getting data" << std::endl;
+    sentStatus = xml_r->getData();
+    //std::cout << "data gotten" << std::endl;
+    std::string toBeSend;
+
+    // if site is 1 data is 1 else data is 0
+    if (sentStatus[0]){
+        sendStatus.push_back(1);
+        sendStatus.push_back(1);
+    } else {
+        sendStatus.push_back(0);
+        sendStatus.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(sendStatus);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
 }

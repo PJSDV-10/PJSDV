@@ -30,6 +30,21 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
     return toBeReturned;
 }
 
+std::string Website::handleWebsiteUpdate(XmlReader* xml_r) {
+    std::string destination;
+    std::vector<double> sentStatus;
+    std::vector<double> sendStatus;
+    std::cout << "reading destination" << std::endl;
+    destination = xml_r->getSenderName();
+
+    sentStatus = xml_r->getData();
+
+    std::string toBeReturned;
+
+    toBeReturned = "<message><header><sender>server</sender><receiver>website</receiver></header><function>answerToUpdateRequest</function><context></context></message>";
+    return toBeReturned;
+}
+
 /*XmlReader *Website::sendStatusRequest(fd_set* all_sockets){
     XmlWriter xml_w("getStatusBroadcast", "allWemos");
     xml_w.buildXMLStatusRequest();
@@ -40,7 +55,7 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
     xml_w.buildXMLAnswerToSR();
     for (int i = 0; i < FD_SETSIZE; i++)
     {
-        if(FD_ISSET(i, all_sockets)){        
+        if(FD_ISSET(i, all_sockets)){
             ssize_t error = send(i, toBeSent.c_str(), strlen(toBeSent.c_str()), 0);
             if(error = -1){
                 if(errno = ECONNRESET){
@@ -64,6 +79,5 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
     xml_w.finalizeAnswerToSR();
     std::string sendBack;
     sendBack = xml_w.getXML();
-    
-}*/
 
+}*/

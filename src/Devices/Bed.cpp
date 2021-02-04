@@ -29,7 +29,7 @@ std::string Bed::handleSensorUpdate(XmlReader * xml_r) {
 
     std::string toBeReturned;
 
-    /* 
+    /*
         Receiving order:
         1: push button
         2: force sensor
@@ -41,7 +41,7 @@ std::string Bed::handleSensorUpdate(XmlReader * xml_r) {
             make pushbutton to switch using PBState
         second:
             turn on LED is pbstate is true
-        third: 
+        third:
             save the time and compare it ever time before the select function in socketServer...
             The LED has to turn off after 30 minutes automatically.
     */
@@ -58,7 +58,7 @@ std::string Bed::handleSensorUpdate(XmlReader * xml_r) {
         sendStatus.push_back(0);
     }
 
-    
+
 
     /* Todo: add a third logic thing */
     XmlWriter xml_w("actuateBool", destination);
@@ -66,4 +66,32 @@ std::string Bed::handleSensorUpdate(XmlReader * xml_r) {
     toBeReturned = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeReturned;
+}
+
+std::string Bed::handleWebsiteUpdate(XmlReader * xml_r) {
+    /* init variables to be used */
+    std::string destination;
+    std::vector<double> sentStatus;
+    std::vector<double> sendStatus;
+    //std::cout << "reading destination" << std::endl;
+    destination = xml_r->getClientName();
+    //std::cout << "getting data" << std::endl;
+    sentStatus = xml_r->getData();
+    //std::cout << "data gotten" << std::endl;
+    std::string toBeSend;
+
+    // if site is 1 data is 1 else data is 0
+    if (sentStatus[0]){
+        sendStatus.push_back(1);
+        sendStatus.push_back(1);
+    } else {
+        sendStatus.push_back(0);
+        sendStatus.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(sendStatus);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
 }

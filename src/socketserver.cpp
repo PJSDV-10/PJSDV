@@ -170,7 +170,7 @@ void SocketServer::handleRequest(int fd){
     //Map xml = xml_r.getParsedDoc();
     if(xml_r.getFunction() == "authentication"){
         std::cout << "The following device authenticated with the server:\n"
-                    << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
+                    << xml_r.getClientName() << "\nThis one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
             std::cout << "Wemos failure with authentication" << std::endl;
 
@@ -216,7 +216,7 @@ void SocketServer::handleRequest(int fd){
         /*
             Handling for the getStatusAll request from the website.
             Let's hope this actually goddamn works XD
-
+senderName compa
             A thing you can try when it doesn't work is to add a select() call to make sure you can actually
             write to the sockets.
             */
@@ -290,12 +290,14 @@ void SocketServer::handleRequest(int fd){
     } else if(xml_r.getFunction() == "changeStatus"){
 
         std::string statusmsg;
-        std::cout << "Status update received for:\n" << xml_r.getSenderName() << std::endl;
+        std::cout << "Status update received from: " << xml_r.getSenderName() << std::endl;
+        std::cout << "update for wemos: " << xml_r.getClientName() << '\n';
 
 
         for (std::size_t i = 0; i < wemosjes.size(); i++){
             std::cout << "trying to find right wemos" << std::endl;
-            if (wemosjes[i]->getSenderName() == xml_r.getClientName())
+            std::cout << "wemos name: "<< wemosjes[i]->getClientName() << '\n';
+            if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
                 statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r);
                 break;

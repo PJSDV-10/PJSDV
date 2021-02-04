@@ -83,7 +83,7 @@ public:
 
 class Website : public Wemos{
 private:
-    
+
 
 public:
     Website(int fd, std::string clientName, std::string senderName);
