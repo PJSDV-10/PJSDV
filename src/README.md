@@ -160,3 +160,17 @@ reply:
 <unknown/>
 ```
 
+server to selected wemos:
+```xml
+<message>
+    <header>
+        <sender>server</sender>
+        <receiver>wemosnaam</receiver>
+    </header>
+    <function>actuateBool</function>
+    <context>
+        <data1>0</data1> <!-- Vibration motor -->
+        <data2>0</data2> <!-- LED -->
+    </context>
+```
+</message>
