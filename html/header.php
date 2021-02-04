@@ -2,7 +2,7 @@
 	$page = $_GET['p'];
 } else {
 	$page = "Status";
-} 
+}
 ?>
 <!DOCTYPE html>
 <html>

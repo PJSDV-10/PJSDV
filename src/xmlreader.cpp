@@ -131,6 +131,7 @@ bool XmlReader::checkPassword(std::string password)
 }
 
 bool XmlReader::empty(){
-    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented.\n\rPlease don't use it, it will always return false for safety" << std::endl;
+    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented."
+                 "\n\rPlease don't use it, it will always return false for safety" << std::endl;
     return false;
 }

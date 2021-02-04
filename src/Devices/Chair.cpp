@@ -29,32 +29,10 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     sentStatus = xml_r->getData();
     //std::cout << "data gotten" << std::endl;
     std::string toBeReturned;
-    /* 
-        OBSOLETE SINCE WEMOS FIX
-        Check if the pushbutton changed. It should act as a switch, which is only implemented here.
-
-        If button is true && !stepState
-            stepState = true
-        If button is false && stepState
-            PBState = true
-            stepState = false
-    */
-
-    /*if((int)std::round(sentStatus[1]) && !stepState){
-        stepState = true;
-    }
-
-    if(!(int)std::round(sentStatus[1]) && stepState){
-        PBState = !PBState;
-        stepState = false;
-    }*/
 
     std::cout << "PBState status: " << PBState << std::endl;
-    
-    /*
-        force sensor + push button
-        if both are on, then send 1, otherwise 0. XOR them
-    */
+
+
     if ((int)std::round(sentStatus[0]) && (int)std::round(sentStatus[1]))
     {
         std::cout << "both are on" << std::endl;
@@ -78,6 +56,33 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     return toBeReturned;
 }
 
+std::string Chair::handleWebsiteUpdate(XmlReader * xml_r) {
+    /* init variables to be used */
+    std::string destination;
+    std::vector<double> sentStatus;
+    std::vector<double> sendStatus;
+    //std::cout << "reading destination" << std::endl;
+    destination = xml_r->getClientName();
+    //std::cout << "getting data" << std::endl;
+    sentStatus = xml_r->getData();
+    //std::cout << "data gotten" << std::endl;
+    std::string toBeSend;
+
+    // if site is 1 data is 1 else data is 0
+    if (sentStatus[0]){
+        sendStatus.push_back(1);
+        sendStatus.push_back(1);
+    } else {
+        sendStatus.push_back(0);
+        sendStatus.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(sendStatus);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
+}
 /*XmlReader *Chair::sendStatusRequest(fd_set* all_sockets){
 
 }*/
