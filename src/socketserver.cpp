@@ -7,7 +7,8 @@ SocketServer::SocketServer(const char *port)
 
 
 
-    /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
+    /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket.
+     * By itself it doesn't do anything.
     The arguments passed are:
     PF_INET:
         This specifies that the socket should operate on the Profile Family for Internet addresses.
@@ -67,7 +68,9 @@ SocketServer::SocketServer(const char *port)
         exit(EXIT_FAILURE);
     }
 
-    /* The serverInfo is not needed anymore, as the socket is already bound at this point. This essentially just frees all the struct. It's a specialized function because serverInfo is a addrinfo struct, which is a linked list. It's made specially for this struct and is a native function. */
+    /* The serverInfo is not needed anymore, as the socket is already bound at this point. This essentially just frees
+     * all the struct. It's a specialized function because serverInfo is a addrinfo struct, which is a linked list.
+     * It's made specially for this struct and is a native function. */
     freeaddrinfo(serverInfo);
 }
 
@@ -316,18 +319,21 @@ void SocketServer::handleRequest(int fd){
     else if(xml_r.getFunction() == "changeStatusAan"){
 
         std::string statusmsg;
+        int fd_tmp;
 
         for (std::size_t i = 0; i < wemosjes.size(); i++){
             std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
             if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
                 statusmsg = wemosjes[i]->website(&xml_r,1);
+                fd_tmp = wemosjes[i]->getFD();
+
                 break;
             }
         }
         std::cout << statusmsg << std::endl;
-        send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
-        //std::cout << "Reply to sensorUpdate sent" << std::endl;
+        send(fd_tmp, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        std::cout << "Reply to sensorUpdate sent" << std::endl;
 
         /* Close socket in case that the client is the website */
         if(xml_r.getSenderName() == "website"){
@@ -339,18 +345,19 @@ void SocketServer::handleRequest(int fd){
     else if(xml_r.getFunction() == "changeStatusUit"){
 
         std::string statusmsg;
-
+        int fd_tmp;
         for (std::size_t i = 0; i < wemosjes.size(); i++){
             std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
             if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
                 statusmsg = wemosjes[i]->website(&xml_r,0);
+                fd_tmp = wemosjes[i]->getFD();
                 break;
             }
         }
         std::cout << statusmsg << std::endl;
-        send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
-        //std::cout << "Reply to sensorUpdate sent" << std::endl;
+        send(fd_tmp, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        std::cout << "Reply to sensorUpdate sent" << std::endl;
 
         /* Close socket in case that the client is the website */
         if(xml_r.getSenderName() == "website"){
