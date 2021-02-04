@@ -46,6 +46,20 @@ void XmlReader::parseDocument(){
         //parsedContext.emplace("type", type);
         parseDeviceData();
     }
+    else if (function == "changeStatusAan")
+    {
+        clientName = context_node->first_node("clientName")->value();
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
+    }else if (function == "changeStatusUit")
+    {
+        clientName = context_node->first_node("clientName")->value();
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
+    }
+
 }
 
 void XmlReader::parseDeviceData(){
