@@ -98,6 +98,21 @@ std::string Wall::handleWebsiteUpdate(XmlReader * xml_r) {
     return toBeSend;
 }
 std::string Wall::website(XmlReader * xml_r, int i) {
+    std::vector<float> data;
+    std::string destination;
+    destination = xml_r->getClientName();
+    std::string toBeSend;
 
+    if (i == 1){
+        data.push_back(100);
+    }else {
+        data.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(data);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
     return 0;
 }

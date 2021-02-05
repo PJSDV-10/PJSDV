@@ -87,5 +87,24 @@ std::string TableLamp::handleWebsiteUpdate(XmlReader * xml_r) {
 }
 std::string TableLamp::website(XmlReader * xml_r, int i) {
 
-return 0;
+    std::vector<float> data;
+    std::string destination;
+    destination = xml_r->getClientName();
+    std::string toBeSend;
+
+    if (i == 1){
+        data.push_back(255);
+        data.push_back(255);
+        data.push_back(255);
+    }else {
+        data.push_back(0);
+        data.push_back(0);
+        data.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(data);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
 }

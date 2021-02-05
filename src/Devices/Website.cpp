@@ -45,7 +45,7 @@ std::string Website::handleWebsiteUpdate(XmlReader* xml_r) {
     return toBeReturned;
 }
 std::string Website::website(XmlReader * xml_r, int i) {
-
+    // Not necessary
     return 0;
 }
 

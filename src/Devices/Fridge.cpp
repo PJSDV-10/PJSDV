@@ -100,6 +100,22 @@ std::string Fridge::handleWebsiteUpdate(XmlReader * xml_r) {
     return toBeSend;
 }
 std::string Fridge::website(XmlReader * xml_r, int i) {
+    std::vector<float> data;
+    std::string destination;
+    destination = xml_r->getClientName();
+    std::string toBeSend;
 
-    return 0;
+    if (i == 1){
+        data.push_back(1);
+        data.push_back(1);
+    }else {
+        data.push_back(0);
+        data.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(data);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
 }
