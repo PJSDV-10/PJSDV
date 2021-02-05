@@ -32,7 +32,7 @@ std::string buildStatusMsg(std::string function, bool knop){
         }
        }
        
-       /*if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) { // the pushbutton has to function as a switch, so we toggle a bool variable "knopAan". 
+       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) { // the pushbutton has to function as a switch, so we toggle a bool variable "knopAan". 
         
         if (knop) { // if the switch is currently on, and the button was pressed: turn the switch off.
           worth = "0";
@@ -41,7 +41,7 @@ std::string buildStatusMsg(std::string function, bool knop){
           worth = "1";
           knopAan = 1;
         }
-       }*/
+       }
        
       temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
       delay(0);
@@ -66,7 +66,7 @@ bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[2].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
     Serial.println("Received an answerToStatusRequest msg");
-    client.write(buildStatusMsg("answerToStatusRequest", knopAan).c_str());
+    client.write(answerBuildStatusMsg("answerToStatusRequest").c_str()); //stuur hier antwoord naar site actuators
     Serial.println("send a reply to the broadcast request\n\r");
     return 1;
     
@@ -121,3 +121,18 @@ void authenticating(){
     Serial.println("authentication procedure not completed, trying again.");
   
 }
+
+
+
+
+std::string answerBuildStatusMsg(std::string function){
+  // composes a string that has all the sensor data formatted in xml.
+  
+  std::string temp = Buildheader(); // message starts off with a header
+  temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";
+      
+      temp +=  "<data1>" + intToString(sensor[0][0])+ " </data1>"+ "<data2>" +intToString(sensor[1][0])+ " </data2>";
+     delay(0);
+     temp +=   "</context></message>";
+     return temp;
+  }
