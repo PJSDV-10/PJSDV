@@ -56,7 +56,7 @@ std::string Chair::handleSensorUpdate(XmlReader *xml_r){
     return toBeReturned;
 }
 
-std::string Chair::website(XmlReader * xml_r, int i) {
+std::string Chair::handleWebsiteUpdate(XmlReader * xml_r, int i) {
     std::vector<float> data;
     std::string destination;
     destination = xml_r->getClientName();
@@ -79,36 +79,6 @@ std::string Chair::website(XmlReader * xml_r, int i) {
 
 }
 
-std::string Chair::handleWebsiteUpdate(XmlReader * xml_r) {
-    /* init variables to be used */
-    std::string destination;
-    std::vector<float> sentStatus;
-    std::vector<float> sendStatus;
-    //std::cout << "reading destination" << std::endl;
-    destination = xml_r->getClientName();
-    //std::cout << "getting data" << std::endl;
-    sentStatus = xml_r->getData();
-    //std::cout << "data gotten" << std::endl;
-    std::string toBeSend;
-
-
-
-//    // if site is 1 data is 1 else data is 0
-//    if ((int)std::round(sentStatus[0])){
-//        sendStatus.push_back(1);
-//        sendStatus.push_back(1);
-//    } else {
-//        sendStatus.push_back(0);
-//        sendStatus.push_back(0);
-//    }
-
-    std::cout << "sentStatus: "<< (sentStatus[0]) << sentStatus[1] << '\n';
-    XmlWriter xml_w("actuateBool", destination);
-    xml_w.buildXMLActuate(sentStatus);
-    toBeSend = xml_w.getXML();
-    xml_w.~XmlWriter();
-    return toBeSend;
-}
 /*XmlReader *Chair::sendStatusRequest(fd_set* all_sockets){
 
 }*/

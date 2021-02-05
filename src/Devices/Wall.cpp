@@ -70,34 +70,8 @@ std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
     return toBeReturned;
 }
 
-std::string Wall::handleWebsiteUpdate(XmlReader * xml_r) {
-    /* init variables to be used */
-    std::string destination;
-    std::vector<float> sentStatus;
-    std::vector<float> sendStatus;
-    //std::cout << "reading destination" << std::endl;
-    destination = xml_r->getClientName();
-    //std::cout << "getting data" << std::endl;
-    sentStatus = xml_r->getData();
-    //std::cout << "data gotten" << std::endl;
-    std::string toBeSend;
 
-    // if site is 1 data is 1 else data is 0
-    if (sentStatus[0]){
-        sendStatus.push_back(1);
-        sendStatus.push_back(1);
-    } else {
-        sendStatus.push_back(0);
-        sendStatus.push_back(0);
-    }
-
-    XmlWriter xml_w("actuateBool", destination);
-    xml_w.buildXMLActuate(sendStatus);
-    toBeSend = xml_w.getXML();
-    xml_w.~XmlWriter();
-    return toBeSend;
-}
-std::string Wall::website(XmlReader * xml_r, int i) {
+std::string Wall::handleWebsiteUpdate(XmlReader * xml_r, int i) {
     std::vector<float> data;
     std::string destination;
     destination = xml_r->getClientName();

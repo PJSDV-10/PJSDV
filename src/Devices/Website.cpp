@@ -29,22 +29,7 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
     toBeReturned = "<message><header><sender>server</sender><receiver>website</receiver></header><function>answerToStatusRequest</function><context></context></message>";
     return toBeReturned;
 }
-
-std::string Website::handleWebsiteUpdate(XmlReader* xml_r) {
-    std::string destination;
-    std::vector<float> sentStatus;
-    std::vector<float> sendStatus;
-    std::cout << "reading destination" << std::endl;
-    destination = xml_r->getSenderName();
-
-    sentStatus = xml_r->getData();
-
-    std::string toBeReturned;
-
-    toBeReturned = "<message><header><sender>server</sender><receiver>website</receiver></header><function>answerToUpdateRequest</function><context></context></message>";
-    return toBeReturned;
-}
-std::string Website::website(XmlReader * xml_r, int i) {
+std::string Website::handleWebsiteUpdate(XmlReader * xml_r, int i) {
     // Not necessary
     return 0;
 }

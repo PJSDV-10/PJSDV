@@ -290,7 +290,7 @@ void SocketServer::handleRequest(int fd){
         closeConnection(fd);
         std::cout << "Returning" << std::endl;
         // Destroy
-    } else if(xml_r.getFunction() == "changeStatus"){
+   } /*else if(xml_r.getFunction() == "changeStatus"){
 
         std::string statusmsg;
         std::cout << "update for wemos: " << xml_r.getClientName() << '\n';
@@ -308,13 +308,13 @@ void SocketServer::handleRequest(int fd){
         send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
         //std::cout << "Reply to sensorUpdate sent" << std::endl;
 
-        /* Close socket in case that the client is the website */
+        // Close socket in case that the client is the website
         if(xml_r.getSenderName() == "website"){
             closeConnection(fd);
         }
         // Destroy
         return;
-    }
+    }*/
 
     else if(xml_r.getFunction() == "changeStatusAan"){
 
@@ -325,7 +325,7 @@ void SocketServer::handleRequest(int fd){
             std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
             if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
-                statusmsg = wemosjes[i]->website(&xml_r,1);
+                statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r,1);
                 fd_tmp = wemosjes[i]->getFD();
 
                 break;
@@ -350,7 +350,7 @@ void SocketServer::handleRequest(int fd){
             std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
             if (wemosjes[i]->getClientName() == xml_r.getClientName())
             {
-                statusmsg = wemosjes[i]->website(&xml_r,0);
+                statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r,0);
                 fd_tmp = wemosjes[i]->getFD();
                 break;
             }
