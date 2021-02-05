@@ -16,7 +16,7 @@ Request:
     </header>
     <function>authentication</function>
     <context>
-        <password>JeMoederIsEenWachtwoord</password>
+        <password>solarwinds123</password>
         <clientName>Keuken Lamp</clientName>
         <type>lamp</type>
     </context>
@@ -77,7 +77,7 @@ Request:
     </header>
     <function>getStatusBroadcast</function>
     <context>
-        <password>JeMoederIsEenWachtwoord</password>
+        <password>solarwinds123</password>
     </context>
 </message>
 ```
@@ -110,7 +110,7 @@ Request:
     </header>
     <function>authentication</function>
     <context>
-        <password>JeMoederIsEenWachtwoord</password>
+        <password>solarwinds123</password>
         <clientName>Website</clientName>
         <type>website</type>
     </context>
@@ -139,7 +139,7 @@ Request:
     </header>
     <function>getStatusAll</function>
     <context>
-        <password>JeMoederIsEenWachtwoord</password>
+        <password>solarwinds123</password>
     </context>
 </message>
 ```
@@ -179,7 +179,7 @@ Request:
 	</header>
 	<function>changeStatus</function>
 	<context>
-		<password>JeMoederIsEenWachtwoord</password>
+		<password>solarwinds123</password>
         <clientName>UniekeWemosNaam</clientName>
         <type>lamp</type>
         <data1>1</data1>

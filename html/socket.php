@@ -40,7 +40,7 @@ function initialiseSocket() {
 	$out .= "</header>";
 	$out .= "<function>authentication</function>";
 	$out .= "<context>";
-	$out .= "<password>JeMoederIsEenWachtwoord</password>";
+	$out .= "<password>solarwinds123</password>";
 	$out .= "<clientName>Website</clientName>";
 	$out .= "<type>website</type>";
 	$out .= "</context>";
@@ -62,7 +62,7 @@ function requestAllSocket() {
 	$out .= "</header>";
 	$out .= "<function>getStatusAll</function>";
 	$out .= "<context>";
-	$out .= "<password>JeMoederIsEenWachtwoord</password>";
+	$out .= "<password>solarwinds123</password>";
 	$out .= "</context>";
 	$out .= "</message>";
 
@@ -90,7 +90,7 @@ function toggleDevice($name, $type, $data0, $data1) {
 	}
 	$out .= "<function>changeStatus${dt}</function>";
 	$out .= "<context>";
-	$out .= "<password>JeMoederIsEenWachtwoord</password>";
+	$out .= "<password>solarwinds123</password>";
 	$out .= "<clientName>${name}</clientName>";
 	$out .= "<type>${type}</type>";
 	$out .= "<data1>${data0}</data1>";
