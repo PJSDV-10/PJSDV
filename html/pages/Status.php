@@ -12,11 +12,11 @@
     }
 
     $apparaten = array(
-        array("Column", "Push button: ", "Gas sensor: "),
-        array("Bed", "Push button: ", "Force sensor: "),
-        array("Chair", "Force sensor: ", "Push button: "),
-        array("Table-lamp", "PIR sensor: ", "Force sensor: ")
-    )
+        array("column", "Push button: ", "Gas sensor: "),
+        array("bed", "Push button: ", "Force sensor: "),
+        array("chair", "Force sensor: ", "Push button: "),
+        array("tablelamp", "PIR sensor: ", "Force sensor: ")
+    );
     function onOrOff($data) {
         if($data > 0) {
             return "aan";
@@ -27,10 +27,11 @@
     function getDevice($type, $dat1, $dat2) {
         $returnString = "";
         $index = 0;
-        for($apparaten as $app) {
-            if($type == $app) {
-                $returnString .= $apparaten[$index][0] . onOrOff($dat1) . "<br>";
-                $returnString .= $apparaten[$index][1] . onOrOff($dat2);
+	global $apparaten;
+        foreach($apparaten as $app) {
+            if($type == $app[0]) {
+                $returnString .= $apparaten[$index][1] . onOrOff($dat1) . "<br>";
+                $returnString .= $apparaten[$index][2] . onOrOff($dat2);
             }
             $index++;
         }
@@ -51,7 +52,9 @@
     foreach($devices as $device) {
         echo "<tr>";
         echo "<td>".$device->type."</td>";
-                echo "<td>".getDevice($device->type, $device->data1, $device->data2)."</td>";
+	$printdeze = getDevice($device->type, $device->data1, $device->data2);
+                echo "<td>".$printdeze."</td>";
+	$status;
         if($device->data1 > 0) { $status = "turn off"; }
         else {$status = "turn on"; }
         echo "<td><form method=\"post\"><input type=\"submit\" name=\""
