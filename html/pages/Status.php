@@ -53,13 +53,11 @@ for($i; $i >= 0; $i--) {
 	if($devices[$i]->data1 == 1) {
 		$d1 = 0;
 	}
-	$d2 = 1;
-	if(isset($devices[$i]->data2)) {
-		if($devices[$i]->data2 == 1) {
-			$d2 = 0;
-		}
-	} else {
-		$d2 = NULL;
+	$d2 = NULL;
+	if($devices[$i]->data2 == 1) {
+		$d2 = 0;
+	} else if($devices[$i]->data2 == 0){
+		$d2 = 1;
 	}
         toggleDevice($devices[$i]->name, $devices[$i]->type, $d1, $d2);
 
