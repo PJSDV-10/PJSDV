@@ -1,5 +1,7 @@
 CREATE SCHEMA PJSDV;
 
+CONNECT PJSDV;
+
 CREATE TABLE users (
 	usr_ID int NOT NULL AUTO_INCREMENT,
 	username varchar(255) NOT NULL,
@@ -22,3 +24,5 @@ CREATE TABLE devices (
 	PRIMARY KEY (type_number),
 	UNIQUE (type_number)
 );
+
+INSERT INTO users(username, password) VALUES ("admin", "admin");

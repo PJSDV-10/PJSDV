@@ -16,15 +16,15 @@ Fridge::~Fridge() {
 std::string Fridge::handleSensorUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
 
     destination = xml_r->getSenderName();
     sentStatus = xml_r->getData();
 
     std::string toBeReturned;
 
-    /* 
+    /*
         Sensors order:
         1: switch
         2: NTC (koelkast)
@@ -41,7 +41,7 @@ std::string Fridge::handleSensorUpdate(XmlReader * xml_r) {
                 peltier = 1
             else if switch == true && NTC (koelkast) < -35
                 peltier = 0
-            
+
             if NTC (peltier) > 60
                 fan = 1
             else
@@ -63,11 +63,32 @@ std::string Fridge::handleSensorUpdate(XmlReader * xml_r) {
     }else{
         sendStatus.push_back(0);
     }
-    
-    
+
+
     XmlWriter xml_w("actuateBool", destination);
     xml_w.buildXMLActuate(sendStatus);
     toBeReturned = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeReturned;
+}
+
+std::string Fridge::handleWebsiteUpdate(XmlReader * xml_r, int i) {
+    std::vector<float> data;
+    std::string destination;
+    destination = xml_r->getClientName();
+    std::string toBeSend;
+
+    if (i == 1){
+        data.push_back(1);
+        data.push_back(1);
+    }else {
+        data.push_back(0);
+        data.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(data);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
 }

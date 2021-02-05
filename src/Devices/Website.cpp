@@ -17,8 +17,8 @@ Website::~Website(){
 std::string Website::handleSensorUpdate(XmlReader* xml_r){
     /* Realistically the actual function is called getStatusAll, but this works fine too */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
     std::cout << "reading destination" << std::endl;
     destination = xml_r->getSenderName();
 
@@ -28,6 +28,10 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
 
     toBeReturned = "<message><header><sender>server</sender><receiver>website</receiver></header><function>answerToStatusRequest</function><context></context></message>";
     return toBeReturned;
+}
+std::string Website::handleWebsiteUpdate(XmlReader * xml_r, int i) {
+    // Not necessary
+    return 0;
 }
 
 /*XmlReader *Website::sendStatusRequest(fd_set* all_sockets){
@@ -40,7 +44,7 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
     xml_w.buildXMLAnswerToSR();
     for (int i = 0; i < FD_SETSIZE; i++)
     {
-        if(FD_ISSET(i, all_sockets)){        
+        if(FD_ISSET(i, all_sockets)){
             ssize_t error = send(i, toBeSent.c_str(), strlen(toBeSent.c_str()), 0);
             if(error = -1){
                 if(errno = ECONNRESET){
@@ -64,6 +68,5 @@ std::string Website::handleSensorUpdate(XmlReader* xml_r){
     xml_w.finalizeAnswerToSR();
     std::string sendBack;
     sendBack = xml_w.getXML();
-    
-}*/
 
+}*/

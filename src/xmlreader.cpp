@@ -1,4 +1,5 @@
 #include "xmlreader.h"
+#include <cmath>
 
 
 void XmlReader::parseDocument(){
@@ -38,6 +39,27 @@ void XmlReader::parseDocument(){
         //parsedContext.emplace("type", type);
         parseDeviceData();
     }
+    else if (function == "changeStatus")
+    {
+        clientName = context_node->first_node("clientName")->value();
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
+    }
+    else if (function == "changeStatusAan")
+    {
+        clientName = context_node->first_node("clientName")->value();
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
+    }else if (function == "changeStatusUit")
+    {
+        clientName = context_node->first_node("clientName")->value();
+        type = context_node->first_node("type")->value();
+        //parsedContext.emplace("type", type);
+        parseDeviceData();
+    }
+
 }
 
 void XmlReader::parseDeviceData(){
@@ -47,6 +69,9 @@ void XmlReader::parseDeviceData(){
 
         data.emplace_back(atoi(context_node->first_node("data1")->value())); //Force sensor
         data.emplace_back(atoi(context_node->first_node("data2")->value())); //Push button
+        std::cout << "data1 in XmlReader: " << data[0] << '\n';
+        std::cout << "data2 in XmlReader: " << data[1] << '\n';
+
     }else if(type == "column"){
         std::cout << "Column" << std::endl;
 
@@ -131,6 +156,7 @@ bool XmlReader::checkPassword(std::string password)
 }
 
 bool XmlReader::empty(){
-    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented.\n\rPlease don't use it, it will always return false for safety" << std::endl;
+    std::cout << "A check was done if an xmlreader was empty, however this function is not yet implemented."
+                 "\n\rPlease don't use it, it will always return false for safety" << std::endl;
     return false;
 }

@@ -17,7 +17,7 @@ std::string buildStatusMsg(std::string function, bool knop){
   std::string temp = Buildheader(); // message starts off with a header
   temp += "<function>"+ function + "</function><context><password>" +wachtwoord+ "</password><type>" + type + "</type>";
   
-    for (int i = 0;i<AMOUNTOFSENSORS;i++) { //voeg elke keer neeiwe sensot toe
+    for (int i = 0;i<AMOUNTOFSENSORS;i++) { //voeg elke keer nieuwe sensor toe
       delay(0);
       
        std::string roundd = intToString(i + 1); // this will be the number x in <datax> in the xml message
@@ -26,12 +26,13 @@ std::string buildStatusMsg(std::string function, bool knop){
        if (sensorNames[i][1].compare("forceSensor") == 0) { // if the sensor is a force sensor:
         if (sensor[i][0] > 200) { // if the sensor is higher than 200, someone is problably sitting on the chair. We send a '1', otherwise we send '0'.
           worth = "1";
-        } else
+        } else {
           worth = "0";
           knopAan = "0";
+        }
        }
        
-       if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) { // the bushbutton has to function as a switch, so we toggle a bool variable "knopAan". 
+       /*if (sensorNames[i][1].compare("pushButton") == 0 && sensor[i][0] == 1) { // the pushbutton has to function as a switch, so we toggle a bool variable "knopAan". 
         
         if (knop) { // if the switch is currently on, and the button was pressed: turn the switch off.
           worth = "0";
@@ -40,7 +41,7 @@ std::string buildStatusMsg(std::string function, bool knop){
           worth = "1";
           knopAan = 1;
         }
-       }
+       }*/
        
       temp +=  "<data"+roundd+">"+ worth +"</data"+roundd+">";
       delay(0);
@@ -64,13 +65,13 @@ std::string intToString(int i){ //conver int to string
 bool handleMessage(std::string parsedMsg[BUFFERSIZE]) {
   
   if(parsedMsg[2].compare("getStatusBroadcast") == 0) { // can't do switch statements with strings so giant if else it's gonna have to be.
-    Serial.println("Received a awnserToStatusRequest msg");
+    Serial.println("Received an answerToStatusRequest msg");
     client.write(buildStatusMsg("answerToStatusRequest", knopAan).c_str());
     Serial.println("send a reply to the broadcast request\n\r");
     return 1;
     
   } else if (parsedMsg[2].compare("actuateBool") == 0) {
-    Serial.println("we received a actuateBool message");
+    Serial.println("we received an actuateBool message");
     for (int i = 3; i < (3 + AMOUNTOFACTUATORS); i++) {
 
       // we want to change the actuator's wanted value to the one in the message:

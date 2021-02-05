@@ -24,6 +24,8 @@ public:
 
     //virtual const bool getStatus(std::string sensor) = 0;
     virtual std::string handleSensorUpdate(XmlReader *) = 0;
+    virtual std::string handleWebsiteUpdate(XmlReader *, int) = 0;
+
     //virtual XmlReader* sendStatusRequest();
     //    virtual std::string handleSiteRequest();
 };

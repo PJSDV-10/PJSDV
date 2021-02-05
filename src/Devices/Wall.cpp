@@ -17,22 +17,22 @@ Wall::~Wall() {
 std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
     /* init variables to be used */
     std::string destination;
-    std::vector<double> sentStatus;
-    std::vector<double> sendStatus;
+    std::vector<float> sentStatus;
+    std::vector<float> sendStatus;
 
     destination = xml_r->getSenderName();
     sentStatus = xml_r->getData();
 
     std::string toBeReturned;
 
-    /* 
+    /*
         Receiving order:
         1: LDR (1-1024)
         2: potentiometer (1-1024)
 
         Sending order:
         1: lcd ( 1 - 100 )
-        2: rgb 
+        2: rgb
 
         first:
             if ldr / 10 > 255
@@ -59,7 +59,7 @@ std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
     }else{
         sendStatus.push_back((int)std::round(sentStatus[1]/4));
     }
-    
+
     sendStatus.push_back(0);
     sendStatus.push_back(0);
 
@@ -68,4 +68,25 @@ std::string Wall::handleSensorUpdate(XmlReader * xml_r) {
     toBeReturned = xml_w.getXML();
     xml_w.~XmlWriter();
     return toBeReturned;
+}
+
+
+std::string Wall::handleWebsiteUpdate(XmlReader * xml_r, int i) {
+    std::vector<float> data;
+    std::string destination;
+    destination = xml_r->getClientName();
+    std::string toBeSend;
+
+    if (i == 1){
+        data.push_back(100);
+    }else {
+        data.push_back(0);
+    }
+
+    XmlWriter xml_w("actuateBool", destination);
+    xml_w.buildXMLActuate(data);
+    toBeSend = xml_w.getXML();
+    xml_w.~XmlWriter();
+    return toBeSend;
+    return 0;
 }

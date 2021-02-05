@@ -7,7 +7,8 @@ SocketServer::SocketServer(const char *port)
 
 
 
-    /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket. By itself it doesn't do anything.
+    /*server_fd is the File Descriptor for the socket. Calling socket() simply creates a file descriptor for the websocket.
+     * By itself it doesn't do anything.
     The arguments passed are:
     PF_INET:
         This specifies that the socket should operate on the Profile Family for Internet addresses.
@@ -67,7 +68,9 @@ SocketServer::SocketServer(const char *port)
         exit(EXIT_FAILURE);
     }
 
-    /* The serverInfo is not needed anymore, as the socket is already bound at this point. This essentially just frees all the struct. It's a specialized function because serverInfo is a addrinfo struct, which is a linked list. It's made specially for this struct and is a native function. */
+    /* The serverInfo is not needed anymore, as the socket is already bound at this point. This essentially just frees
+     * all the struct. It's a specialized function because serverInfo is a addrinfo struct, which is a linked list.
+     * It's made specially for this struct and is a native function. */
     freeaddrinfo(serverInfo);
 }
 
@@ -170,10 +173,10 @@ void SocketServer::handleRequest(int fd){
     //Map xml = xml_r.getParsedDoc();
     if(xml_r.getFunction() == "authentication"){
         std::cout << "The following device authenticated with the server:\n"
-                    << xml_r.getClientName() << "This one has file descriptor: " << fd << std::endl;
+                    << xml_r.getClientName() << "\nThis one has file descriptor: " << fd << std::endl;
         if(authWemos(fd, xml_r) == 1){ // 1 means error
             std::cout << "Wemos failure with authentication" << std::endl;
-            
+
         }
         std::string respondmsg;
         XmlWriter xml_w(xml_r);
@@ -216,7 +219,7 @@ void SocketServer::handleRequest(int fd){
         /*
             Handling for the getStatusAll request from the website.
             Let's hope this actually goddamn works XD
-
+            senderName compa
             A thing you can try when it doesn't work is to add a select() call to make sure you can actually
             write to the sockets.
             */
@@ -266,7 +269,7 @@ void SocketServer::handleRequest(int fd){
                     std::cout << "message received: " << buffer2 << std::endl;
                     XmlReader xml_rr(buffer2);
                     xml_rr.parseDocument();
-                    xml_ww.addDataToAnswer(xml_rr.getType(), xml_rr.getClientName(), xml_rr.getData());
+                    xml_ww.addDataToAnswer(xml_rr.getType(), xml_rr.getSenderName(), xml_rr.getData());
                 }
             }
         }
@@ -287,21 +290,85 @@ void SocketServer::handleRequest(int fd){
         closeConnection(fd);
         std::cout << "Returning" << std::endl;
         // Destroy
+   } /*else if(xml_r.getFunction() == "changeStatus"){
+
+        std::string statusmsg;
+        std::cout << "update for wemos: " << xml_r.getClientName() << '\n';
+        std::vector<float> tmp =  xml_r.getData();
+        std::cout << "data for wemos: " << tmp[0] << tmp[1] << std::endl;
+
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            if (wemosjes[i]->getClientName() == xml_r.getClientName())
+            {
+                statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r);
+                break;
+            }
+        }
+        std::cout << statusmsg << std::endl;
+        send(fd, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        //std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        // Close socket in case that the client is the website
+        if(xml_r.getSenderName() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+        return;
+    }*/
+
+    else if(xml_r.getFunction() == "changeStatusAan"){
+
+        std::string statusmsg;
+        int fd_tmp;
+
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
+            if (wemosjes[i]->getClientName() == xml_r.getClientName())
+            {
+                statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r,1);
+                fd_tmp = wemosjes[i]->getFD();
+
+                break;
+            }
+        }
+        std::cout << statusmsg << std::endl;
+        send(fd_tmp, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getSenderName() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+        return;
     }
-    return;
+    else if(xml_r.getFunction() == "changeStatusUit"){
+
+        std::string statusmsg;
+        int fd_tmp;
+        for (std::size_t i = 0; i < wemosjes.size(); i++){
+            std::cout << (wemosjes[i]->getClientName() == xml_r.getClientName()) << std::endl;
+            if (wemosjes[i]->getClientName() == xml_r.getClientName())
+            {
+                statusmsg = wemosjes[i]->handleWebsiteUpdate(&xml_r,0);
+                fd_tmp = wemosjes[i]->getFD();
+                break;
+            }
+        }
+        std::cout << statusmsg << std::endl;
+        send(fd_tmp, statusmsg.c_str(), strlen(statusmsg.c_str()), 0);
+        std::cout << "Reply to sensorUpdate sent" << std::endl;
+
+        /* Close socket in case that the client is the website */
+        if(xml_r.getSenderName() == "website"){
+            closeConnection(fd);
+        }
+        // Destroy
+        return;
+    }
+
 }
 
-/*void SocketServer::checkWemosTimers(){
-    time_t current;
-    time(&current);
-    for (int i = 0; i < timers.size(); i++)
-    {
-        if(current - timers[i].oldTime > timers[i].setting){
-            timers[i].device.
-        }
-    }
-
-}*/
 
 /* Returns a 1 if an error occurred */
 int SocketServer::authWemos(int fd, XmlReader& msg){

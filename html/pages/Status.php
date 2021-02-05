@@ -1,33 +1,15 @@
+<meta http-equiv="refresh" content="10" >
+
 <div class="main">
 <br>
 <?php
-    require "socket.php";
-    $devices;
-    if(initialiseSocket()) {
-        $devices = xmlParseDevices(requestAllSocket());
+    require "socket.php"; // voor de verbinding met de server.
+    $devices; // scoping
+    if(initialiseSocket()) { // test of initialisatie slaagt
+        $devices = xmlParseDevices(requestAllSocket()); // haalt alle data op en parsed het
+    } else {
+	       $devices = NULL;
     }
-    //require "xml.php";
-    /*$devices = xmlParseDevices("<message>
-            <header>
-                <sender>server</sender>
-                <receiver>website</receiver>
-            </header>
-            <function>answerToStatusRequest</function>
-            <context>
-                <wemosjes>
-                    <wemos>
-                        <name>UniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
-                        <type>stoel</type>
-                        <data1>0</data1>
-                    </wemos>
-                    <wemos>
-                        <name>AndereUniekeWemosNaamDieDeWemosOokGebruiktBijDeSenderInDeHeader</name>
-                        <type>lamp</type>
-                        <data1>1</data1>
-                    </wemos>
-                </wemosjes>
-            </context>
-    </message>");*/
 ?>
 <table class="">
     <thead>
@@ -63,11 +45,24 @@
 
 <?php
 for($i; $i >= 0; $i--) {
-    if(isset($_POST[$i])) {
-        echo "<br>Switching mode of ".$devices[$i]->type;
-        //stel er zou iets bij de server zitten kon ik hiervoor een echte actie kunnen sturen...
-        toggleDevice($devices[$i]->name, $devices[$i]->type, $devices[$i]->data1, if(isset($devices[$i]->data2)) {$devices[$i]->data2} else {NULL});
-        header("/?p=Status");
+    if(isset($_POST[$i])) { //checkt of er op een schakel knop gedrukt is.
+        echo "<br>Switching mode of ".$devices[$i]->type." from ".$devices[$i]->data1."&".$devices[$i]->data2;
+
+        // stuurt de vereiste data naar de server met een verzoek tot aanpassen
+	$d1 = 1;
+	if($devices[$i]->data1 == 1) {
+		$d1 = 0;
+	}
+	$d2 = NULL;
+	if($devices[$i]->data2 == 1) {
+		$d2 = 0;
+	} else if($devices[$i]->data2 == 0){
+		$d2 = 1;
+	}
+        toggleDevice($devices[$i]->name, $devices[$i]->type, $d1, $d2);
+
+        // herlaad de pagina.
+        //header("/?p=Status");
     }
 }
 

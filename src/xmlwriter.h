@@ -32,13 +32,13 @@ private:
     //Different function context builders
     void buildHeader();
     void buildAckContext();
-    void buildActuateContext(std::vector<double> &status);
+    void buildActuateContext(std::vector<float> &status);
     void buildStatusRequestContext();
 
 
 public:
     XmlWriter();
-    /* Type is the function that is sent in the final message, 
+    /* Type is the function that is sent in the final message,
     dest is the sendername from whence your message came*/
     XmlWriter(std::string type, std::string dest);
     XmlWriter(XmlReader &xml_r);
@@ -46,11 +46,11 @@ public:
     ~XmlWriter();
 
     void buildXMLAck();
-    void buildXMLActuate(std::vector<double> &status);
+    void buildXMLActuate(std::vector<float> &status);
     void buildXMLStatusRequest();
     void buildXMLAnswerToSR();
     void finalizeAnswerToSR();
-    void addDataToAnswer(std::string type, std::string clientName, std::vector<double> data);
+    void addDataToAnswer(std::string type, std::string clientName, std::vector<float> data);
     //Getters
     std::string getXML();
 };

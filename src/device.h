@@ -14,6 +14,8 @@ public:
     Wall(int fd, std::string clientName, std::string senderName);
     ~Wall();
     std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
+
 };
 
 
@@ -27,6 +29,8 @@ public:
     Door(int fd, std::string clientName, std::string senderName);
     ~Door();
     std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
+
 };
 
 
@@ -39,6 +43,8 @@ public:
     Column(int fd, std::string clientName, std::string senderName);
     ~Column();
     std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
+
 };
 
 
@@ -51,7 +57,9 @@ private:
 public:
     Bed(int fd, std::string clientName, std::string senderName);
     ~Bed();
-    std::string handleSensorUpdate(XmlReader *); 
+    std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
+
 };
 
 
@@ -63,6 +71,7 @@ public:
     TableLamp(int fd, std::string clientName, std::string senderName);
     ~TableLamp();
     std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
 };
 
 class Fridge : public Wemos{
@@ -73,18 +82,21 @@ public:
     Fridge(int fd, std::string clientName, std::string senderName);
     ~Fridge();
     std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
 
 };
 
 
 class Website : public Wemos{
 private:
-    
+
 
 public:
     Website(int fd, std::string clientName, std::string senderName);
     ~Website();
     std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
+
     //XmlReader* sendStatusRequest(fd_set* all_sockets);
 };
 
@@ -99,7 +111,8 @@ protected:
 public:
     Chair(int fd, std::string clientName, std::string senderName);
     ~Chair();
-    std::string handleSensorUpdate(XmlReader*);
+    std::string handleSensorUpdate(XmlReader *);
+    std::string handleWebsiteUpdate(XmlReader *,int);
     //XmlReader* sendStatusRequest(fd_set*);
 };
 
