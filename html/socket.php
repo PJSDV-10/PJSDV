@@ -94,7 +94,8 @@ function toggleDevice($name, $type, $data0, $data1) {
 	$out .= "<clientName>${name}</clientName>";
 	$out .= "<type>${type}</type>";
 	$out .= "<data1>${data0}</data1>";
-	if(isset($data1) && $data1 != NULL) {
+	if($type == "Column") {
+	} else {
 		$out .= "<data2>${data1}</data2>";
 	}
 	$out .= "</context>";
