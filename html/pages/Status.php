@@ -1,4 +1,4 @@
-<meta http-equiv="refresh" content="10" >
+<!--meta http-equiv="refresh" content="10" -->
 
 <div class="main">
 <br>
