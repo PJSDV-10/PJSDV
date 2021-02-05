@@ -10,6 +10,32 @@
     } else {
 	       $devices = NULL;
     }
+
+    $apparaten = array(
+        array("Column", "Push button: ", "Gas sensor: "),
+        array("Bed", "Push button: ", "Force sensor: "),
+        array("Chair", "Force sensor: ", "Push button: "),
+        array("Table-lamp", "PIR sensor: ", "Force sensor: ")
+    )
+    function onOrOff($data) {
+        if($data > 0) {
+            return "aan";
+        } else {
+            return "uit";
+        }
+    }
+    function getDevice($type, $dat1, $dat2) {
+        $returnString = "";
+        $index = 0;
+        for($apparaten as $app) {
+            if($type == $app) {
+                $returnString .= $apparaten[$index][0] . onOrOff($dat1) . "<br>";
+                $returnString .= $apparaten[$index][1] . onOrOff($dat2);
+            }
+            $index++;
+        }
+        return $returnString;
+    }
 ?>
 <table class="">
     <thead>
@@ -25,11 +51,7 @@
     foreach($devices as $device) {
         echo "<tr>";
         echo "<td>".$device->type."</td>";
-        $status = "off";
-        if($device->data1 > 0 && (!isset($device->data2) || $device->data2 > 0)) {
-            $status = "on";
-        }
-        echo "<td>".$status."</td>";
+                echo "<td>".getDevice($device->type, $device->data1, $device->data2)."</td>";
         if($status == "on") { $status = "turn off"; }
         else {$status = "turn on"; }
         echo "<td><form method=\"post\"><input type=\"submit\" name=\""
