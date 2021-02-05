@@ -8,8 +8,8 @@
     if(initialiseSocket()) { // test of initialisatie slaagt
         $devices = xmlParseDevices(requestAllSocket()); // haalt alle data op en parsed het
     } else {
-	$devices = NULL;
-    }    
+	       $devices = NULL;
+    }
 ?>
 <table class="">
     <thead>
@@ -46,23 +46,23 @@
 <?php
 for($i; $i >= 0; $i--) {
     if(isset($_POST[$i])) { //checkt of er op een schakel knop gedrukt is.
-        echo "<br>Switching mode of ".$devices[$i]->type;
+        echo "<br>Switching mode of ".$devices[$i]->type." from ".$devices[$i]->data1."&".$devices[$i]->data2;
 
         // stuurt de vereiste data naar de server met een verzoek tot aanpassen
-	$data1 = 1;
+	$d1 = 1;
 	if($devices[$i]->data1 == 1) {
-		$data1 = 0;
+		$d1 = 0;
 	}
-	$data2 = 1;
+	$d2 = 1;
 	if(isset($devices[$i]->data2)) {
 		if($devices[$i]->data2 == 1) {
-			$data2 = 0;
+			$d2 = 0;
 		}
 	} else {
-		$data2 = NULL;
+		$d2 = NULL;
 	}
-        toggleDevice($devices[$i]->name, $devices[$i]->type, $data1, $data2);
-	
+        toggleDevice($devices[$i]->name, $devices[$i]->type, $d1, $d2);
+
         // herlaad de pagina.
         //header("/?p=Status");
     }
