@@ -46,7 +46,7 @@
 int NUMBER_OF_STRING = 10;
 
 // authentication macros
-std::string wemosNaam = "chair";
+std::string wemosNaam = "chair1";
 std::string server = "Server";
 std::string wachtwoord = "solarwinds123";
 std::string type = "chair";
@@ -55,7 +55,7 @@ std::string type = "chair";
 
 const char *ssid = "PJSDV-10"; // ssid of the wifi
 const char *password = "PJSDV-10"; // password of the wifi
-const char *ip = "192.168.43.201"; // ip adress of the server
+const char *ip = "192.168.43.174"; // ip adress of the server
 
 
 // sensor globals
