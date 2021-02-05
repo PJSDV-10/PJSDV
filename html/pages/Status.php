@@ -52,7 +52,7 @@
         echo "<tr>";
         echo "<td>".$device->type."</td>";
                 echo "<td>".getDevice($device->type, $device->data1, $device->data2)."</td>";
-        if($status == "on") { $status = "turn off"; }
+        if($device->data1 > 0) { $status = "turn off"; }
         else {$status = "turn on"; }
         echo "<td><form method=\"post\"><input type=\"submit\" name=\""
             .$i."\" class=\"button\" value=\"".$status."\"/></form></td>";
